@@ -1,0 +1,159 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="light">
+<head>
+    <script async src="https://www.googletagmanager.com/gtag/js?id=G-R4Y4YXFHZS"></script>
+    <script>
+        window.dataLayer = window.dataLayer || [];
+
+        function gtag(){
+            dataLayer.push(arguments);
+        }
+
+        gtag('js', new Date());
+
+        gtag('config', 'G-R4Y4YXFHZS');
+    </script>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>How ut_metadata Completes Magnet Link Initialization - bittorrent</title>
+    <meta name="description" content="This article explains how the BitTorrent extension utmetadata works and why it is essential for starting downloads from magnet links. While traditional .torrent files contain full details about a download's file structure and data integrity, magnet links">
+    <link rel="canonical" href="https://salivity.github.io/bittorrent/article/how-ut-metadata-completes-magnet-link-initialization">
+    <link rel="icon" href="/bittorrent/favicon.ico">
+    <link rel="stylesheet" href="/bittorrent/css/style.css">
+    <link media="print" rel="stylesheet" href="/bittorrent/css/print.css">
+    <script src="/bittorrent/js/fuse.min.js"></script>
+    <script src="/bittorrent/js/script.js"></script>
+    <script id="MathJax-script" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/4.1.3/tex-chtml.min.js" defer></script>
+    <meta property="og:type" content="website" />
+    <meta property="og:title" content="How ut_metadata Completes Magnet Link Initialization - bittorrent" />
+    <meta property="og:url" content="https://salivity.github.io/bittorrent/article/how-ut-metadata-completes-magnet-link-initialization" />
+    <meta property="og:image:url" content="https://salivity.github.io/bittorrent/images/open-graph/default.webp" />
+    <meta property="og:image:secure_url" content="https://salivity.github.io/bittorrent/images/open-graph/default.webp" />
+    <meta property="og:image:width" content="1120" />
+    <meta property="og:image:height" content="630" />
+    <meta property="og:description" content="This article explains how the BitTorrent extension utmetadata works and why it is essential for starting downloads from magnet links. While traditional .torrent files contain full details about a download's file structure and data integrity, magnet links" />
+    <link rel="manifest" href="/bittorrent/pwa/manifest.json" />
+</head>
+<body>
+    <header>
+        <a href="/bittorrent/" aria-label="Go To Home Page" title="Go To Home Page" id="logo">
+            <span>salivity.github.io/</span><span>bittorrent</span>
+        </a>
+        <nav>
+            <ul class="header-links">
+                <li><a href="https://github.com/salivity" title="Github" aria-label="Go To Github Profile Page"><svg class="svg-icon" focusable="false" aria-hidden="true" viewBox="0 0 24 24"><path d="M12 1.27a11 11 0 00-3.48 21.46c.55.09.73-.28.73-.55v-1.84c-3.03.64-3.67-1.46-3.67-1.46-.55-1.29-1.28-1.65-1.28-1.65-.92-.65.1-.65.1-.65 1.1 0 1.73 1.1 1.73 1.1.92 1.65 2.57 1.2 3.21.92a2 2 0 01.64-1.47c-2.47-.27-5.04-1.19-5.04-5.5 0-1.1.46-2.1 1.2-2.84a3.76 3.76 0 010-2.93s.91-.28 3.11 1.1c1.8-.49 3.7-.49 5.5 0 2.1-1.38 3.02-1.1 3.02-1.1a3.76 3.76 0 010 2.93c.83.74 1.2 1.74 1.2 2.94 0 4.21-2.57 5.13-5.04 5.4.45.37.82.92.82 2.02v3.03c0 .27.1.64.73.55A11 11 0 0012 1.27"></path></svg></a></li>
+                <li><a href="/bittorrent/search" title="Search" aria-label="Go To Search Page"><svg class="svg-icon" aria-hidden="true" focusable="false" viewBox="0 0 24 24"><path d="M15.5 14h-.79l-.28-.27C15.41 12.59 16 11.11 16 9.5 16 5.91 13.09 3 9.5 3S3 5.91 3 9.5 5.91 16 9.5 16c1.61 0 3.09-.59 4.23-1.57l.27.28v.79l5 4.99L20.49 19zm-6 0C7.01 14 5 11.99 5 9.5S7.01 5 9.5 5 14 7.01 14 9.5 11.99 14 9.5 14"></path></svg></a></li>
+                <li><a id="theme-toggle" title="Theme" href="javascript:void(0);" aria-label="Toggle Website Theme"></a></li>
+            </ul>
+        </nav>
+    </header>
+    <main>
+        <article><h1 id="how-ut_metadata-completes-magnet-link-initialization">How
+ut_metadata Completes Magnet Link Initialization</h1>
+<p>This article explains how the BitTorrent extension
+<code>ut_metadata</code> works and why it is essential for starting
+downloads from magnet links. While traditional <code>.torrent</code>
+files contain full details about a download's file structure and data
+integrity, magnet links only provide an identification hash. Through
+<code>ut_metadata</code>, BitTorrent clients fetch the missing torrent
+file data directly from other peers in the swarm, validating the payload
+and enabling the regular file download process to begin.</p>
+<h3 id="the-magnet-link-dilemma">The Magnet Link Dilemma</h3>
+<p>A traditional <code>.torrent</code> file contains the complete "info
+dictionary," which details the file names, file sizes, piece lengths,
+and cryptographic hashes of every individual data piece.</p>
+<p>In contrast, a magnet link is essentially a URI that contains:</p>
+<ul>
+<li>The cryptographic info hash (BTIH) of the target data.</li>
+<li>Optional display names.</li>
+<li>Optional tracker URLs.</li>
+</ul>
+<p>Because a magnet link lacks the info dictionary, a BitTorrent client
+cannot immediately start downloading the actual content. It does not
+know what files are being downloaded, how many pieces exist, or how to
+verify the validity of received data blocks.</p>
+<h3 id="what-is-ut_metadata">What is <code>ut_metadata</code>?</h3>
+<p>Metadata exchange, formalized as <strong>BEP 9</strong> (BitTorrent
+Extension Protocol 9), defines a standardized method for peers to
+transfer the info dictionary to one another. It relies on the extension
+protocol framework (<strong>BEP 10</strong>), which allows BitTorrent
+clients to negotiate custom capabilities.</p>
+<p>The extension identifier <code>ut_metadata</code> (originally
+developed for μTorrent) designates that a client supports sending and
+receiving raw metadata pieces over an active peer-to-peer
+connection.</p>
+<h3 id="how-ut_metadata-initializes-a-magnet-link">How
+<code>ut_metadata</code> Initializes a Magnet Link</h3>
+<p>The initialization workflow transforms an incomplete magnet link into
+an active, verified download through five distinct steps:</p>
+<h4 id="1-peer-discovery">1. Peer Discovery</h4>
+<p>Using the info hash from the magnet link, the client queries
+trackers, the Distributed Hash Table (DHT), and Peer Exchange (PEX) to
+discover peers who are participating in the corresponding swarm.</p>
+<h4 id="2-extension-handshake-bep-10">2. Extension Handshake (BEP
+10)</h4>
+<p>Upon establishing a TCP or uTP connection with a peer, both clients
+exchange standard BitTorrent handshakes followed by an extended
+handshake message. In this message, each peer advertises the extensions
+they support:</p>
+<ul>
+<li>The client indicates support for <code>ut_metadata</code>.</li>
+<li>The peer confirms its support and specifies the ID number it uses
+for <code>ut_metadata</code> messages, as well as the total size (in
+bytes) of the metadata.</li>
+</ul>
+<h4 id="3-requesting-metadata-blocks-bep-9">3. Requesting Metadata
+Blocks (BEP 9)</h4>
+<p>Once the client learns the metadata size from the peer, it divides
+the metadata into 16 KiB (16,384 bytes) chunks. The client sends
+<code>ut_metadata</code> request messages asking the connected peer for
+each specific chunk.</p>
+<h4 id="4-verification-against-the-info-hash">4. Verification Against
+the Info Hash</h4>
+<p>After downloading all individual metadata chunks, the client
+reassembles the complete info dictionary. The client then computes the
+cryptographic hash (SHA-1 for BitTorrent v1 or SHA-256 for BitTorrent
+v2) of this assembled data and compares it directly to the info hash
+extracted from the original magnet link.</p>
+<ul>
+<li>If the hashes match, the metadata is proven authentic and
+untampered.</li>
+<li>If the hashes do not match, the downloaded metadata is discarded,
+and the client attempts to fetch it from other peers.</li>
+</ul>
+<h4 id="5-transition-to-content-transfer">5. Transition to Content
+Transfer</h4>
+<p>Once verification succeeds, initialization is complete. The client
+loads the file paths, verifies disk space, allocates files, and
+generates the list of piece hashes. The client then exits metadata
+retrieval mode and begins requesting actual file payload blocks from the
+swarm like a standard BitTorrent download.</p></article>
+        <div id=comments-container></div>
+
+        <script>
+            const utterancesScript = document.createElement('script');
+            
+            utterancesScript.setAttribute('src', 'https://utteranc.es/client.js');
+            utterancesScript.setAttribute('repo', 'salivity/bittorrent'); 
+            utterancesScript.setAttribute('issue-term', 'pathname'); 
+            utterancesScript.setAttribute('theme', localStorage.getItem('theme') === 'dark' ? 'github-dark' : 'github-light'); 
+            utterancesScript.setAttribute('crossorigin', 'anonymous');
+            utterancesScript.async = true;
+
+            document.getElementById('comments-container').appendChild(utterancesScript);
+        </script>
+    
+    </main>
+    <footer>
+        <nav>
+            <ul class="footer-links">
+                <li><a href="/bittorrent/privacy-policy">Privacy Policy</a></li>
+                <li><a href="/bittorrent/terms-and-conditions">Terms and Conditions</a></li>
+            </ul>
+        </nav>
+        <div class="copyright">
+            Copyright &copy; <span id="current-year"></span>
+        </div>
+    </footer>
+</body>
+</html>

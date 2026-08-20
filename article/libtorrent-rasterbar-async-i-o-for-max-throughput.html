@@ -1,0 +1,173 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="light">
+<head>
+    <script async src="https://www.googletagmanager.com/gtag/js?id=G-R4Y4YXFHZS"></script>
+    <script>
+        window.dataLayer = window.dataLayer || [];
+
+        function gtag(){
+            dataLayer.push(arguments);
+        }
+
+        gtag('js', new Date());
+
+        gtag('config', 'G-R4Y4YXFHZS');
+    </script>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Libtorrent-rasterbar Async I/O for Max Throughput - bittorrent</title>
+    <meta name="description" content="Libtorrent-rasterbar achieves industry-leading BitTorrent throughput by employing an entirely asynchronous, event-driven I/O architecture. This article explains how the library separates network operations from disk storage using Boost.Asio, implements m">
+    <link rel="canonical" href="https://salivity.github.io/bittorrent/article/libtorrent-rasterbar-async-i-o-for-max-throughput">
+    <link rel="icon" href="/bittorrent/favicon.ico">
+    <link rel="stylesheet" href="/bittorrent/css/style.css">
+    <link media="print" rel="stylesheet" href="/bittorrent/css/print.css">
+    <script src="/bittorrent/js/fuse.min.js"></script>
+    <script src="/bittorrent/js/script.js"></script>
+    <script id="MathJax-script" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/4.1.3/tex-chtml.min.js" defer></script>
+    <meta property="og:type" content="website" />
+    <meta property="og:title" content="Libtorrent-rasterbar Async I/O for Max Throughput - bittorrent" />
+    <meta property="og:url" content="https://salivity.github.io/bittorrent/article/libtorrent-rasterbar-async-i-o-for-max-throughput" />
+    <meta property="og:image:url" content="https://salivity.github.io/bittorrent/images/open-graph/default.webp" />
+    <meta property="og:image:secure_url" content="https://salivity.github.io/bittorrent/images/open-graph/default.webp" />
+    <meta property="og:image:width" content="1120" />
+    <meta property="og:image:height" content="630" />
+    <meta property="og:description" content="Libtorrent-rasterbar achieves industry-leading BitTorrent throughput by employing an entirely asynchronous, event-driven I/O architecture. This article explains how the library separates network operations from disk storage using Boost.Asio, implements m" />
+    <link rel="manifest" href="/bittorrent/pwa/manifest.json" />
+</head>
+<body>
+    <header>
+        <a href="/bittorrent/" aria-label="Go To Home Page" title="Go To Home Page" id="logo">
+            <span>salivity.github.io/</span><span>bittorrent</span>
+        </a>
+        <nav>
+            <ul class="header-links">
+                <li><a href="https://github.com/salivity" title="Github" aria-label="Go To Github Profile Page"><svg class="svg-icon" focusable="false" aria-hidden="true" viewBox="0 0 24 24"><path d="M12 1.27a11 11 0 00-3.48 21.46c.55.09.73-.28.73-.55v-1.84c-3.03.64-3.67-1.46-3.67-1.46-.55-1.29-1.28-1.65-1.28-1.65-.92-.65.1-.65.1-.65 1.1 0 1.73 1.1 1.73 1.1.92 1.65 2.57 1.2 3.21.92a2 2 0 01.64-1.47c-2.47-.27-5.04-1.19-5.04-5.5 0-1.1.46-2.1 1.2-2.84a3.76 3.76 0 010-2.93s.91-.28 3.11 1.1c1.8-.49 3.7-.49 5.5 0 2.1-1.38 3.02-1.1 3.02-1.1a3.76 3.76 0 010 2.93c.83.74 1.2 1.74 1.2 2.94 0 4.21-2.57 5.13-5.04 5.4.45.37.82.92.82 2.02v3.03c0 .27.1.64.73.55A11 11 0 0012 1.27"></path></svg></a></li>
+                <li><a href="/bittorrent/search" title="Search" aria-label="Go To Search Page"><svg class="svg-icon" aria-hidden="true" focusable="false" viewBox="0 0 24 24"><path d="M15.5 14h-.79l-.28-.27C15.41 12.59 16 11.11 16 9.5 16 5.91 13.09 3 9.5 3S3 5.91 3 9.5 5.91 16 9.5 16c1.61 0 3.09-.59 4.23-1.57l.27.28v.79l5 4.99L20.49 19zm-6 0C7.01 14 5 11.99 5 9.5S7.01 5 9.5 5 14 7.01 14 9.5 11.99 14 9.5 14"></path></svg></a></li>
+                <li><a id="theme-toggle" title="Theme" href="javascript:void(0);" aria-label="Toggle Website Theme"></a></li>
+            </ul>
+        </nav>
+    </header>
+    <main>
+        <article><h1
+id="libtorrent-rasterbar-async-io-for-max-throughput">Libtorrent-rasterbar
+Async I/O for Max Throughput</h1>
+<p>Libtorrent-rasterbar achieves industry-leading BitTorrent throughput
+by employing an entirely asynchronous, event-driven I/O architecture.
+This article explains how the library separates network operations from
+disk storage using Boost.Asio, implements multi-threaded disk
+subsystems, utilizes zero-copy buffer pools, and optimizes socket
+pipelines to sustain tens of thousands of concurrent connections without
+blocking execution.</p>
+<h2 id="boostasio-and-the-proactor-event-loop">Boost.Asio and the
+Proactor Event Loop</h2>
+<p>At the core of libtorrent's networking layer is Boost.Asio, a
+cross-platform C++ library for network and low-level I/O programming.
+Libtorrent uses Asio to implement the Proactor design pattern, which
+offloads asynchronous operations to the operating system's native
+demultiplexing mechanisms:</p>
+<ul>
+<li><strong>Linux:</strong> <code>epoll</code></li>
+<li><strong>macOS and BSD:</strong> <code>kqueue</code></li>
+<li><strong>Windows:</strong> I/O Completion Ports
+(<code>IOCP</code>)</li>
+</ul>
+<p>Instead of dedicating a thread per connection or constantly polling
+sockets, libtorrent dispatches asynchronous read and write requests to
+the operating system. The main network thread handles completed events
+via non-blocking callbacks. This design allows a single thread to
+maintain thousands of active peer connections with minimal CPU overhead
+and context-switching costs.</p>
+<h2 id="decoupling-network-io-from-disk-io">Decoupling Network I/O from
+Disk I/O</h2>
+<p>Disk drives and solid-state storage have significantly higher latency
+and variance than in-memory network queues. If network sockets wait for
+physical disk reads or writes, throughput drops instantly.</p>
+<p>Libtorrent solves this by fully isolating the network layer from the
+disk subsystem:</p>
+<ol type="1">
+<li><strong>Dedicated Disk Threads:</strong> Disk operations (reading
+piece blocks, verifying SHA-1/SHA-256 hashes, writing incoming data, and
+allocating files) are executed on independent background threads.</li>
+<li><strong>Job Queues:</strong> When a complete 16 KiB block arrives
+from the network, the network thread posts a write job to the disk queue
+and immediately resumes reading from sockets.</li>
+<li><strong>Completion Callbacks:</strong> When a read or write job
+finishes on the disk thread, an asynchronous notification is posted back
+to the network thread's event loop, triggering peer responses or unchoke
+logic.</li>
+</ol>
+<h2 id="buffer-management-and-memory-allocation">Buffer Management and
+Memory Allocation</h2>
+<p>Memory allocation overhead can become a major bottleneck under high
+transfer rates. Libtorrent avoids dynamic heap allocations during
+high-frequency I/O operations through custom memory management:</p>
+<ul>
+<li><strong>Pre-allocated Block Pools:</strong> The library manages
+custom pool allocators for standard 16 KiB BitTorrent disk blocks.
+Memory buffers are recycled continuously, reducing fragmentation and
+eliminating standard <code>malloc</code>/<code>free</code> locks.</li>
+<li><strong>Zero-Copy Pipelines:</strong> Where the operating system and
+socket architecture permit, data passes directly from network receive
+buffers into disk-bound storage blocks, minimizing memory-to-memory
+copies across system boundaries.</li>
+</ul>
+<h2 id="disk-caching-and-write-coalescing">Disk Caching and Write
+Coalescing</h2>
+<p>To maximize storage throughput and prevent disk queue saturation,
+libtorrent implements an internal asynchronous disk cache:</p>
+<ul>
+<li><strong>Write Coalescing:</strong> Incoming contiguous blocks are
+aggregated in RAM before being flushed to disk in larger sequential
+chunks. This reduces filesystem fragmentation and optimizes transfer
+rates for mechanical hard drives.</li>
+<li><strong>Read-Ahead Caching:</strong> When peers request sequential
+piece data, libtorrent reads larger continuous segments into cache
+proactively, satisfying subsequent requests entirely from memory.</li>
+<li><strong>Hash Check Pipelining:</strong> Piece hashing is combined
+with read/write operations whenever possible, ensuring data already
+loaded in the CPU cache is verified without re-reading it from
+storage.</li>
+</ul>
+<h2 id="transport-level-optimizations-tcp-and-utp">Transport-Level
+Optimizations (TCP and uTP)</h2>
+<p>Libtorrent's asynchronous architecture handles both standard TCP and
+Micro Transport Protocol (uTP) through unified asynchronous
+wrappers:</p>
+<ul>
+<li><strong>Dynamic Socket Buffers:</strong> The library dynamically
+sizes OS send and receive buffers to match the calculated
+bandwidth-delay product (BDP).</li>
+<li><strong>User-Space Rate Limiting:</strong> Bandwidth limiters
+throttle asynchronous read and write dispatch rates at the application
+level, avoiding bufferbloat while ensuring connections remain saturated
+up to configured ceilings.</li>
+</ul></article>
+        <div id=comments-container></div>
+
+        <script>
+            const utterancesScript = document.createElement('script');
+            
+            utterancesScript.setAttribute('src', 'https://utteranc.es/client.js');
+            utterancesScript.setAttribute('repo', 'salivity/bittorrent'); 
+            utterancesScript.setAttribute('issue-term', 'pathname'); 
+            utterancesScript.setAttribute('theme', localStorage.getItem('theme') === 'dark' ? 'github-dark' : 'github-light'); 
+            utterancesScript.setAttribute('crossorigin', 'anonymous');
+            utterancesScript.async = true;
+
+            document.getElementById('comments-container').appendChild(utterancesScript);
+        </script>
+    
+    </main>
+    <footer>
+        <nav>
+            <ul class="footer-links">
+                <li><a href="/bittorrent/privacy-policy">Privacy Policy</a></li>
+                <li><a href="/bittorrent/terms-and-conditions">Terms and Conditions</a></li>
+            </ul>
+        </nav>
+        <div class="copyright">
+            Copyright &copy; <span id="current-year"></span>
+        </div>
+    </footer>
+</body>
+</html>

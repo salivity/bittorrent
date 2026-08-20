@@ -1,0 +1,169 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="light">
+<head>
+    <script async src="https://www.googletagmanager.com/gtag/js?id=G-R4Y4YXFHZS"></script>
+    <script>
+        window.dataLayer = window.dataLayer || [];
+
+        function gtag(){
+            dataLayer.push(arguments);
+        }
+
+        gtag('js', new Date());
+
+        gtag('config', 'G-R4Y4YXFHZS');
+    </script>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>How Multi-Homed Systems Route Torrent Traffic - bittorrent</title>
+    <meta name="description" content="A multi-homed system—a computer connected to multiple networks simultaneously via separate network interface cards (NICs)—selects its outgoing network path for BitTorrent traffic through a combination of operating system routing tables, metric priori">
+    <link rel="canonical" href="https://salivity.github.io/bittorrent/article/how-multi-homed-systems-route-torrent-traffic">
+    <link rel="icon" href="/bittorrent/favicon.ico">
+    <link rel="stylesheet" href="/bittorrent/css/style.css">
+    <link media="print" rel="stylesheet" href="/bittorrent/css/print.css">
+    <script src="/bittorrent/js/fuse.min.js"></script>
+    <script src="/bittorrent/js/script.js"></script>
+    <script id="MathJax-script" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/4.1.3/tex-chtml.min.js" defer></script>
+    <meta property="og:type" content="website" />
+    <meta property="og:title" content="How Multi-Homed Systems Route Torrent Traffic - bittorrent" />
+    <meta property="og:url" content="https://salivity.github.io/bittorrent/article/how-multi-homed-systems-route-torrent-traffic" />
+    <meta property="og:image:url" content="https://salivity.github.io/bittorrent/images/open-graph/default.webp" />
+    <meta property="og:image:secure_url" content="https://salivity.github.io/bittorrent/images/open-graph/default.webp" />
+    <meta property="og:image:width" content="1120" />
+    <meta property="og:image:height" content="630" />
+    <meta property="og:description" content="A multi-homed system—a computer connected to multiple networks simultaneously via separate network interface cards (NICs)—selects its outgoing network path for BitTorrent traffic through a combination of operating system routing tables, metric priori" />
+    <link rel="manifest" href="/bittorrent/pwa/manifest.json" />
+</head>
+<body>
+    <header>
+        <a href="/bittorrent/" aria-label="Go To Home Page" title="Go To Home Page" id="logo">
+            <span>salivity.github.io/</span><span>bittorrent</span>
+        </a>
+        <nav>
+            <ul class="header-links">
+                <li><a href="https://github.com/salivity" title="Github" aria-label="Go To Github Profile Page"><svg class="svg-icon" focusable="false" aria-hidden="true" viewBox="0 0 24 24"><path d="M12 1.27a11 11 0 00-3.48 21.46c.55.09.73-.28.73-.55v-1.84c-3.03.64-3.67-1.46-3.67-1.46-.55-1.29-1.28-1.65-1.28-1.65-.92-.65.1-.65.1-.65 1.1 0 1.73 1.1 1.73 1.1.92 1.65 2.57 1.2 3.21.92a2 2 0 01.64-1.47c-2.47-.27-5.04-1.19-5.04-5.5 0-1.1.46-2.1 1.2-2.84a3.76 3.76 0 010-2.93s.91-.28 3.11 1.1c1.8-.49 3.7-.49 5.5 0 2.1-1.38 3.02-1.1 3.02-1.1a3.76 3.76 0 010 2.93c.83.74 1.2 1.74 1.2 2.94 0 4.21-2.57 5.13-5.04 5.4.45.37.82.92.82 2.02v3.03c0 .27.1.64.73.55A11 11 0 0012 1.27"></path></svg></a></li>
+                <li><a href="/bittorrent/search" title="Search" aria-label="Go To Search Page"><svg class="svg-icon" aria-hidden="true" focusable="false" viewBox="0 0 24 24"><path d="M15.5 14h-.79l-.28-.27C15.41 12.59 16 11.11 16 9.5 16 5.91 13.09 3 9.5 3S3 5.91 3 9.5 5.91 16 9.5 16c1.61 0 3.09-.59 4.23-1.57l.27.28v.79l5 4.99L20.49 19zm-6 0C7.01 14 5 11.99 5 9.5S7.01 5 9.5 5 14 7.01 14 9.5 11.99 14 9.5 14"></path></svg></a></li>
+                <li><a id="theme-toggle" title="Theme" href="javascript:void(0);" aria-label="Toggle Website Theme"></a></li>
+            </ul>
+        </nav>
+    </header>
+    <main>
+        <article><h1 id="how-multi-homed-systems-route-torrent-traffic">How Multi-Homed
+Systems Route Torrent Traffic</h1>
+<p>A multi-homed system—a computer connected to multiple networks
+simultaneously via separate network interface cards (NICs)—selects its
+outgoing network path for BitTorrent traffic through a combination of
+operating system routing tables, metric prioritization, socket binding,
+and application-level configuration. While the operating system
+generally dictates default network paths based on route metrics,
+BitTorrent clients have the unique ability to explicitly bind to
+specific interfaces, overriding standard routing behaviors to control,
+isolate, or balance outgoing peer-to-peer data streams.</p>
+<h3 id="1-default-operating-system-routing-and-metrics">1. Default
+Operating System Routing and Metrics</h3>
+<p>By default, if a BitTorrent client is not configured to use a
+specific network adapter, the operating system's kernel routing table
+determines the interface for every outgoing packet.</p>
+<ul>
+<li><strong>Routing Table Lookup:</strong> When the client initiates a
+connection to a remote peer’s IP address, the OS checks its routing
+table to find a matching route.</li>
+<li><strong>Interface Metrics:</strong> If multiple default gateways
+exist (e.g., Ethernet and Wi-Fi both connected to the internet), the OS
+selects the interface with the lowest metric. A lower metric indicates a
+higher priority, typically assigned automatically based on link speed
+and reliability.</li>
+<li><strong>Host Models:</strong> Operating systems handle multi-homing
+via specific host models:
+<ul>
+<li><strong>Weak Host Model (Windows default):</strong> Outgoing packets
+are sent through the interface with the best route to the destination,
+regardless of which IP address the application bound to.</li>
+<li><strong>Strong Host Model (Linux default):</strong> Packets will
+only be sent through an interface if the source IP matches that specific
+interface's assigned address.</li>
+</ul></li>
+</ul>
+<h3 id="2-application-level-interface-binding">2. Application-Level
+Interface Binding</h3>
+<p>BitTorrent applications (such as qBittorrent, Transmission, or
+Deluge) often allow users to explicitly choose which network interface
+to use, bypassing the system's default route selection.</p>
+<ul>
+<li><strong>Socket Binding (<code>bind</code> System Call):</strong>
+When an application creates a network socket, it can bind that socket to
+a specific local IP address or network interface name (e.g.,
+<code>eth0</code>, <code>tun0</code> for a VPN, or
+<code>wlan0</code>).</li>
+<li><strong>Linux <code>SO_BINDTODEVICE</code>:</strong> On Linux,
+clients can use the <code>SO_BINDTODEVICE</code> socket option to force
+all outgoing packets on that socket to physically exit through a
+designated network interface, completely bypassing standard routing
+table destination checks.</li>
+<li><strong>Windows IP Binding:</strong> On Windows, clients bind to the
+specific local IP address assigned to an adapter. The Windows networking
+stack then sends packets associated with that source IP through the
+corresponding interface.</li>
+</ul>
+<h3 id="3-vpns-and-virtual-interfaces">3. VPNs and Virtual
+Interfaces</h3>
+<p>Many multi-homed systems utilize virtual network adapters created by
+VPN software alongside physical Ethernet or Wi-Fi adapters.</p>
+<ul>
+<li><strong>Default Route Takeover:</strong> When a VPN connects, it
+typically inserts a new default route (<code>0.0.0.0/0</code>) into the
+routing table with a lower metric than the physical adapters, causing
+all unassigned torrent traffic to route through the encrypted
+tunnel.</li>
+<li><strong>Kill Switch Mechanics:</strong> Advanced torrent clients can
+bind exclusively to the VPN's virtual interface. If the VPN disconnects
+and the interface disappears, the application fails to bind sockets,
+immediately halting outgoing torrent traffic to prevent IP leaks onto
+the physical network.</li>
+</ul>
+<h3 id="4-advanced-policy-based-routing-pbr">4. Advanced Policy-Based
+Routing (PBR)</h3>
+<p>In complex multi-homed environments, administrators use policy-based
+routing to direct torrent traffic based on criteria other than
+destination IP:</p>
+<ul>
+<li><strong>Port-Based Routing:</strong> Routers or OS firewalls (such
+as <code>iptables</code>/<code>nftables</code> on Linux) can mark
+outgoing packets originating from specific BitTorrent listening ports
+and direct them to secondary routing tables associated with alternate
+WAN interfaces.</li>
+<li><strong>User/Group Routing:</strong> Multi-user systems can route
+all traffic generated by a dedicated user account (e.g., a
+<code>torrent</code> system user) directly through a designated network
+interface while keeping general system traffic on the primary
+connection.</li>
+</ul></article>
+        <div id=comments-container></div>
+
+        <script>
+            const utterancesScript = document.createElement('script');
+            
+            utterancesScript.setAttribute('src', 'https://utteranc.es/client.js');
+            utterancesScript.setAttribute('repo', 'salivity/bittorrent'); 
+            utterancesScript.setAttribute('issue-term', 'pathname'); 
+            utterancesScript.setAttribute('theme', localStorage.getItem('theme') === 'dark' ? 'github-dark' : 'github-light'); 
+            utterancesScript.setAttribute('crossorigin', 'anonymous');
+            utterancesScript.async = true;
+
+            document.getElementById('comments-container').appendChild(utterancesScript);
+        </script>
+    
+    </main>
+    <footer>
+        <nav>
+            <ul class="footer-links">
+                <li><a href="/bittorrent/privacy-policy">Privacy Policy</a></li>
+                <li><a href="/bittorrent/terms-and-conditions">Terms and Conditions</a></li>
+            </ul>
+        </nav>
+        <div class="copyright">
+            Copyright &copy; <span id="current-year"></span>
+        </div>
+    </footer>
+</body>
+</html>

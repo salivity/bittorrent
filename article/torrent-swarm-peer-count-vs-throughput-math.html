@@ -1,0 +1,186 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="light">
+<head>
+    <script async src="https://www.googletagmanager.com/gtag/js?id=G-R4Y4YXFHZS"></script>
+    <script>
+        window.dataLayer = window.dataLayer || [];
+
+        function gtag(){
+            dataLayer.push(arguments);
+        }
+
+        gtag('js', new Date());
+
+        gtag('config', 'G-R4Y4YXFHZS');
+    </script>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Torrent Swarm Peer Count vs Throughput Math - bittorrent</title>
+    <meta name="description" content="This article explores the mathematical relationship between the number of peers in a BitTorrent swarm and the network's total aggregate throughput. In peer-to-peer (P2P) systems, unlike traditional client-server architectures, aggregate download capacity">
+    <link rel="canonical" href="https://salivity.github.io/bittorrent/article/torrent-swarm-peer-count-vs-throughput-math">
+    <link rel="icon" href="/bittorrent/favicon.ico">
+    <link rel="stylesheet" href="/bittorrent/css/style.css">
+    <link media="print" rel="stylesheet" href="/bittorrent/css/print.css">
+    <script src="/bittorrent/js/fuse.min.js"></script>
+    <script src="/bittorrent/js/script.js"></script>
+    <script id="MathJax-script" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/4.1.3/tex-chtml.min.js" defer></script>
+    <meta property="og:type" content="website" />
+    <meta property="og:title" content="Torrent Swarm Peer Count vs Throughput Math - bittorrent" />
+    <meta property="og:url" content="https://salivity.github.io/bittorrent/article/torrent-swarm-peer-count-vs-throughput-math" />
+    <meta property="og:image:url" content="https://salivity.github.io/bittorrent/images/open-graph/default.webp" />
+    <meta property="og:image:secure_url" content="https://salivity.github.io/bittorrent/images/open-graph/default.webp" />
+    <meta property="og:image:width" content="1120" />
+    <meta property="og:image:height" content="630" />
+    <meta property="og:description" content="This article explores the mathematical relationship between the number of peers in a BitTorrent swarm and the network's total aggregate throughput. In peer-to-peer (P2P) systems, unlike traditional client-server architectures, aggregate download capacity" />
+    <link rel="manifest" href="/bittorrent/pwa/manifest.json" />
+</head>
+<body>
+    <header>
+        <a href="/bittorrent/" aria-label="Go To Home Page" title="Go To Home Page" id="logo">
+            <span>salivity.github.io/</span><span>bittorrent</span>
+        </a>
+        <nav>
+            <ul class="header-links">
+                <li><a href="https://github.com/salivity" title="Github" aria-label="Go To Github Profile Page"><svg class="svg-icon" focusable="false" aria-hidden="true" viewBox="0 0 24 24"><path d="M12 1.27a11 11 0 00-3.48 21.46c.55.09.73-.28.73-.55v-1.84c-3.03.64-3.67-1.46-3.67-1.46-.55-1.29-1.28-1.65-1.28-1.65-.92-.65.1-.65.1-.65 1.1 0 1.73 1.1 1.73 1.1.92 1.65 2.57 1.2 3.21.92a2 2 0 01.64-1.47c-2.47-.27-5.04-1.19-5.04-5.5 0-1.1.46-2.1 1.2-2.84a3.76 3.76 0 010-2.93s.91-.28 3.11 1.1c1.8-.49 3.7-.49 5.5 0 2.1-1.38 3.02-1.1 3.02-1.1a3.76 3.76 0 010 2.93c.83.74 1.2 1.74 1.2 2.94 0 4.21-2.57 5.13-5.04 5.4.45.37.82.92.82 2.02v3.03c0 .27.1.64.73.55A11 11 0 0012 1.27"></path></svg></a></li>
+                <li><a href="/bittorrent/search" title="Search" aria-label="Go To Search Page"><svg class="svg-icon" aria-hidden="true" focusable="false" viewBox="0 0 24 24"><path d="M15.5 14h-.79l-.28-.27C15.41 12.59 16 11.11 16 9.5 16 5.91 13.09 3 9.5 3S3 5.91 3 9.5 5.91 16 9.5 16c1.61 0 3.09-.59 4.23-1.57l.27.28v.79l5 4.99L20.49 19zm-6 0C7.01 14 5 11.99 5 9.5S7.01 5 9.5 5 14 7.01 14 9.5 11.99 14 9.5 14"></path></svg></a></li>
+                <li><a id="theme-toggle" title="Theme" href="javascript:void(0);" aria-label="Toggle Website Theme"></a></li>
+            </ul>
+        </nav>
+    </header>
+    <main>
+        <article><h1 id="torrent-swarm-peer-count-vs-throughput-math">Torrent Swarm Peer
+Count vs Throughput Math</h1>
+<p>This article explores the mathematical relationship between the
+number of peers in a BitTorrent swarm and the network's total aggregate
+throughput. In peer-to-peer (P2P) systems, unlike traditional
+client-server architectures, aggregate download capacity scales
+cooperatively with the number of participants. By examining fluid
+models, upload and download capacity bounds, and protocol overhead, we
+can quantify how total throughput evolves as a swarm grows from a few
+clients to thousands of peers.</p>
+<h3 id="the-fundamental-fluid-model">The Fundamental Fluid Model</h3>
+<p>The baseline relationship between peer population and swarm
+throughput is modeled using fluid traffic theory, originally formalized
+by Qiu and Srikant.</p>
+<p>A swarm consists of two classes of nodes:</p>
+<ul>
+<li><strong>Seeders (<span class="math inline">\(S\)</span>):</strong>
+Peers possessing the complete file, contributing only upload
+capacity.</li>
+<li><strong>Leechers (<span class="math inline">\(L\)</span>):</strong>
+Peers actively downloading and uploading pieces simultaneously.</li>
+<li><strong>Total Peers (<span
+class="math inline">\(N\)</span>):</strong> <span
+class="math inline">\(N = S + L\)</span></li>
+</ul>
+<p>Let:</p>
+<ul>
+<li><span class="math inline">\(\mu_s =\)</span> average upload
+bandwidth of seeders</li>
+<li><span class="math inline">\(\mu_l =\)</span> average upload
+bandwidth of leechers</li>
+<li><span class="math inline">\(d =\)</span> average download bandwidth
+of leechers</li>
+</ul>
+<p>The theoretical maximum aggregate throughput (<span
+class="math inline">\(T\)</span>) of the entire swarm is limited by the
+minimum between the total available upload capacity and the total
+available download capacity:</p>
+<p><span class="math display">\[T = \min\left( L \cdot d, \; S \cdot
+\mu_s + \eta \cdot L \cdot \mu_l \right)\]</span></p>
+<p>Where <span class="math inline">\(\eta \in [0, 1]\)</span> represents
+the piece-sharing efficiency of leechers (the probability that a leecher
+holds a piece another leecher needs).</p>
+<h3 id="linear-scaling-in-upload-constrained-networks">Linear Scaling in
+Upload-Constrained Networks</h3>
+<p>In standard residential broadband environments, asymmetric
+connections (such as ADSL or Cable) mean download bandwidth vastly
+exceeds upload bandwidth (<span class="math inline">\(d \gg
+\mu_l\)</span>). Consequently, swarms almost always operate in the
+<strong>upload-constrained regime</strong>.</p>
+<p>Assuming high piece diversity (<span class="math inline">\(\eta
+\approx 1\)</span>), aggregate throughput scales linearly with the
+number of peers:</p>
+<p><span class="math display">\[T \approx S \cdot \mu_s + L \cdot
+\mu_l\]</span></p>
+<p>If the ratio of seeders to leechers remains constant (<span
+class="math inline">\(\gamma = S / L\)</span>), throughput as a function
+of total peers <span class="math inline">\(N\)</span> simplifies to:</p>
+<p><span class="math display">\[T(N) = N \left( \frac{\gamma \mu_s +
+\mu_l}{1 + \gamma} \right)\]</span></p>
+<p>This demonstrates a direct linear relationship: <strong>doubling the
+number of participating peers approximately doubles total swarm
+throughput</strong>.</p>
+<h3 id="average-download-rate-per-peer">Average Download Rate per
+Peer</h3>
+<p>While total throughput <span class="math inline">\(T\)</span>
+increases with <span class="math inline">\(N\)</span>, the individual
+download rate per leecher (<span
+class="math inline">\(R_{down}\)</span>) is determined by dividing
+aggregate leecher throughput by the number of leechers:</p>
+<p><span class="math display">\[R_{down} = \frac{T}{L} = \frac{S \cdot
+\mu_s}{L} + \eta \cdot \mu_l = \gamma \mu_s + \eta \mu_l\]</span></p>
+<ul>
+<li>When <span class="math inline">\(N\)</span> increases due to
+proportional growth in both <span class="math inline">\(S\)</span> and
+<span class="math inline">\(L\)</span>, individual download speeds
+remain constant rather than degrading.</li>
+<li>If a flash crowd occurs (<span class="math inline">\(L \to
+\infty\)</span> while <span class="math inline">\(S\)</span> remains
+fixed, so <span class="math inline">\(\gamma \to 0\)</span>), individual
+throughput asymptotically approaches the leecher upload rate: <span
+class="math inline">\(\lim_{L \to \infty} R_{down} = \eta
+\mu_l\)</span>.</li>
+</ul>
+<h3 id="non-linear-limiting-factors">Non-Linear Limiting Factors</h3>
+<p>As <span class="math inline">\(N\)</span> becomes extremely large,
+secondary effects cause throughput growth to sub-linearly deviate from
+the ideal fluid model:</p>
+<ol type="1">
+<li><strong>Protocol and Signaling Overhead:</strong> Peer exchange
+(PEX), distributed hash table (DHT) lookups, and BitTorrent handshakes
+consume bandwidth. Signaling overhead scales roughly with <span
+class="math inline">\(O(k)\)</span> where <span
+class="math inline">\(k\)</span> is the number of active connections per
+peer, reducing effective payload throughput.</li>
+<li><strong>Piece Diversity Bottlenecks (The "Last Piece"
+Problem):</strong> If <span class="math inline">\(N\)</span> grows
+rapidly without sufficient initial seeding, <span
+class="math inline">\(\eta\)</span> degrades (<span
+class="math inline">\(\eta &lt; 1\)</span>) because peers hold identical
+chunks and cannot trade efficiently.</li>
+<li><strong>TCP Congestion and Choking:</strong> The BitTorrent choking
+algorithm limits active unchoked upload slots (typically 4 to 8 per
+client). While this prevents TCP pipe saturation on individual
+connections, it introduces discrete scheduling inefficiencies across the
+global network topology.</li>
+</ol></article>
+        <div id=comments-container></div>
+
+        <script>
+            const utterancesScript = document.createElement('script');
+            
+            utterancesScript.setAttribute('src', 'https://utteranc.es/client.js');
+            utterancesScript.setAttribute('repo', 'salivity/bittorrent'); 
+            utterancesScript.setAttribute('issue-term', 'pathname'); 
+            utterancesScript.setAttribute('theme', localStorage.getItem('theme') === 'dark' ? 'github-dark' : 'github-light'); 
+            utterancesScript.setAttribute('crossorigin', 'anonymous');
+            utterancesScript.async = true;
+
+            document.getElementById('comments-container').appendChild(utterancesScript);
+        </script>
+    
+    </main>
+    <footer>
+        <nav>
+            <ul class="footer-links">
+                <li><a href="/bittorrent/privacy-policy">Privacy Policy</a></li>
+                <li><a href="/bittorrent/terms-and-conditions">Terms and Conditions</a></li>
+            </ul>
+        </nav>
+        <div class="copyright">
+            Copyright &copy; <span id="current-year"></span>
+        </div>
+    </footer>
+</body>
+</html>

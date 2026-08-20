@@ -1,0 +1,181 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="light">
+<head>
+    <script async src="https://www.googletagmanager.com/gtag/js?id=G-R4Y4YXFHZS"></script>
+    <script>
+        window.dataLayer = window.dataLayer || [];
+
+        function gtag(){
+            dataLayer.push(arguments);
+        }
+
+        gtag('js', new Date());
+
+        gtag('config', 'G-R4Y4YXFHZS');
+    </script>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>How BitTorrent Tracks Blocks in Incomplete Pieces - bittorrent</title>
+    <meta name="description" content="In the BitTorrent protocol, files are divided into pieces, which are further broken down into standard 16 KiB transmission blocks for peer-to-peer exchange. Because the main torrent metadata only verifies full pieces via cryptographic hashes, clients mus">
+    <link rel="canonical" href="https://salivity.github.io/bittorrent/article/how-bittorrent-tracks-blocks-in-incomplete-pieces">
+    <link rel="icon" href="/bittorrent/favicon.ico">
+    <link rel="stylesheet" href="/bittorrent/css/style.css">
+    <link media="print" rel="stylesheet" href="/bittorrent/css/print.css">
+    <script src="/bittorrent/js/fuse.min.js"></script>
+    <script src="/bittorrent/js/script.js"></script>
+    <script id="MathJax-script" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/4.1.3/tex-chtml.min.js" defer></script>
+    <meta property="og:type" content="website" />
+    <meta property="og:title" content="How BitTorrent Tracks Blocks in Incomplete Pieces - bittorrent" />
+    <meta property="og:url" content="https://salivity.github.io/bittorrent/article/how-bittorrent-tracks-blocks-in-incomplete-pieces" />
+    <meta property="og:image:url" content="https://salivity.github.io/bittorrent/images/open-graph/default.webp" />
+    <meta property="og:image:secure_url" content="https://salivity.github.io/bittorrent/images/open-graph/default.webp" />
+    <meta property="og:image:width" content="1120" />
+    <meta property="og:image:height" content="630" />
+    <meta property="og:description" content="In the BitTorrent protocol, files are divided into pieces, which are further broken down into standard 16 KiB transmission blocks for peer-to-peer exchange. Because the main torrent metadata only verifies full pieces via cryptographic hashes, clients mus" />
+    <link rel="manifest" href="/bittorrent/pwa/manifest.json" />
+</head>
+<body>
+    <header>
+        <a href="/bittorrent/" aria-label="Go To Home Page" title="Go To Home Page" id="logo">
+            <span>salivity.github.io/</span><span>bittorrent</span>
+        </a>
+        <nav>
+            <ul class="header-links">
+                <li><a href="https://github.com/salivity" title="Github" aria-label="Go To Github Profile Page"><svg class="svg-icon" focusable="false" aria-hidden="true" viewBox="0 0 24 24"><path d="M12 1.27a11 11 0 00-3.48 21.46c.55.09.73-.28.73-.55v-1.84c-3.03.64-3.67-1.46-3.67-1.46-.55-1.29-1.28-1.65-1.28-1.65-.92-.65.1-.65.1-.65 1.1 0 1.73 1.1 1.73 1.1.92 1.65 2.57 1.2 3.21.92a2 2 0 01.64-1.47c-2.47-.27-5.04-1.19-5.04-5.5 0-1.1.46-2.1 1.2-2.84a3.76 3.76 0 010-2.93s.91-.28 3.11 1.1c1.8-.49 3.7-.49 5.5 0 2.1-1.38 3.02-1.1 3.02-1.1a3.76 3.76 0 010 2.93c.83.74 1.2 1.74 1.2 2.94 0 4.21-2.57 5.13-5.04 5.4.45.37.82.92.82 2.02v3.03c0 .27.1.64.73.55A11 11 0 0012 1.27"></path></svg></a></li>
+                <li><a href="/bittorrent/search" title="Search" aria-label="Go To Search Page"><svg class="svg-icon" aria-hidden="true" focusable="false" viewBox="0 0 24 24"><path d="M15.5 14h-.79l-.28-.27C15.41 12.59 16 11.11 16 9.5 16 5.91 13.09 3 9.5 3S3 5.91 3 9.5 5.91 16 9.5 16c1.61 0 3.09-.59 4.23-1.57l.27.28v.79l5 4.99L20.49 19zm-6 0C7.01 14 5 11.99 5 9.5S7.01 5 9.5 5 14 7.01 14 9.5 11.99 14 9.5 14"></path></svg></a></li>
+                <li><a id="theme-toggle" title="Theme" href="javascript:void(0);" aria-label="Toggle Website Theme"></a></li>
+            </ul>
+        </nav>
+    </header>
+    <main>
+        <article><h1 id="how-bittorrent-tracks-blocks-in-incomplete-pieces">How
+BitTorrent Tracks Blocks in Incomplete Pieces</h1>
+<p>In the BitTorrent protocol, files are divided into pieces, which are
+further broken down into standard 16 KiB transmission blocks for
+peer-to-peer exchange. Because the main torrent metadata only verifies
+full pieces via cryptographic hashes, clients must internally track the
+individual 16 KiB blocks of active, incomplete pieces. This article
+explains the internal data structures, bitmask tracking methods, and
+buffer management clients use to monitor these sub-piece chunks from
+request to disk verification.</p>
+<h2 id="the-distinction-between-pieces-and-blocks">The Distinction
+Between Pieces and Blocks</h2>
+<p>The BitTorrent metainfo file (<code>.torrent</code>) defines a
+torrent by "pieces," typically ranging from 256 KiB to several megabytes
+in size. Each piece has a corresponding SHA-1 or SHA-256 hash. However,
+transmitting an entire piece in a single network packet is inefficient.
+To facilitate smooth transmission and pipelining, clients break pieces
+down into "blocks" (also called chunks), with 16 KiB (16,384 bytes)
+being the universally accepted standard size.</p>
+<p>While the global piece availability of a client is advertised to
+peers using a piece-level <code>bitfield</code> message, individual 16
+KiB block tracking is strictly managed locally within the client's
+memory.</p>
+<h2 id="in-memory-piece-state-structures">In-Memory Piece State
+Structures</h2>
+<p>When a client decides to download a piece, it initializes a dedicated
+in-memory data structure for that specific piece. This structure, often
+referred to as a <code>PieceState</code> or
+<code>ActivePieceContext</code>, contains all the metadata required to
+track incoming data:</p>
+<ul>
+<li><strong>Piece Index:</strong> The zero-based index of the piece
+within the torrent.</li>
+<li><strong>Total Blocks:</strong> The total number of 16 KiB blocks in
+the piece (the final piece of a file may have fewer blocks).</li>
+<li><strong>Blocks Received Counter:</strong> An integer tracking how
+many blocks have arrived.</li>
+<li><strong>Block Status Mask:</strong> A small local bitmask or boolean
+array.</li>
+<li><strong>Data Buffer:</strong> A contiguous block of allocated memory
+sized to hold the entire piece.</li>
+</ul>
+<h2 id="sub-piece-bitmasks-and-offset-mapping">Sub-Piece Bitmasks and
+Offset Mapping</h2>
+<p>The primary mechanism for tracking which specific 16 KiB blocks have
+been received is a local bitfield (or bitmask) dedicated to that active
+piece.</p>
+<p>Because standard pieces contain a fixed number of 16 KiB blocks, each
+block corresponds to a discrete index:</p>
+<ul>
+<li>Block 0: Offset <code>0</code> bytes (Bit 0)</li>
+<li>Block 1: Offset <code>16,384</code> bytes (Bit 1)</li>
+<li>Block 2: Offset <code>32,768</code> bytes (Bit 2)</li>
+<li>Block <em>n</em>: Offset <code>n * 16,384</code> bytes (Bit
+<em>n</em>)</li>
+</ul>
+<p>When a peer sends a <code>piece</code> network message containing the
+piece index, byte offset, and raw data payload, the client calculates
+the block index:</p>
+<p><span class="math display">\[\text{Block Index} = \frac{\text{Byte
+Offset}}{16384}\]</span></p>
+<p>The client copies the 16 KiB payload into the memory buffer at the
+exact byte offset and flips the corresponding bit in the local bitmask
+from <code>0</code> to <code>1</code>. It also increments the blocks
+received counter.</p>
+<h2 id="request-states-and-duplicate-prevention">Request States and
+Duplicate Prevention</h2>
+<p>Advanced BitTorrent clients (such as libtorrent-rasterbar,
+qBittorrent, and Transmission) track sub-piece blocks with more
+granularity than just "present" or "missing." Each block within an
+active piece often exists in one of several states:</p>
+<ol type="1">
+<li><strong>Unrequested:</strong> The block is needed, but no peer has
+been asked for it.</li>
+<li><strong>Pending / Requested:</strong> A <code>request</code> message
+has been sent to a peer, and the client is awaiting the response. The
+client logs the timestamp and peer ID to handle timeouts.</li>
+<li><strong>Received:</strong> The block has been written to the piece
+buffer.</li>
+</ol>
+<p>Tracking these states prevents the client from redundantly requesting
+the same 16 KiB block from multiple peers under normal conditions, while
+allowing the client to re-request blocks if a peer disconnects or fails
+to respond before a timeout.</p>
+<h2 id="completion-and-verification">Completion and Verification</h2>
+<p>Once the "blocks received" counter matches the total block count for
+the piece (meaning all bits in the local block bitmask are set to
+<code>1</code>), the piece is complete.</p>
+<p>The client passes the contiguous piece buffer through a cryptographic
+hashing function (SHA-1 or SHA-256) and compares the output to the
+expected hash in the metadata:</p>
+<ul>
+<li><strong>If the hash matches:</strong> The piece is written to disk,
+the client's global torrent-level bitfield is updated to mark the entire
+piece as complete, <code>have</code> messages are sent to connected
+peers, and the sub-piece memory structure is deallocated.</li>
+<li><strong>If the hash fails:</strong> A data corruption or malicious
+block occurred. Because individual 16 KiB blocks lack individual
+cryptographic hashes in standard BitTorrent v1, the entire piece buffer
+is marked invalid, all block bits are reset to <code>0</code>, and the
+blocks are re-requested from different peers.</li>
+</ul></article>
+        <div id=comments-container></div>
+
+        <script>
+            const utterancesScript = document.createElement('script');
+            
+            utterancesScript.setAttribute('src', 'https://utteranc.es/client.js');
+            utterancesScript.setAttribute('repo', 'salivity/bittorrent'); 
+            utterancesScript.setAttribute('issue-term', 'pathname'); 
+            utterancesScript.setAttribute('theme', localStorage.getItem('theme') === 'dark' ? 'github-dark' : 'github-light'); 
+            utterancesScript.setAttribute('crossorigin', 'anonymous');
+            utterancesScript.async = true;
+
+            document.getElementById('comments-container').appendChild(utterancesScript);
+        </script>
+    
+    </main>
+    <footer>
+        <nav>
+            <ul class="footer-links">
+                <li><a href="/bittorrent/privacy-policy">Privacy Policy</a></li>
+                <li><a href="/bittorrent/terms-and-conditions">Terms and Conditions</a></li>
+            </ul>
+        </nav>
+        <div class="copyright">
+            Copyright &copy; <span id="current-year"></span>
+        </div>
+    </footer>
+</body>
+</html>

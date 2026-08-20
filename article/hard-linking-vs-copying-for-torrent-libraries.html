@@ -1,0 +1,153 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="light">
+<head>
+    <script async src="https://www.googletagmanager.com/gtag/js?id=G-R4Y4YXFHZS"></script>
+    <script>
+        window.dataLayer = window.dataLayer || [];
+
+        function gtag(){
+            dataLayer.push(arguments);
+        }
+
+        gtag('js', new Date());
+
+        gtag('config', 'G-R4Y4YXFHZS');
+    </script>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Hard Linking vs Copying for Torrent Libraries - bittorrent</title>
+    <meta name="description" content="Hard linking is a file system feature that allows multiple directory paths to point directly to the exact same data on a storage drive without consuming additional disk space. Managing a large torrent library often requires organizing and renaming media">
+    <link rel="canonical" href="https://salivity.github.io/bittorrent/article/hard-linking-vs-copying-for-torrent-libraries">
+    <link rel="icon" href="/bittorrent/favicon.ico">
+    <link rel="stylesheet" href="/bittorrent/css/style.css">
+    <link media="print" rel="stylesheet" href="/bittorrent/css/print.css">
+    <script src="/bittorrent/js/fuse.min.js"></script>
+    <script src="/bittorrent/js/script.js"></script>
+    <script id="MathJax-script" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/4.1.3/tex-chtml.min.js" defer></script>
+    <meta property="og:type" content="website" />
+    <meta property="og:title" content="Hard Linking vs Copying for Torrent Libraries - bittorrent" />
+    <meta property="og:url" content="https://salivity.github.io/bittorrent/article/hard-linking-vs-copying-for-torrent-libraries" />
+    <meta property="og:image:url" content="https://salivity.github.io/bittorrent/images/open-graph/default.webp" />
+    <meta property="og:image:secure_url" content="https://salivity.github.io/bittorrent/images/open-graph/default.webp" />
+    <meta property="og:image:width" content="1120" />
+    <meta property="og:image:height" content="630" />
+    <meta property="og:description" content="Hard linking is a file system feature that allows multiple directory paths to point directly to the exact same data on a storage drive without consuming additional disk space. Managing a large torrent library often requires organizing and renaming media" />
+    <link rel="manifest" href="/bittorrent/pwa/manifest.json" />
+</head>
+<body>
+    <header>
+        <a href="/bittorrent/" aria-label="Go To Home Page" title="Go To Home Page" id="logo">
+            <span>salivity.github.io/</span><span>bittorrent</span>
+        </a>
+        <nav>
+            <ul class="header-links">
+                <li><a href="https://github.com/salivity" title="Github" aria-label="Go To Github Profile Page"><svg class="svg-icon" focusable="false" aria-hidden="true" viewBox="0 0 24 24"><path d="M12 1.27a11 11 0 00-3.48 21.46c.55.09.73-.28.73-.55v-1.84c-3.03.64-3.67-1.46-3.67-1.46-.55-1.29-1.28-1.65-1.28-1.65-.92-.65.1-.65.1-.65 1.1 0 1.73 1.1 1.73 1.1.92 1.65 2.57 1.2 3.21.92a2 2 0 01.64-1.47c-2.47-.27-5.04-1.19-5.04-5.5 0-1.1.46-2.1 1.2-2.84a3.76 3.76 0 010-2.93s.91-.28 3.11 1.1c1.8-.49 3.7-.49 5.5 0 2.1-1.38 3.02-1.1 3.02-1.1a3.76 3.76 0 010 2.93c.83.74 1.2 1.74 1.2 2.94 0 4.21-2.57 5.13-5.04 5.4.45.37.82.92.82 2.02v3.03c0 .27.1.64.73.55A11 11 0 0012 1.27"></path></svg></a></li>
+                <li><a href="/bittorrent/search" title="Search" aria-label="Go To Search Page"><svg class="svg-icon" aria-hidden="true" focusable="false" viewBox="0 0 24 24"><path d="M15.5 14h-.79l-.28-.27C15.41 12.59 16 11.11 16 9.5 16 5.91 13.09 3 9.5 3S3 5.91 3 9.5 5.91 16 9.5 16c1.61 0 3.09-.59 4.23-1.57l.27.28v.79l5 4.99L20.49 19zm-6 0C7.01 14 5 11.99 5 9.5S7.01 5 9.5 5 14 7.01 14 9.5 11.99 14 9.5 14"></path></svg></a></li>
+                <li><a id="theme-toggle" title="Theme" href="javascript:void(0);" aria-label="Toggle Website Theme"></a></li>
+            </ul>
+        </nav>
+    </header>
+    <main>
+        <article><h1 id="hard-linking-vs-copying-for-torrent-libraries">Hard Linking vs
+Copying for Torrent Libraries</h1>
+<p>Hard linking is a file system feature that allows multiple directory
+paths to point directly to the exact same data on a storage drive
+without consuming additional disk space. Managing a large torrent
+library often requires organizing and renaming media for automation
+tools and media servers while simultaneously keeping original files
+intact for seeding. This article explains what hard linking is, how it
+works, and why it is vastly superior to traditional file copying for
+media management.</p>
+<h3 id="what-is-a-hard-link">What Is a Hard Link?</h3>
+<p>In modern file systems (such as NTFS, ext4, and Btrfs), a file
+consists of two main parts: the data stored on the disk (the data
+blocks) and an index entry (the inode or file record) that includes the
+file's name and location.</p>
+<p>When you create a standard file, the system creates a pointer to that
+data. A <strong>hard link</strong> creates an additional, independent
+pointer to the exact same physical data blocks. To the operating system
+and applications, a hard link looks and acts exactly like an
+independent, original file, but it takes up zero additional storage
+capacity.</p>
+<h3 id="the-problem-with-traditional-copying">The Problem with
+Traditional Copying</h3>
+<p>When organizing a media library managed by tools like Sonarr, Radarr,
+Plex, or Jellyfin, two conflicting needs arise:</p>
+<ol type="1">
+<li><strong>Torrent Clients:</strong> Require original file names,
+specific directory structures, and unmodified files to continue seeding
+to the swarm.</li>
+<li><strong>Media Servers:</strong> Require clean, standardized naming
+conventions (e.g., <code>Movie Name (Year)/Movie Name (Year).mkv</code>)
+and specific folder hierarchies to accurately identify and fetch
+metadata.</li>
+</ol>
+<p>If you copy files from your download folder to your media library,
+you double your storage usage. A 40 GB 4K movie will instantly consume
+80 GB of drive space. Copying also wastes drive read/write cycles and
+takes considerable time for large files.</p>
+<h3 id="why-hard-linking-is-preferred">Why Hard Linking Is
+Preferred</h3>
+<p>Hard linking solves the conflict between seeding requirements and
+media organization seamlessly.</p>
+<h4 id="1-zero-additional-storage-use">1. Zero Additional Storage
+Use</h4>
+<p>Because hard links point to existing data blocks on the drive, you
+can have a file in <code>/downloads/torrents/</code> with its original
+raw name and another in <code>/media/movies/</code> with a clean name,
+and the total storage consumed remains equal to a single file.</p>
+<h4 id="2-instantaneous-operations">2. Instantaneous Operations</h4>
+<p>Creating a hard link takes milliseconds, regardless of file size. A
+100 GB media file is linked immediately because no actual data is being
+read from or written to the disk—only a new reference entry is
+registered in the file system table.</p>
+<h4 id="3-continuous-and-unbroken-seeding">3. Continuous and Unbroken
+Seeding</h4>
+<p>Because the original file in the download directory remains
+untouched, your BitTorrent client continues seeding without
+interruption. Renaming or modifying the hard-linked file in your media
+library will not alter the integrity of the data being seeded.</p>
+<h4 id="4-safe-and-independent-deletion">4. Safe and Independent
+Deletion</h4>
+<p>The underlying data on the storage drive is only permanently deleted
+when the <em>last</em> remaining hard link to it is removed. If you
+delete the torrent and its file from your download client, the file
+remains fully accessible in your media library. Conversely, removing the
+movie from your media server will leave the seeding file untouched.</p>
+<h3 id="crucial-requirement-same-file-system">Crucial Requirement: Same
+File System</h3>
+<p>Hard links operate at the file system level. Consequently, hard links
+can only be created within the same partition or volume. You cannot
+create a hard link across two separate physical drives or between two
+distinct network shares. For automated media setups, ensuring your
+download directory and media library share the same underlying volume is
+required to take full advantage of hard linking.</p></article>
+        <div id=comments-container></div>
+
+        <script>
+            const utterancesScript = document.createElement('script');
+            
+            utterancesScript.setAttribute('src', 'https://utteranc.es/client.js');
+            utterancesScript.setAttribute('repo', 'salivity/bittorrent'); 
+            utterancesScript.setAttribute('issue-term', 'pathname'); 
+            utterancesScript.setAttribute('theme', localStorage.getItem('theme') === 'dark' ? 'github-dark' : 'github-light'); 
+            utterancesScript.setAttribute('crossorigin', 'anonymous');
+            utterancesScript.async = true;
+
+            document.getElementById('comments-container').appendChild(utterancesScript);
+        </script>
+    
+    </main>
+    <footer>
+        <nav>
+            <ul class="footer-links">
+                <li><a href="/bittorrent/privacy-policy">Privacy Policy</a></li>
+                <li><a href="/bittorrent/terms-and-conditions">Terms and Conditions</a></li>
+            </ul>
+        </nav>
+        <div class="copyright">
+            Copyright &copy; <span id="current-year"></span>
+        </div>
+    </footer>
+</body>
+</html>

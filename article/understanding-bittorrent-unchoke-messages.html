@@ -1,0 +1,154 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="light">
+<head>
+    <script async src="https://www.googletagmanager.com/gtag/js?id=G-R4Y4YXFHZS"></script>
+    <script>
+        window.dataLayer = window.dataLayer || [];
+
+        function gtag(){
+            dataLayer.push(arguments);
+        }
+
+        gtag('js', new Date());
+
+        gtag('config', 'G-R4Y4YXFHZS');
+    </script>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Understanding BitTorrent Unchoke Messages - bittorrent</title>
+    <meta name="description" content="In the BitTorrent protocol, an unchoke message acts as an explicit green light that alters connection states, allowing a remote peer to begin requesting file blocks. By default, peers start in a choked state where data requests are blocked to prevent ban">
+    <link rel="canonical" href="https://salivity.github.io/bittorrent/article/understanding-bittorrent-unchoke-messages">
+    <link rel="icon" href="/bittorrent/favicon.ico">
+    <link rel="stylesheet" href="/bittorrent/css/style.css">
+    <link media="print" rel="stylesheet" href="/bittorrent/css/print.css">
+    <script src="/bittorrent/js/fuse.min.js"></script>
+    <script src="/bittorrent/js/script.js"></script>
+    <script id="MathJax-script" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/4.1.3/tex-chtml.min.js" defer></script>
+    <meta property="og:type" content="website" />
+    <meta property="og:title" content="Understanding BitTorrent Unchoke Messages - bittorrent" />
+    <meta property="og:url" content="https://salivity.github.io/bittorrent/article/understanding-bittorrent-unchoke-messages" />
+    <meta property="og:image:url" content="https://salivity.github.io/bittorrent/images/open-graph/default.webp" />
+    <meta property="og:image:secure_url" content="https://salivity.github.io/bittorrent/images/open-graph/default.webp" />
+    <meta property="og:image:width" content="1120" />
+    <meta property="og:image:height" content="630" />
+    <meta property="og:description" content="In the BitTorrent protocol, an unchoke message acts as an explicit green light that alters connection states, allowing a remote peer to begin requesting file blocks. By default, peers start in a choked state where data requests are blocked to prevent ban" />
+    <link rel="manifest" href="/bittorrent/pwa/manifest.json" />
+</head>
+<body>
+    <header>
+        <a href="/bittorrent/" aria-label="Go To Home Page" title="Go To Home Page" id="logo">
+            <span>salivity.github.io/</span><span>bittorrent</span>
+        </a>
+        <nav>
+            <ul class="header-links">
+                <li><a href="https://github.com/salivity" title="Github" aria-label="Go To Github Profile Page"><svg class="svg-icon" focusable="false" aria-hidden="true" viewBox="0 0 24 24"><path d="M12 1.27a11 11 0 00-3.48 21.46c.55.09.73-.28.73-.55v-1.84c-3.03.64-3.67-1.46-3.67-1.46-.55-1.29-1.28-1.65-1.28-1.65-.92-.65.1-.65.1-.65 1.1 0 1.73 1.1 1.73 1.1.92 1.65 2.57 1.2 3.21.92a2 2 0 01.64-1.47c-2.47-.27-5.04-1.19-5.04-5.5 0-1.1.46-2.1 1.2-2.84a3.76 3.76 0 010-2.93s.91-.28 3.11 1.1c1.8-.49 3.7-.49 5.5 0 2.1-1.38 3.02-1.1 3.02-1.1a3.76 3.76 0 010 2.93c.83.74 1.2 1.74 1.2 2.94 0 4.21-2.57 5.13-5.04 5.4.45.37.82.92.82 2.02v3.03c0 .27.1.64.73.55A11 11 0 0012 1.27"></path></svg></a></li>
+                <li><a href="/bittorrent/search" title="Search" aria-label="Go To Search Page"><svg class="svg-icon" aria-hidden="true" focusable="false" viewBox="0 0 24 24"><path d="M15.5 14h-.79l-.28-.27C15.41 12.59 16 11.11 16 9.5 16 5.91 13.09 3 9.5 3S3 5.91 3 9.5 5.91 16 9.5 16c1.61 0 3.09-.59 4.23-1.57l.27.28v.79l5 4.99L20.49 19zm-6 0C7.01 14 5 11.99 5 9.5S7.01 5 9.5 5 14 7.01 14 9.5 11.99 14 9.5 14"></path></svg></a></li>
+                <li><a id="theme-toggle" title="Theme" href="javascript:void(0);" aria-label="Toggle Website Theme"></a></li>
+            </ul>
+        </nav>
+    </header>
+    <main>
+        <article><h1 id="understanding-bittorrent-unchoke-messages">Understanding
+BitTorrent Unchoke Messages</h1>
+<p>In the BitTorrent protocol, an <strong>unchoke</strong> message acts
+as an explicit green light that alters connection states, allowing a
+remote peer to begin requesting file blocks. By default, peers start in
+a choked state where data requests are blocked to prevent bandwidth
+saturation. This article explains how the unchoke message functions
+within the peer connection lifecycle, changes internal client states,
+and enables structured data transfer across the decentralized
+network.</p>
+<h3 id="the-bittorrent-peer-state-model">The BitTorrent Peer State
+Model</h3>
+<p>Every BitTorrent peer-to-peer connection maintains two independent
+state flags for each direction of communication:</p>
+<ol type="1">
+<li><strong>Choked / Unchoked:</strong> Whether a client will fulfill
+requests from the remote peer.</li>
+<li><strong>Interested / Not Interested:</strong> Whether a client wants
+data that the remote peer possesses.</li>
+</ol>
+<p>When two peers initially connect, both sides assume the other is in a
+choked and not-interested state. Because of this, a peer cannot simply
+start downloading blocks immediately upon establishing a TCP
+handshake.</p>
+<h3 id="the-structure-of-the-unchoke-message">The Structure of the
+Unchoke Message</h3>
+<p>The BitTorrent protocol uses lightweight framing for its state
+messages. An unchoke message is a fixed-length message consisting
+of:</p>
+<ul>
+<li><strong>Length prefix (4 bytes):</strong> Specifies a length of
+<code>0x00000001</code> (1 byte to follow).</li>
+<li><strong>Message ID (1 byte):</strong> Set to <code>1</code>, which
+uniquely identifies the payload as an <code>unchoke</code> signal.</li>
+</ul>
+<p>Because it contains no payload body beyond its ID, the message
+requires minimal overhead to transmit over the network.</p>
+<h3 id="how-the-unchoke-message-alters-peer-state">How the Unchoke
+Message Alters Peer State</h3>
+<p>When Client A sends an unchoke message (ID 1) to Client B, the
+following sequence occurs:</p>
+<ol type="1">
+<li><strong>State Update:</strong> Client B updates its internal
+tracking variable for Client A from <code>peer_choking = true</code> to
+<code>peer_choking = false</code>.</li>
+<li><strong>Authorization of Request Messages:</strong> With
+<code>peer_choking</code> set to <code>false</code>, Client B is now
+authorized to send <code>request</code> messages (Message ID 6)
+specifying the index, block offset, and length of desired data.</li>
+<li><strong>Queue Processing:</strong> If Client B is also marked as
+<code>interested</code>, its download engine immediately begins
+dispatching block requests from its queue to Client A.</li>
+<li><strong>Data Transmission:</strong> Client A receives the
+<code>request</code> messages and responds with <code>piece</code>
+messages containing the actual payload data.</li>
+</ol>
+<p>If Client B were to send <code>request</code> messages while still in
+a choked state, Client A’s protocol engine would silently discard or
+reject those requests.</p>
+<h3 id="bandwidth-allocation-and-the-choking-algorithm">Bandwidth
+Allocation and the Choking Algorithm</h3>
+<p>Clients do not unchoke every connected peer at once. The unchoke
+signal is managed by a client's local choking algorithm (typically
+relying on a "tit-for-tat" strategy):</p>
+<ul>
+<li><strong>Regular Unchoking:</strong> Clients continuously measure
+download rates and periodically unchoke the top peers that provide the
+fastest upload speeds in return.</li>
+<li><strong>Optimistic Unchoking:</strong> Periodically, a client will
+unchoke a random peer regardless of transfer rate to discover new,
+potentially faster connections.</li>
+</ul>
+<p>When a client decides to stop uploading to a peer, it transmits a
+<code>choke</code> message (Message ID 0), immediately revoking request
+permissions and pausing transfer until the next unchoke cycle.</p></article>
+        <div id=comments-container></div>
+
+        <script>
+            const utterancesScript = document.createElement('script');
+            
+            utterancesScript.setAttribute('src', 'https://utteranc.es/client.js');
+            utterancesScript.setAttribute('repo', 'salivity/bittorrent'); 
+            utterancesScript.setAttribute('issue-term', 'pathname'); 
+            utterancesScript.setAttribute('theme', localStorage.getItem('theme') === 'dark' ? 'github-dark' : 'github-light'); 
+            utterancesScript.setAttribute('crossorigin', 'anonymous');
+            utterancesScript.async = true;
+
+            document.getElementById('comments-container').appendChild(utterancesScript);
+        </script>
+    
+    </main>
+    <footer>
+        <nav>
+            <ul class="footer-links">
+                <li><a href="/bittorrent/privacy-policy">Privacy Policy</a></li>
+                <li><a href="/bittorrent/terms-and-conditions">Terms and Conditions</a></li>
+            </ul>
+        </nav>
+        <div class="copyright">
+            Copyright &copy; <span id="current-year"></span>
+        </div>
+    </footer>
+</body>
+</html>

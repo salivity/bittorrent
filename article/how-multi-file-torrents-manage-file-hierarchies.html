@@ -1,0 +1,164 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="light">
+<head>
+    <script async src="https://www.googletagmanager.com/gtag/js?id=G-R4Y4YXFHZS"></script>
+    <script>
+        window.dataLayer = window.dataLayer || [];
+
+        function gtag(){
+            dataLayer.push(arguments);
+        }
+
+        gtag('js', new Date());
+
+        gtag('config', 'G-R4Y4YXFHZS');
+    </script>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>How Multi-File Torrents Manage File Hierarchies - bittorrent</title>
+    <meta name="description" content="Multi-file torrents manage complex directory structures by encoding folder hierarchies and file paths directly into the metadata of the .torrent file or magnet link data. By utilizing the Bencode data serialization format, the BitTorrent protocol stores">
+    <link rel="canonical" href="https://salivity.github.io/bittorrent/article/how-multi-file-torrents-manage-file-hierarchies">
+    <link rel="icon" href="/bittorrent/favicon.ico">
+    <link rel="stylesheet" href="/bittorrent/css/style.css">
+    <link media="print" rel="stylesheet" href="/bittorrent/css/print.css">
+    <script src="/bittorrent/js/fuse.min.js"></script>
+    <script src="/bittorrent/js/script.js"></script>
+    <script id="MathJax-script" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/4.1.3/tex-chtml.min.js" defer></script>
+    <meta property="og:type" content="website" />
+    <meta property="og:title" content="How Multi-File Torrents Manage File Hierarchies - bittorrent" />
+    <meta property="og:url" content="https://salivity.github.io/bittorrent/article/how-multi-file-torrents-manage-file-hierarchies" />
+    <meta property="og:image:url" content="https://salivity.github.io/bittorrent/images/open-graph/default.webp" />
+    <meta property="og:image:secure_url" content="https://salivity.github.io/bittorrent/images/open-graph/default.webp" />
+    <meta property="og:image:width" content="1120" />
+    <meta property="og:image:height" content="630" />
+    <meta property="og:description" content="Multi-file torrents manage complex directory structures by encoding folder hierarchies and file paths directly into the metadata of the .torrent file or magnet link data. By utilizing the Bencode data serialization format, the BitTorrent protocol stores" />
+    <link rel="manifest" href="/bittorrent/pwa/manifest.json" />
+</head>
+<body>
+    <header>
+        <a href="/bittorrent/" aria-label="Go To Home Page" title="Go To Home Page" id="logo">
+            <span>salivity.github.io/</span><span>bittorrent</span>
+        </a>
+        <nav>
+            <ul class="header-links">
+                <li><a href="https://github.com/salivity" title="Github" aria-label="Go To Github Profile Page"><svg class="svg-icon" focusable="false" aria-hidden="true" viewBox="0 0 24 24"><path d="M12 1.27a11 11 0 00-3.48 21.46c.55.09.73-.28.73-.55v-1.84c-3.03.64-3.67-1.46-3.67-1.46-.55-1.29-1.28-1.65-1.28-1.65-.92-.65.1-.65.1-.65 1.1 0 1.73 1.1 1.73 1.1.92 1.65 2.57 1.2 3.21.92a2 2 0 01.64-1.47c-2.47-.27-5.04-1.19-5.04-5.5 0-1.1.46-2.1 1.2-2.84a3.76 3.76 0 010-2.93s.91-.28 3.11 1.1c1.8-.49 3.7-.49 5.5 0 2.1-1.38 3.02-1.1 3.02-1.1a3.76 3.76 0 010 2.93c.83.74 1.2 1.74 1.2 2.94 0 4.21-2.57 5.13-5.04 5.4.45.37.82.92.82 2.02v3.03c0 .27.1.64.73.55A11 11 0 0012 1.27"></path></svg></a></li>
+                <li><a href="/bittorrent/search" title="Search" aria-label="Go To Search Page"><svg class="svg-icon" aria-hidden="true" focusable="false" viewBox="0 0 24 24"><path d="M15.5 14h-.79l-.28-.27C15.41 12.59 16 11.11 16 9.5 16 5.91 13.09 3 9.5 3S3 5.91 3 9.5 5.91 16 9.5 16c1.61 0 3.09-.59 4.23-1.57l.27.28v.79l5 4.99L20.49 19zm-6 0C7.01 14 5 11.99 5 9.5S7.01 5 9.5 5 14 7.01 14 9.5 11.99 14 9.5 14"></path></svg></a></li>
+                <li><a id="theme-toggle" title="Theme" href="javascript:void(0);" aria-label="Toggle Website Theme"></a></li>
+            </ul>
+        </nav>
+    </header>
+    <main>
+        <article><h1 id="how-multi-file-torrents-manage-file-hierarchies">How Multi-File
+Torrents Manage File Hierarchies</h1>
+<p>Multi-file torrents manage complex directory structures by encoding
+folder hierarchies and file paths directly into the metadata of the
+<code>.torrent</code> file or magnet link data. By utilizing the Bencode
+data serialization format, the BitTorrent protocol stores directories as
+structured lists of strings, maps these paths to specific file lengths,
+and treats the entire folder structure as a single, continuous stream of
+data for transfer.</p>
+<h3 id="the-bencoded-info-dictionary">The Bencoded <code>info</code>
+Dictionary</h3>
+<p>At the core of every torrent file is the <code>info</code>
+dictionary, serialized using Bencoding. When a torrent contains multiple
+files, the <code>info</code> dictionary alters its schema compared to a
+single-file torrent:</p>
+<ul>
+<li><strong><code>name</code></strong>: In a multi-file torrent, the
+top-level <code>name</code> key represents the name of the root
+directory rather than an individual file.</li>
+<li><strong><code>files</code></strong>: Instead of a single
+<code>length</code> key, a multi-file torrent contains a
+<code>files</code> list. Each entry in this list is a dictionary
+containing metadata for an individual file.</li>
+</ul>
+<h3 id="representing-subdirectories-with-the-path-list">Representing
+Subdirectories with the <code>path</code> List</h3>
+<p>BitTorrent achieves platform independence by avoiding
+operating-system-specific path separators like <code>/</code> on
+Unix/macOS or <code>\</code> on Windows. Instead, inside each dictionary
+in the <code>files</code> list, the torrent defines:</p>
+<ol type="1">
+<li><strong><code>length</code></strong>: An integer indicating the
+exact size of the file in bytes.</li>
+<li><strong><code>path</code></strong>: A list of strings where each
+element represents a step in the directory tree, terminating with the
+file name.</li>
+</ol>
+<p>For example, a file located at
+<code>RootFolder/Music/Rock/track1.mp3</code> with a size of 5 MB is
+encoded in the metadata as:</p>
+<pre><code>{
+    &quot;length&quot;: 5242880,
+    &quot;path&quot;: [&quot;Music&quot;, &quot;Rock&quot;, &quot;track1.mp3&quot;]
+}</code></pre>
+<p>The client reads this list sequentially, treating every item before
+the final element as a nested directory, and the final element as the
+actual file name.</p>
+<h3 id="continuous-byte-stream-mapping">Continuous Byte Stream
+Mapping</h3>
+<p>While the metadata maintains a clear visual and logical directory
+tree, the BitTorrent transfer engine abstracts the entire file hierarchy
+into a single, continuous stream of bytes.</p>
+<p>The protocol concatenates all files in the order they appear in the
+<code>files</code> list. It then divides this continuous byte stream
+into uniform chunks known as "pieces" (typically between 256 KB and 16
+MB). Because pieces are split based purely on byte offsets:</p>
+<ul>
+<li>A single piece may contain the end of one file and the beginning of
+another.</li>
+<li>Pieces frequently span across directory boundaries.</li>
+<li>The torrent protocol does not transfer "folders"; it transfers
+indexed pieces and uses the metadata map to write the downloaded byte
+ranges to their corresponding local files.</li>
+</ul>
+<h3 id="client-side-construction-and-path-sanitization">Client-Side
+Construction and Path Sanitization</h3>
+<p>When a download begins, the BitTorrent client parses the
+<code>files</code> list and constructs the local folder hierarchy using
+the host operating system's native file system APIs.</p>
+<p>During this process, the client performs path sanitization:</p>
+<ul>
+<li><strong>Illegal Characters</strong>: Strips or replaces characters
+not supported by the local OS (such as <code>:</code>, <code>*</code>,
+<code>?</code>, <code>"</code>, <code>&lt;</code>, <code>&gt;</code>,
+<code>|</code> on Windows).</li>
+<li><strong>Path Traversal Prevention</strong>: Strips directory
+traversal tokens like <code>../</code> or absolute path markers to
+prevent files from being written outside the intended download
+directory.</li>
+<li><strong>Path Length Limitations</strong>: Truncates or renames paths
+that exceed operating system path length limits.</li>
+</ul>
+<p>Once the directory skeleton is created on the storage drive, the
+client writes the incoming byte blocks into their correct file offsets
+within the generated folder tree.</p></article>
+        <div id=comments-container></div>
+
+        <script>
+            const utterancesScript = document.createElement('script');
+            
+            utterancesScript.setAttribute('src', 'https://utteranc.es/client.js');
+            utterancesScript.setAttribute('repo', 'salivity/bittorrent'); 
+            utterancesScript.setAttribute('issue-term', 'pathname'); 
+            utterancesScript.setAttribute('theme', localStorage.getItem('theme') === 'dark' ? 'github-dark' : 'github-light'); 
+            utterancesScript.setAttribute('crossorigin', 'anonymous');
+            utterancesScript.async = true;
+
+            document.getElementById('comments-container').appendChild(utterancesScript);
+        </script>
+    
+    </main>
+    <footer>
+        <nav>
+            <ul class="footer-links">
+                <li><a href="/bittorrent/privacy-policy">Privacy Policy</a></li>
+                <li><a href="/bittorrent/terms-and-conditions">Terms and Conditions</a></li>
+            </ul>
+        </nav>
+        <div class="copyright">
+            Copyright &copy; <span id="current-year"></span>
+        </div>
+    </footer>
+</body>
+</html>

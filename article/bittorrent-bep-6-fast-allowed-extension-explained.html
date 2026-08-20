@@ -1,0 +1,157 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="light">
+<head>
+    <script async src="https://www.googletagmanager.com/gtag/js?id=G-R4Y4YXFHZS"></script>
+    <script>
+        window.dataLayer = window.dataLayer || [];
+
+        function gtag(){
+            dataLayer.push(arguments);
+        }
+
+        gtag('js', new Date());
+
+        gtag('config', 'G-R4Y4YXFHZS');
+    </script>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>BitTorrent BEP 6 Fast Allowed Extension Explained - bittorrent</title>
+    <meta name="description" content="The BitTorrent Enhancement Proposal 6 (BEP 6), known as the Fast Extension, introduces several optimizations to the standard BitTorrent protocol to improve network efficiency and peer bootstrapping. Central to this specification is the "Allowed Fast" mec">
+    <link rel="canonical" href="https://salivity.github.io/bittorrent/article/bittorrent-bep-6-fast-allowed-extension-explained">
+    <link rel="icon" href="/bittorrent/favicon.ico">
+    <link rel="stylesheet" href="/bittorrent/css/style.css">
+    <link media="print" rel="stylesheet" href="/bittorrent/css/print.css">
+    <script src="/bittorrent/js/fuse.min.js"></script>
+    <script src="/bittorrent/js/script.js"></script>
+    <script id="MathJax-script" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/4.1.3/tex-chtml.min.js" defer></script>
+    <meta property="og:type" content="website" />
+    <meta property="og:title" content="BitTorrent BEP 6 Fast Allowed Extension Explained - bittorrent" />
+    <meta property="og:url" content="https://salivity.github.io/bittorrent/article/bittorrent-bep-6-fast-allowed-extension-explained" />
+    <meta property="og:image:url" content="https://salivity.github.io/bittorrent/images/open-graph/default.webp" />
+    <meta property="og:image:secure_url" content="https://salivity.github.io/bittorrent/images/open-graph/default.webp" />
+    <meta property="og:image:width" content="1120" />
+    <meta property="og:image:height" content="630" />
+    <meta property="og:description" content="The BitTorrent Enhancement Proposal 6 (BEP 6), known as the Fast Extension, introduces several optimizations to the standard BitTorrent protocol to improve network efficiency and peer bootstrapping. Central to this specification is the "Allowed Fast" mec" />
+    <link rel="manifest" href="/bittorrent/pwa/manifest.json" />
+</head>
+<body>
+    <header>
+        <a href="/bittorrent/" aria-label="Go To Home Page" title="Go To Home Page" id="logo">
+            <span>salivity.github.io/</span><span>bittorrent</span>
+        </a>
+        <nav>
+            <ul class="header-links">
+                <li><a href="https://github.com/salivity" title="Github" aria-label="Go To Github Profile Page"><svg class="svg-icon" focusable="false" aria-hidden="true" viewBox="0 0 24 24"><path d="M12 1.27a11 11 0 00-3.48 21.46c.55.09.73-.28.73-.55v-1.84c-3.03.64-3.67-1.46-3.67-1.46-.55-1.29-1.28-1.65-1.28-1.65-.92-.65.1-.65.1-.65 1.1 0 1.73 1.1 1.73 1.1.92 1.65 2.57 1.2 3.21.92a2 2 0 01.64-1.47c-2.47-.27-5.04-1.19-5.04-5.5 0-1.1.46-2.1 1.2-2.84a3.76 3.76 0 010-2.93s.91-.28 3.11 1.1c1.8-.49 3.7-.49 5.5 0 2.1-1.38 3.02-1.1 3.02-1.1a3.76 3.76 0 010 2.93c.83.74 1.2 1.74 1.2 2.94 0 4.21-2.57 5.13-5.04 5.4.45.37.82.92.82 2.02v3.03c0 .27.1.64.73.55A11 11 0 0012 1.27"></path></svg></a></li>
+                <li><a href="/bittorrent/search" title="Search" aria-label="Go To Search Page"><svg class="svg-icon" aria-hidden="true" focusable="false" viewBox="0 0 24 24"><path d="M15.5 14h-.79l-.28-.27C15.41 12.59 16 11.11 16 9.5 16 5.91 13.09 3 9.5 3S3 5.91 3 9.5 5.91 16 9.5 16c1.61 0 3.09-.59 4.23-1.57l.27.28v.79l5 4.99L20.49 19zm-6 0C7.01 14 5 11.99 5 9.5S7.01 5 9.5 5 14 7.01 14 9.5 11.99 14 9.5 14"></path></svg></a></li>
+                <li><a id="theme-toggle" title="Theme" href="javascript:void(0);" aria-label="Toggle Website Theme"></a></li>
+            </ul>
+        </nav>
+    </header>
+    <main>
+        <article><h1 id="bittorrent-bep-6-fast-allowed-extension-explained">BitTorrent
+BEP 6 Fast Allowed Extension Explained</h1>
+<p>The BitTorrent Enhancement Proposal 6 (BEP 6), known as the Fast
+Extension, introduces several optimizations to the standard BitTorrent
+protocol to improve network efficiency and peer bootstrapping. Central
+to this specification is the "Allowed Fast" mechanism, a feature
+designed to bypass traditional bandwidth choking limitations. This
+article provides a clear overview of BEP 6, explains how the Allowed
+Fast set is generated, and details how it permits peers to download
+specific pieces of data even while being actively choked.</p>
+<h3 id="the-choking-mechanism-in-standard-bittorrent">The Choking
+Mechanism in Standard BitTorrent</h3>
+<p>In the baseline BitTorrent protocol, peer interaction relies heavily
+on "choking." When a client chokes a peer, it stops sending data blocks
+to that peer, usually as part of a tit-for-tat strategy to incentivize
+uploading. Under classic rules, if a peer is choked, any piece requests
+it sends are ignored.</p>
+<p>This creates a bootstrapping problem: a newly joined peer with zero
+completed pieces has nothing to upload, making it difficult to earn
+unchoked status from other peers. Furthermore, peers close to finishing
+a download can experience long delays if the few remaining pieces they
+need are held by peers who currently have them choked.</p>
+<h3 id="what-is-bep-6-fast-extension">What is BEP 6 (Fast
+Extension)?</h3>
+<p>BEP 6 introduces a set of protocol extensions—including
+<code>Suggest Piece</code>, <code>Reject Request</code>,
+<code>Have All</code>, <code>Have None</code>, and
+<code>Allowed Fast</code>—to eliminate unnecessary latency and reduce
+overhead.</p>
+<p>The most impactful of these additions is the
+<code>Allowed Fast</code> message. It defines a selective exemption to
+the choking rule, allowing peers to request and receive a small,
+predefined set of pieces regardless of whether their connection state is
+choked or unchoked.</p>
+<h3 id="how-the-allowed-fast-set-works">How the "Allowed Fast" Set
+Works</h3>
+<p>When two peers connect and both support BEP 6, the serving peer
+generates an "Allowed Fast" set for the receiving peer. This process
+operates under specific rules:</p>
+<ol type="1">
+<li><strong>Deterministic Calculation:</strong> The pieces included in
+the Allowed Fast set are calculated using a standardized hashing
+algorithm defined in BEP 6. This algorithm takes the serving peer's IP
+address, the client's IP address, and the torrent's infohash as inputs.
+Because the formula is deterministic, both peers compute the exact same
+set of piece indices independently.</li>
+<li><strong>Transmission of Allowed Fast Messages:</strong> The serving
+peer sends one or more <code>Allowed Fast</code> messages (message ID
+<code>0x11</code>) containing the piece indices the remote peer is
+permitted to download.</li>
+<li><strong>Requesting While Choked:</strong> When the remote peer is
+choked, it normally cannot request data. However, for pieces listed in
+its Allowed Fast set, it can still send standard <code>Request</code>
+messages.</li>
+<li><strong>Fulfilling the Request:</strong> Instead of dropping or
+rejecting the request, the choked peer recognizes that the requested
+piece is within the Allowed Fast list and transmits the requested
+<code>Piece</code> data.</li>
+</ol>
+<h3 id="why-allowed-fast-improves-swarm-performance">Why Allowed Fast
+Improves Swarm Performance</h3>
+<p>The Allowed Fast extension solves critical edge cases in BitTorrent
+swarms:</p>
+<ul>
+<li><strong>Faster Peer Bootstrapping:</strong> New peers can
+immediately fetch a few pieces without waiting for an unchoke cycle.
+Once they possess these pieces, they can begin uploading them to other
+peers, integrating into the swarm's tit-for-tat economy much
+faster.</li>
+<li><strong>Reduced Overhead:</strong> In standard BitTorrent, choked
+peers often spam request messages during unchoke transitions. BEP 6
+explicitly defines clear boundaries, allowing peers to fetch what is
+available without redundant requests.</li>
+<li><strong>Elimination of "Endgame" Stalls:</strong> Peers that only
+need one or two pieces to complete a torrent do not need to wait
+indefinitely for an unchoke slot to open on a specific peer that holds
+those final blocks.</li>
+</ul></article>
+        <div id=comments-container></div>
+
+        <script>
+            const utterancesScript = document.createElement('script');
+            
+            utterancesScript.setAttribute('src', 'https://utteranc.es/client.js');
+            utterancesScript.setAttribute('repo', 'salivity/bittorrent'); 
+            utterancesScript.setAttribute('issue-term', 'pathname'); 
+            utterancesScript.setAttribute('theme', localStorage.getItem('theme') === 'dark' ? 'github-dark' : 'github-light'); 
+            utterancesScript.setAttribute('crossorigin', 'anonymous');
+            utterancesScript.async = true;
+
+            document.getElementById('comments-container').appendChild(utterancesScript);
+        </script>
+    
+    </main>
+    <footer>
+        <nav>
+            <ul class="footer-links">
+                <li><a href="/bittorrent/privacy-policy">Privacy Policy</a></li>
+                <li><a href="/bittorrent/terms-and-conditions">Terms and Conditions</a></li>
+            </ul>
+        </nav>
+        <div class="copyright">
+            Copyright &copy; <span id="current-year"></span>
+        </div>
+    </footer>
+</body>
+</html>

@@ -1,0 +1,157 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="light">
+<head>
+    <script async src="https://www.googletagmanager.com/gtag/js?id=G-R4Y4YXFHZS"></script>
+    <script>
+        window.dataLayer = window.dataLayer || [];
+
+        function gtag(){
+            dataLayer.push(arguments);
+        }
+
+        gtag('js', new Date());
+
+        gtag('config', 'G-R4Y4YXFHZS');
+    </script>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>How WireGuard VPNs Hide Torrent Metadata from ISPs - bittorrent</title>
+    <meta name="description" content="Using an encrypted tunnel such as a WireGuard VPN completely masks torrent packet metadata from an Internet Service Provider (ISP) through full-packet encapsulation and end-to-end cryptography. By wrapping all BitTorrent transport protocols, application">
+    <link rel="canonical" href="https://salivity.github.io/bittorrent/article/how-wireguard-vpns-hide-torrent-metadata-from-isps">
+    <link rel="icon" href="/bittorrent/favicon.ico">
+    <link rel="stylesheet" href="/bittorrent/css/style.css">
+    <link media="print" rel="stylesheet" href="/bittorrent/css/print.css">
+    <script src="/bittorrent/js/fuse.min.js"></script>
+    <script src="/bittorrent/js/script.js"></script>
+    <script id="MathJax-script" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/4.1.3/tex-chtml.min.js" defer></script>
+    <meta property="og:type" content="website" />
+    <meta property="og:title" content="How WireGuard VPNs Hide Torrent Metadata from ISPs - bittorrent" />
+    <meta property="og:url" content="https://salivity.github.io/bittorrent/article/how-wireguard-vpns-hide-torrent-metadata-from-isps" />
+    <meta property="og:image:url" content="https://salivity.github.io/bittorrent/images/open-graph/default.webp" />
+    <meta property="og:image:secure_url" content="https://salivity.github.io/bittorrent/images/open-graph/default.webp" />
+    <meta property="og:image:width" content="1120" />
+    <meta property="og:image:height" content="630" />
+    <meta property="og:description" content="Using an encrypted tunnel such as a WireGuard VPN completely masks torrent packet metadata from an Internet Service Provider (ISP) through full-packet encapsulation and end-to-end cryptography. By wrapping all BitTorrent transport protocols, application" />
+    <link rel="manifest" href="/bittorrent/pwa/manifest.json" />
+</head>
+<body>
+    <header>
+        <a href="/bittorrent/" aria-label="Go To Home Page" title="Go To Home Page" id="logo">
+            <span>salivity.github.io/</span><span>bittorrent</span>
+        </a>
+        <nav>
+            <ul class="header-links">
+                <li><a href="https://github.com/salivity" title="Github" aria-label="Go To Github Profile Page"><svg class="svg-icon" focusable="false" aria-hidden="true" viewBox="0 0 24 24"><path d="M12 1.27a11 11 0 00-3.48 21.46c.55.09.73-.28.73-.55v-1.84c-3.03.64-3.67-1.46-3.67-1.46-.55-1.29-1.28-1.65-1.28-1.65-.92-.65.1-.65.1-.65 1.1 0 1.73 1.1 1.73 1.1.92 1.65 2.57 1.2 3.21.92a2 2 0 01.64-1.47c-2.47-.27-5.04-1.19-5.04-5.5 0-1.1.46-2.1 1.2-2.84a3.76 3.76 0 010-2.93s.91-.28 3.11 1.1c1.8-.49 3.7-.49 5.5 0 2.1-1.38 3.02-1.1 3.02-1.1a3.76 3.76 0 010 2.93c.83.74 1.2 1.74 1.2 2.94 0 4.21-2.57 5.13-5.04 5.4.45.37.82.92.82 2.02v3.03c0 .27.1.64.73.55A11 11 0 0012 1.27"></path></svg></a></li>
+                <li><a href="/bittorrent/search" title="Search" aria-label="Go To Search Page"><svg class="svg-icon" aria-hidden="true" focusable="false" viewBox="0 0 24 24"><path d="M15.5 14h-.79l-.28-.27C15.41 12.59 16 11.11 16 9.5 16 5.91 13.09 3 9.5 3S3 5.91 3 9.5 5.91 16 9.5 16c1.61 0 3.09-.59 4.23-1.57l.27.28v.79l5 4.99L20.49 19zm-6 0C7.01 14 5 11.99 5 9.5S7.01 5 9.5 5 14 7.01 14 9.5 11.99 14 9.5 14"></path></svg></a></li>
+                <li><a id="theme-toggle" title="Theme" href="javascript:void(0);" aria-label="Toggle Website Theme"></a></li>
+            </ul>
+        </nav>
+    </header>
+    <main>
+        <article><h1 id="how-wireguard-vpns-hide-torrent-metadata-from-isps">How
+WireGuard VPNs Hide Torrent Metadata from ISPs</h1>
+<p>Using an encrypted tunnel such as a WireGuard VPN completely masks
+torrent packet metadata from an Internet Service Provider (ISP) through
+full-packet encapsulation and end-to-end cryptography. By wrapping all
+BitTorrent transport protocols, application headers, and peer-to-peer
+data inside encrypted packets destined for a single remote server, the
+VPN prevents deep packet inspection (DPI) systems from identifying file
+identifiers, peer connections, tracker communications, or protocol
+signatures.</p>
+<h2 id="what-isps-normally-see-without-a-vpn">What ISPs Normally See
+Without a VPN</h2>
+<p>When downloading or seeding files using standard BitTorrent protocols
+without encryption, traffic is exposed at multiple network layers:</p>
+<ul>
+<li><strong>Application-Layer Signatures:</strong> Standard BitTorrent
+handshakes and data transfers contain distinct protocol identifiers and
+signatures easily categorized by an ISP.</li>
+<li><strong>Infohashes:</strong> The specific cryptographic hash
+(<code>infohash</code>) that identifies the exact torrent being shared
+is sent in plaintext during tracker queries and peer handshakes.</li>
+<li><strong>Tracker and DHT Requests:</strong> Plaintext DNS and
+HTTP/UDP queries directly expose the tracker servers you contact to
+coordinate file transfers.</li>
+<li><strong>Peer IP Addresses and Ports:</strong> The ISP can see every
+individual IP address and port combination you connect to across the
+decentralized swarm.</li>
+</ul>
+<h2 id="how-tunneling-and-encapsulation-hide-the-metadata">How Tunneling
+and Encapsulation Hide the Metadata</h2>
+<p>A VPN functions by establishing a secure virtual network interface on
+your device, altering how packets are structured and routed before they
+reach the ISP’s network infrastructure.</p>
+<h3 id="1-full-outer-encapsulation">1. Full Outer Encapsulation</h3>
+<p>When your BitTorrent client generates a packet, it contains the
+payload, the transport layer header (TCP or UDP with torrent-specific
+port numbers), and the network layer header (source and destination peer
+IP).</p>
+<p>A VPN protocol like WireGuard takes this entire original packet and
+treats it strictly as payload data. It wraps this data inside a new,
+generic outer IP and UDP packet. To your ISP, the destination IP address
+is exclusively the VPN server, and the source IP is your local
+address.</p>
+<h3 id="2-strong-cryptographic-masking">2. Strong Cryptographic
+Masking</h3>
+<p>Before the encapsulated packet leaves your system, WireGuard encrypts
+the inner packet using modern cryptographic primitives, specifically
+ChaCha20 for symmetric encryption and Poly1305 for authentication.</p>
+<p>Because the encryption applies to the entire original packet:</p>
+<ul>
+<li>The BitTorrent protocol headers become indistinguishable from
+high-entropy random data.</li>
+<li>Infohashes, piece data, and client identification strings are
+unreadable.</li>
+<li>Port numbers used by the BitTorrent client are hidden inside the
+encrypted payload; the ISP only sees the outer UDP port used by the VPN
+tunnel.</li>
+</ul>
+<h3 id="3-dns-and-tracker-query-redirection">3. DNS and Tracker Query
+Redirection</h3>
+<p>BitTorrent clients regularly resolve domain names for trackers and
+web seeds. Without a VPN, these queries go through the ISP's DNS
+servers. An encrypted tunnel forces all DNS requests through the
+encrypted channel to be resolved privately by the VPN provider, denying
+the ISP visibility into which domains or trackers are being queried.</p>
+<h2 id="the-result-from-the-isps-perspective">The Result from the ISP's
+Perspective</h2>
+<p>When an encrypted WireGuard tunnel is active, Deep Packet Inspection
+(DPI) tools deployed by ISPs can only observe:</p>
+<ol type="1">
+<li>A continuous stream of encrypted UDP packets.</li>
+<li>The IP address of the VPN server.</li>
+<li>The timestamps and byte size of the packets.</li>
+</ol>
+<p>Because all internal IP addresses, transport headers, infohashes, and
+payload signatures are cryptographically sealed within the tunnel, the
+ISP cannot determine whether the traffic is a BitTorrent transfer, a
+video stream, a voice call, or regular web browsing.</p></article>
+        <div id=comments-container></div>
+
+        <script>
+            const utterancesScript = document.createElement('script');
+            
+            utterancesScript.setAttribute('src', 'https://utteranc.es/client.js');
+            utterancesScript.setAttribute('repo', 'salivity/bittorrent'); 
+            utterancesScript.setAttribute('issue-term', 'pathname'); 
+            utterancesScript.setAttribute('theme', localStorage.getItem('theme') === 'dark' ? 'github-dark' : 'github-light'); 
+            utterancesScript.setAttribute('crossorigin', 'anonymous');
+            utterancesScript.async = true;
+
+            document.getElementById('comments-container').appendChild(utterancesScript);
+        </script>
+    
+    </main>
+    <footer>
+        <nav>
+            <ul class="footer-links">
+                <li><a href="/bittorrent/privacy-policy">Privacy Policy</a></li>
+                <li><a href="/bittorrent/terms-and-conditions">Terms and Conditions</a></li>
+            </ul>
+        </nav>
+        <div class="copyright">
+            Copyright &copy; <span id="current-year"></span>
+        </div>
+    </footer>
+</body>
+</html>

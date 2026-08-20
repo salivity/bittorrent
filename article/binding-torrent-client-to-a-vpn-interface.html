@@ -1,0 +1,147 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="light">
+<head>
+    <script async src="https://www.googletagmanager.com/gtag/js?id=G-R4Y4YXFHZS"></script>
+    <script>
+        window.dataLayer = window.dataLayer || [];
+
+        function gtag(){
+            dataLayer.push(arguments);
+        }
+
+        gtag('js', new Date());
+
+        gtag('config', 'G-R4Y4YXFHZS');
+    </script>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Binding Torrent Client to a VPN Interface - bittorrent</title>
+    <meta name="description" content="Binding a torrent client directly to a specific VPN network interface ensures that peer-to-peer (P2P) traffic can only enter and leave your system through the encrypted VPN tunnel. This configuration is widely considered the most reliable method for prev">
+    <link rel="canonical" href="https://salivity.github.io/bittorrent/article/binding-torrent-client-to-a-vpn-interface">
+    <link rel="icon" href="/bittorrent/favicon.ico">
+    <link rel="stylesheet" href="/bittorrent/css/style.css">
+    <link media="print" rel="stylesheet" href="/bittorrent/css/print.css">
+    <script src="/bittorrent/js/fuse.min.js"></script>
+    <script src="/bittorrent/js/script.js"></script>
+    <script id="MathJax-script" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/4.1.3/tex-chtml.min.js" defer></script>
+    <meta property="og:type" content="website" />
+    <meta property="og:title" content="Binding Torrent Client to a VPN Interface - bittorrent" />
+    <meta property="og:url" content="https://salivity.github.io/bittorrent/article/binding-torrent-client-to-a-vpn-interface" />
+    <meta property="og:image:url" content="https://salivity.github.io/bittorrent/images/open-graph/default.webp" />
+    <meta property="og:image:secure_url" content="https://salivity.github.io/bittorrent/images/open-graph/default.webp" />
+    <meta property="og:image:width" content="1120" />
+    <meta property="og:image:height" content="630" />
+    <meta property="og:description" content="Binding a torrent client directly to a specific VPN network interface ensures that peer-to-peer (P2P) traffic can only enter and leave your system through the encrypted VPN tunnel. This configuration is widely considered the most reliable method for prev" />
+    <link rel="manifest" href="/bittorrent/pwa/manifest.json" />
+</head>
+<body>
+    <header>
+        <a href="/bittorrent/" aria-label="Go To Home Page" title="Go To Home Page" id="logo">
+            <span>salivity.github.io/</span><span>bittorrent</span>
+        </a>
+        <nav>
+            <ul class="header-links">
+                <li><a href="https://github.com/salivity" title="Github" aria-label="Go To Github Profile Page"><svg class="svg-icon" focusable="false" aria-hidden="true" viewBox="0 0 24 24"><path d="M12 1.27a11 11 0 00-3.48 21.46c.55.09.73-.28.73-.55v-1.84c-3.03.64-3.67-1.46-3.67-1.46-.55-1.29-1.28-1.65-1.28-1.65-.92-.65.1-.65.1-.65 1.1 0 1.73 1.1 1.73 1.1.92 1.65 2.57 1.2 3.21.92a2 2 0 01.64-1.47c-2.47-.27-5.04-1.19-5.04-5.5 0-1.1.46-2.1 1.2-2.84a3.76 3.76 0 010-2.93s.91-.28 3.11 1.1c1.8-.49 3.7-.49 5.5 0 2.1-1.38 3.02-1.1 3.02-1.1a3.76 3.76 0 010 2.93c.83.74 1.2 1.74 1.2 2.94 0 4.21-2.57 5.13-5.04 5.4.45.37.82.92.82 2.02v3.03c0 .27.1.64.73.55A11 11 0 0012 1.27"></path></svg></a></li>
+                <li><a href="/bittorrent/search" title="Search" aria-label="Go To Search Page"><svg class="svg-icon" aria-hidden="true" focusable="false" viewBox="0 0 24 24"><path d="M15.5 14h-.79l-.28-.27C15.41 12.59 16 11.11 16 9.5 16 5.91 13.09 3 9.5 3S3 5.91 3 9.5 5.91 16 9.5 16c1.61 0 3.09-.59 4.23-1.57l.27.28v.79l5 4.99L20.49 19zm-6 0C7.01 14 5 11.99 5 9.5S7.01 5 9.5 5 14 7.01 14 9.5 11.99 14 9.5 14"></path></svg></a></li>
+                <li><a id="theme-toggle" title="Theme" href="javascript:void(0);" aria-label="Toggle Website Theme"></a></li>
+            </ul>
+        </nav>
+    </header>
+    <main>
+        <article><h1 id="binding-torrent-client-to-a-vpn-interface">Binding Torrent
+Client to a VPN Interface</h1>
+<p>Binding a torrent client directly to a specific VPN network interface
+ensures that peer-to-peer (P2P) traffic can only enter and leave your
+system through the encrypted VPN tunnel. This configuration is widely
+considered the most reliable method for preventing accidental IP address
+exposure, outperforming standard software kill switches during
+connection drops or network reconfiguration. While it dramatically
+enhances privacy by strictly isolating torrent traffic to the VPN
+adapter, it remains reliant on the underlying security of the VPN
+provider and does not protect against threats contained within
+downloaded files.</p>
+<h3 id="absolute-protection-against-ip-leaks">Absolute Protection
+Against IP Leaks</h3>
+<p>When you bind a torrent client (such as qBittorrent, Transmission, or
+Deluge) directly to a network adapter (such as <code>tun0</code>,
+<code>wg0</code>, or the Windows TAP/TUN adapter), the client instructs
+the operating system to route its network sockets exclusively through
+that interface. If the VPN connection drops, the virtual network
+interface ceases to exist or goes inactive. Because the torrent client
+has no permission to use the default physical interface (Ethernet or
+Wi-Fi), all active transfers immediately halt, ensuring your real public
+IP address is never broadcast to the torrent swarm.</p>
+<h3 id="superior-reliability-over-software-kill-switches">Superior
+Reliability Over Software Kill Switches</h3>
+<p>Standard "kill switches" integrated into VPN applications typically
+monitor network state and use local firewall rules to block traffic when
+a disconnect is detected. However, a slight delay between the
+disconnection and rule application can cause a brief packet leak.
+Binding at the application layer eliminates this race condition entirely
+because the torrent client cannot physically communicate over any
+adapter other than the one explicitly defined in its settings.</p>
+<h3
+id="mitigation-of-split-tunneling-and-multi-homed-network-errors">Mitigation
+of Split-Tunneling and Multi-Homed Network Errors</h3>
+<p>In complex network setups—such as systems utilizing split tunneling,
+virtual machines, or multiple simultaneous connections—operating systems
+can route packets through unexpected interfaces based on routing table
+metrics. Interface binding overrides general routing decisions for that
+specific application, ensuring that torrent traffic never accidentally
+bypasses the VPN tunnel even if other local applications are routed
+through the regular ISP connection.</p>
+<h3 id="prevention-of-dns-and-ipv6-leaks">Prevention of DNS and IPv6
+Leaks</h3>
+<p>Misconfigured network stacks frequently leak IPv6 traffic or DNS
+requests across the default gateway when a VPN only routes IPv4. By
+tethering the client entirely to the VPN adapter, all name resolution
+requests and peer discoveries generated by the client are strictly
+constrained to the VPN tunnel's routing domain, preventing ISP-level
+visibility into P2P activity.</p>
+<h3 id="security-limitations-and-residual-risks">Security Limitations
+and Residual Risks</h3>
+<p>While interface binding solves network-level privacy issues, specific
+security limitations remain:</p>
+<ul>
+<li><strong>VPN Trust and Logging:</strong> Traffic routed through the
+interface remains visible to the VPN provider. If the provider logs
+connection metadata or yields to legal requests, network binding
+provides no additional anonymity.</li>
+<li><strong>Malicious Payloads:</strong> Encrypting and isolating
+network traffic does not protect against malware, compromised torrent
+payloads, or malicious scripts embedded within downloaded data.</li>
+<li><strong>Dynamic Adapter Names:</strong> Some VPN protocols or
+operating system updates dynamically generate new adapter names upon
+reconnection. If the adapter name changes, the client may either stop
+working or, if poorly designed, fall back to default settings unless
+properly configured.</li>
+</ul></article>
+        <div id=comments-container></div>
+
+        <script>
+            const utterancesScript = document.createElement('script');
+            
+            utterancesScript.setAttribute('src', 'https://utteranc.es/client.js');
+            utterancesScript.setAttribute('repo', 'salivity/bittorrent'); 
+            utterancesScript.setAttribute('issue-term', 'pathname'); 
+            utterancesScript.setAttribute('theme', localStorage.getItem('theme') === 'dark' ? 'github-dark' : 'github-light'); 
+            utterancesScript.setAttribute('crossorigin', 'anonymous');
+            utterancesScript.async = true;
+
+            document.getElementById('comments-container').appendChild(utterancesScript);
+        </script>
+    
+    </main>
+    <footer>
+        <nav>
+            <ul class="footer-links">
+                <li><a href="/bittorrent/privacy-policy">Privacy Policy</a></li>
+                <li><a href="/bittorrent/terms-and-conditions">Terms and Conditions</a></li>
+            </ul>
+        </nav>
+        <div class="copyright">
+            Copyright &copy; <span id="current-year"></span>
+        </div>
+    </footer>
+</body>
+</html>

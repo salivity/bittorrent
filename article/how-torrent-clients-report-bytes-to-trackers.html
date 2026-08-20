@@ -1,0 +1,146 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="light">
+<head>
+    <script async src="https://www.googletagmanager.com/gtag/js?id=G-R4Y4YXFHZS"></script>
+    <script>
+        window.dataLayer = window.dataLayer || [];
+
+        function gtag(){
+            dataLayer.push(arguments);
+        }
+
+        gtag('js', new Date());
+
+        gtag('config', 'G-R4Y4YXFHZS');
+    </script>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>How Torrent Clients Report Bytes to Trackers - bittorrent</title>
+    <meta name="description" content="BitTorrent clients continuously update trackers regarding their transfer progress using periodic messages called "announces." Through these requests, the client reports key metrics, specifically the total bytes uploaded, downloaded, and the number of byt">
+    <link rel="canonical" href="https://salivity.github.io/bittorrent/article/how-torrent-clients-report-bytes-to-trackers">
+    <link rel="icon" href="/bittorrent/favicon.ico">
+    <link rel="stylesheet" href="/bittorrent/css/style.css">
+    <link media="print" rel="stylesheet" href="/bittorrent/css/print.css">
+    <script src="/bittorrent/js/fuse.min.js"></script>
+    <script src="/bittorrent/js/script.js"></script>
+    <script id="MathJax-script" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/4.1.3/tex-chtml.min.js" defer></script>
+    <meta property="og:type" content="website" />
+    <meta property="og:title" content="How Torrent Clients Report Bytes to Trackers - bittorrent" />
+    <meta property="og:url" content="https://salivity.github.io/bittorrent/article/how-torrent-clients-report-bytes-to-trackers" />
+    <meta property="og:image:url" content="https://salivity.github.io/bittorrent/images/open-graph/default.webp" />
+    <meta property="og:image:secure_url" content="https://salivity.github.io/bittorrent/images/open-graph/default.webp" />
+    <meta property="og:image:width" content="1120" />
+    <meta property="og:image:height" content="630" />
+    <meta property="og:description" content="BitTorrent clients continuously update trackers regarding their transfer progress using periodic messages called "announces." Through these requests, the client reports key metrics, specifically the total bytes uploaded, downloaded, and the number of byt" />
+    <link rel="manifest" href="/bittorrent/pwa/manifest.json" />
+</head>
+<body>
+    <header>
+        <a href="/bittorrent/" aria-label="Go To Home Page" title="Go To Home Page" id="logo">
+            <span>salivity.github.io/</span><span>bittorrent</span>
+        </a>
+        <nav>
+            <ul class="header-links">
+                <li><a href="https://github.com/salivity" title="Github" aria-label="Go To Github Profile Page"><svg class="svg-icon" focusable="false" aria-hidden="true" viewBox="0 0 24 24"><path d="M12 1.27a11 11 0 00-3.48 21.46c.55.09.73-.28.73-.55v-1.84c-3.03.64-3.67-1.46-3.67-1.46-.55-1.29-1.28-1.65-1.28-1.65-.92-.65.1-.65.1-.65 1.1 0 1.73 1.1 1.73 1.1.92 1.65 2.57 1.2 3.21.92a2 2 0 01.64-1.47c-2.47-.27-5.04-1.19-5.04-5.5 0-1.1.46-2.1 1.2-2.84a3.76 3.76 0 010-2.93s.91-.28 3.11 1.1c1.8-.49 3.7-.49 5.5 0 2.1-1.38 3.02-1.1 3.02-1.1a3.76 3.76 0 010 2.93c.83.74 1.2 1.74 1.2 2.94 0 4.21-2.57 5.13-5.04 5.4.45.37.82.92.82 2.02v3.03c0 .27.1.64.73.55A11 11 0 0012 1.27"></path></svg></a></li>
+                <li><a href="/bittorrent/search" title="Search" aria-label="Go To Search Page"><svg class="svg-icon" aria-hidden="true" focusable="false" viewBox="0 0 24 24"><path d="M15.5 14h-.79l-.28-.27C15.41 12.59 16 11.11 16 9.5 16 5.91 13.09 3 9.5 3S3 5.91 3 9.5 5.91 16 9.5 16c1.61 0 3.09-.59 4.23-1.57l.27.28v.79l5 4.99L20.49 19zm-6 0C7.01 14 5 11.99 5 9.5S7.01 5 9.5 5 14 7.01 14 9.5 11.99 14 9.5 14"></path></svg></a></li>
+                <li><a id="theme-toggle" title="Theme" href="javascript:void(0);" aria-label="Toggle Website Theme"></a></li>
+            </ul>
+        </nav>
+    </header>
+    <main>
+        <article><h1 id="how-torrent-clients-report-bytes-to-trackers">How Torrent
+Clients Report Bytes to Trackers</h1>
+<p>BitTorrent clients continuously update trackers regarding their
+transfer progress using periodic messages called "announces." Through
+these requests, the client reports key metrics, specifically the total
+bytes uploaded, downloaded, and the number of bytes left to complete the
+file. This communication allows the tracker to maintain swarm
+statistics, calculate user sharing ratios on private trackers, and
+provide peer lists to participating clients.</p>
+<h3 id="the-announce-request">The Announce Request</h3>
+<p>When a BitTorrent client communicates with a tracker, it sends an
+announce request over HTTP, HTTPS, or UDP. This message is sent when a
+torrent is started, stopped, completed, or at regular intervals defined
+by the tracker (typically every 30 to 60 minutes).</p>
+<h3 id="core-parameters-sent-by-the-client">Core Parameters Sent by the
+Client</h3>
+<p>The client includes three primary numerical values in the announce
+request payload:</p>
+<ul>
+<li><strong><code>uploaded</code></strong>: A 64-bit integer
+representing the total number of bytes the client has sent to other
+peers for this specific torrent since the client began
+transferring.</li>
+<li><strong><code>downloaded</code></strong>: A 64-bit integer
+representing the total number of verified, non-corrupted payload bytes
+the client has received from peers. This generally does not include
+protocol overhead or discarded corrupted data.</li>
+<li><strong><code>left</code></strong>: A 64-bit integer indicating the
+exact number of bytes the client still needs to download to achieve 100%
+completion. If a client is acting purely as a seeder, this value is sent
+as <code>0</code>.</li>
+</ul>
+<h3 id="httphttps-announce-protocol">HTTP/HTTPS Announce Protocol</h3>
+<p>In the standard HTTP/HTTPS tracker protocol (BEP 3), these metrics
+are passed as query parameters within a standard <code>GET</code>
+request.</p>
+<p>A simplified announce request URL looks like this:</p>
+<p><code>https://tracker.example.com/announce?info_hash=%xx%xx...&amp;peer_id=-UT3530-...&amp;port=6881&amp;uploaded=104857600&amp;downloaded=524288000&amp;left=1048576000&amp;event=started</code></p>
+<p>In this example:</p>
+<ul>
+<li><code>uploaded=104857600</code> reports 100 MB uploaded.</li>
+<li><code>downloaded=524288000</code> reports 500 MB downloaded.</li>
+<li><code>left=1048576000</code> reports 1 GB remaining.</li>
+<li><code>event</code> specifies the state change (<code>started</code>,
+<code>stopped</code>, <code>completed</code>, or omitted if it is a
+regular interval announce).</li>
+</ul>
+<h3 id="udp-announce-protocol">UDP Announce Protocol</h3>
+<p>Because HTTP requests create significant server overhead, modern
+swarms commonly use the UDP Tracker Protocol (BEP 15). Under this binary
+protocol, reporting works identically in function but transmits raw
+binary data instead of text parameters:</p>
+<ul>
+<li>Offset 32–39: 64-bit integer for <code>downloaded</code></li>
+<li>Offset 40–47: 64-bit integer for <code>left</code></li>
+<li>Offset 48–55: 64-bit integer for <code>uploaded</code></li>
+</ul>
+<h3 id="how-the-tracker-calculates-deltas">How the Tracker Calculates
+Deltas</h3>
+<p>The client always reports cumulative values for the current session,
+not the amount transferred since the last individual announce. To track
+live bandwidth or update user accounts, the tracker compares the current
+announce numbers with the previous record stored in its database:</p>
+<p><span class="math display">\[\text{Delta Upload} = \text{Current
+Uploaded} - \text{Previous Uploaded}\]</span></p>
+<p>By dividing this delta by the time elapsed between announces, the
+tracker can also determine the client's average transfer speed.</p></article>
+        <div id=comments-container></div>
+
+        <script>
+            const utterancesScript = document.createElement('script');
+            
+            utterancesScript.setAttribute('src', 'https://utteranc.es/client.js');
+            utterancesScript.setAttribute('repo', 'salivity/bittorrent'); 
+            utterancesScript.setAttribute('issue-term', 'pathname'); 
+            utterancesScript.setAttribute('theme', localStorage.getItem('theme') === 'dark' ? 'github-dark' : 'github-light'); 
+            utterancesScript.setAttribute('crossorigin', 'anonymous');
+            utterancesScript.async = true;
+
+            document.getElementById('comments-container').appendChild(utterancesScript);
+        </script>
+    
+    </main>
+    <footer>
+        <nav>
+            <ul class="footer-links">
+                <li><a href="/bittorrent/privacy-policy">Privacy Policy</a></li>
+                <li><a href="/bittorrent/terms-and-conditions">Terms and Conditions</a></li>
+            </ul>
+        </nav>
+        <div class="copyright">
+            Copyright &copy; <span id="current-year"></span>
+        </div>
+    </footer>
+</body>
+</html>

@@ -1,0 +1,142 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="light">
+<head>
+    <script async src="https://www.googletagmanager.com/gtag/js?id=G-R4Y4YXFHZS"></script>
+    <script>
+        window.dataLayer = window.dataLayer || [];
+
+        function gtag(){
+            dataLayer.push(arguments);
+        }
+
+        gtag('js', new Date());
+
+        gtag('config', 'G-R4Y4YXFHZS');
+    </script>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>How PAR2 Parity Files Provide Torrent Error Correction - bittorrent</title>
+    <meta name="description" content="PAR2 (Parchive 2.0) files provide robust data protection and recovery for large file distributions by generating mathematical parity data capable of repairing damaged or incomplete downloads. By utilizing advanced algorithms like Reed-Solomon coding, PAR">
+    <link rel="canonical" href="https://salivity.github.io/bittorrent/article/how-par2-parity-files-provide-torrent-error-correction">
+    <link rel="icon" href="/bittorrent/favicon.ico">
+    <link rel="stylesheet" href="/bittorrent/css/style.css">
+    <link media="print" rel="stylesheet" href="/bittorrent/css/print.css">
+    <script src="/bittorrent/js/fuse.min.js"></script>
+    <script src="/bittorrent/js/script.js"></script>
+    <script id="MathJax-script" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/4.1.3/tex-chtml.min.js" defer></script>
+    <meta property="og:type" content="website" />
+    <meta property="og:title" content="How PAR2 Parity Files Provide Torrent Error Correction - bittorrent" />
+    <meta property="og:url" content="https://salivity.github.io/bittorrent/article/how-par2-parity-files-provide-torrent-error-correction" />
+    <meta property="og:image:url" content="https://salivity.github.io/bittorrent/images/open-graph/default.webp" />
+    <meta property="og:image:secure_url" content="https://salivity.github.io/bittorrent/images/open-graph/default.webp" />
+    <meta property="og:image:width" content="1120" />
+    <meta property="og:image:height" content="630" />
+    <meta property="og:description" content="PAR2 (Parchive 2.0) files provide robust data protection and recovery for large file distributions by generating mathematical parity data capable of repairing damaged or incomplete downloads. By utilizing advanced algorithms like Reed-Solomon coding, PAR" />
+    <link rel="manifest" href="/bittorrent/pwa/manifest.json" />
+</head>
+<body>
+    <header>
+        <a href="/bittorrent/" aria-label="Go To Home Page" title="Go To Home Page" id="logo">
+            <span>salivity.github.io/</span><span>bittorrent</span>
+        </a>
+        <nav>
+            <ul class="header-links">
+                <li><a href="https://github.com/salivity" title="Github" aria-label="Go To Github Profile Page"><svg class="svg-icon" focusable="false" aria-hidden="true" viewBox="0 0 24 24"><path d="M12 1.27a11 11 0 00-3.48 21.46c.55.09.73-.28.73-.55v-1.84c-3.03.64-3.67-1.46-3.67-1.46-.55-1.29-1.28-1.65-1.28-1.65-.92-.65.1-.65.1-.65 1.1 0 1.73 1.1 1.73 1.1.92 1.65 2.57 1.2 3.21.92a2 2 0 01.64-1.47c-2.47-.27-5.04-1.19-5.04-5.5 0-1.1.46-2.1 1.2-2.84a3.76 3.76 0 010-2.93s.91-.28 3.11 1.1c1.8-.49 3.7-.49 5.5 0 2.1-1.38 3.02-1.1 3.02-1.1a3.76 3.76 0 010 2.93c.83.74 1.2 1.74 1.2 2.94 0 4.21-2.57 5.13-5.04 5.4.45.37.82.92.82 2.02v3.03c0 .27.1.64.73.55A11 11 0 0012 1.27"></path></svg></a></li>
+                <li><a href="/bittorrent/search" title="Search" aria-label="Go To Search Page"><svg class="svg-icon" aria-hidden="true" focusable="false" viewBox="0 0 24 24"><path d="M15.5 14h-.79l-.28-.27C15.41 12.59 16 11.11 16 9.5 16 5.91 13.09 3 9.5 3S3 5.91 3 9.5 5.91 16 9.5 16c1.61 0 3.09-.59 4.23-1.57l.27.28v.79l5 4.99L20.49 19zm-6 0C7.01 14 5 11.99 5 9.5S7.01 5 9.5 5 14 7.01 14 9.5 11.99 14 9.5 14"></path></svg></a></li>
+                <li><a id="theme-toggle" title="Theme" href="javascript:void(0);" aria-label="Toggle Website Theme"></a></li>
+            </ul>
+        </nav>
+    </header>
+    <main>
+        <article><h1 id="how-par2-parity-files-provide-torrent-error-correction">How PAR2
+Parity Files Provide Torrent Error Correction</h1>
+<p>PAR2 (Parchive 2.0) files provide robust data protection and recovery
+for large file distributions by generating mathematical parity data
+capable of repairing damaged or incomplete downloads. By utilizing
+advanced algorithms like Reed-Solomon coding, PAR2 files allow users
+downloading via BitTorrent to verify the integrity of multi-file
+archives and reconstruct missing or corrupted chunks without needing to
+redownload the original source files.</p>
+<h3 id="the-underlying-technology-reed-solomon-coding">The Underlying
+Technology: Reed-Solomon Coding</h3>
+<p>At the core of PAR2 is Reed-Solomon error correction, a mathematical
+algorithm that treats data as points on a polynomial. When a PAR2
+archive is created, the source files are sliced into uniform data
+blocks. The PAR2 algorithm then performs linear algebra across these
+blocks to generate independent recovery blocks (parity slices).</p>
+<p>Because of the mathematical properties of Reed-Solomon coding, parity
+blocks are non-specific. This means any single parity block can replace
+<em>any</em> single missing or corrupted data block. If a download is
+missing 10 data blocks, any 10 PAR2 recovery blocks can reconstruct
+them, regardless of which specific files or parts of the archive were
+damaged.</p>
+<h3 id="how-par2-works-in-torrent-environments">How PAR2 Works in
+Torrent Environments</h3>
+<p>While the BitTorrent protocol includes built-in piece verification
+using SHA-1 or SHA-256 hashes, it relies on an active swarm to re-fetch
+corrupted or missing pieces. In scenarios where a torrent has low seeder
+availability, incomplete seeds, or file-system level bit rot after
+downloading, the swarm may not be able to supply the missing pieces.
+PAR2 solves this at the payload level through a distinct process:</p>
+<ol type="1">
+<li><strong>Block-Level Hashing and Identification:</strong> PAR2 files
+store cryptographic checksums (typically MD5 and CRC32) for individual
+slices of every file in the set. When run, a PAR2 client scans the
+downloaded files, matches intact blocks, and pinpoints the exact
+locations and quantities of damaged or missing slices.</li>
+<li><strong>Dynamic File Reconstruction:</strong> Once the client
+determines that <span class="math inline">\(N\)</span> blocks are
+damaged or missing, it checks if at least <span
+class="math inline">\(N\)</span> parity blocks are available in the
+accompanying <code>.par2</code> recovery files.</li>
+<li><strong>Matrix-Based Repair:</strong> The recovery tool solves a
+system of linear equations using the available data blocks and parity
+blocks to mathematically regenerate the exact original data of the
+damaged slices and writes them back to disk.</li>
+</ol>
+<h3 id="advantages-for-large-file-sets">Advantages for Large File
+Sets</h3>
+<p>Distributing PAR2 files alongside large file sets via torrents offers
+several key operational benefits:</p>
+<ul>
+<li><strong>Efficient Bandwidth Usage:</strong> Creators typically only
+need to create a small percentage of parity data (e.g., 5% to 10% of the
+total dataset size). Downloaders only need to fetch the small PAR2 files
+if corruption occurs, avoiding large re-downloads.</li>
+<li><strong>Resilience Against Renamed or Moved Files:</strong> PAR2
+identifies files by data content and slice hashes rather than filenames,
+allowing it to detect and repair data even if files were accidentally
+renamed or reorganized.</li>
+<li><strong>Long-Term Archive Preservation:</strong> For torrents
+archived to local storage, PAR2 acts as a self-healing layer against bit
+rot, drive degradation, and incomplete storage transfers.</li>
+</ul></article>
+        <div id=comments-container></div>
+
+        <script>
+            const utterancesScript = document.createElement('script');
+            
+            utterancesScript.setAttribute('src', 'https://utteranc.es/client.js');
+            utterancesScript.setAttribute('repo', 'salivity/bittorrent'); 
+            utterancesScript.setAttribute('issue-term', 'pathname'); 
+            utterancesScript.setAttribute('theme', localStorage.getItem('theme') === 'dark' ? 'github-dark' : 'github-light'); 
+            utterancesScript.setAttribute('crossorigin', 'anonymous');
+            utterancesScript.async = true;
+
+            document.getElementById('comments-container').appendChild(utterancesScript);
+        </script>
+    
+    </main>
+    <footer>
+        <nav>
+            <ul class="footer-links">
+                <li><a href="/bittorrent/privacy-policy">Privacy Policy</a></li>
+                <li><a href="/bittorrent/terms-and-conditions">Terms and Conditions</a></li>
+            </ul>
+        </nav>
+        <div class="copyright">
+            Copyright &copy; <span id="current-year"></span>
+        </div>
+    </footer>
+</body>
+</html>

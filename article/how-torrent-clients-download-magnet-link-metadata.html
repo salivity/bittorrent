@@ -1,0 +1,173 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="light">
+<head>
+    <script async src="https://www.googletagmanager.com/gtag/js?id=G-R4Y4YXFHZS"></script>
+    <script>
+        window.dataLayer = window.dataLayer || [];
+
+        function gtag(){
+            dataLayer.push(arguments);
+        }
+
+        gtag('js', new Date());
+
+        gtag('config', 'G-R4Y4YXFHZS');
+    </script>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>How Torrent Clients Download Magnet Link Metadata - bittorrent</title>
+    <meta name="description" content="When you click a magnet link, your torrent client receives only a cryptographic identifier rather than a complete blueprint of the files you wish to download. Unlike traditional .torrent files, which contain full file listings and piece hashes, a magnet">
+    <link rel="canonical" href="https://salivity.github.io/bittorrent/article/how-torrent-clients-download-magnet-link-metadata">
+    <link rel="icon" href="/bittorrent/favicon.ico">
+    <link rel="stylesheet" href="/bittorrent/css/style.css">
+    <link media="print" rel="stylesheet" href="/bittorrent/css/print.css">
+    <script src="/bittorrent/js/fuse.min.js"></script>
+    <script src="/bittorrent/js/script.js"></script>
+    <script id="MathJax-script" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/4.1.3/tex-chtml.min.js" defer></script>
+    <meta property="og:type" content="website" />
+    <meta property="og:title" content="How Torrent Clients Download Magnet Link Metadata - bittorrent" />
+    <meta property="og:url" content="https://salivity.github.io/bittorrent/article/how-torrent-clients-download-magnet-link-metadata" />
+    <meta property="og:image:url" content="https://salivity.github.io/bittorrent/images/open-graph/default.webp" />
+    <meta property="og:image:secure_url" content="https://salivity.github.io/bittorrent/images/open-graph/default.webp" />
+    <meta property="og:image:width" content="1120" />
+    <meta property="og:image:height" content="630" />
+    <meta property="og:description" content="When you click a magnet link, your torrent client receives only a cryptographic identifier rather than a complete blueprint of the files you wish to download. Unlike traditional .torrent files, which contain full file listings and piece hashes, a magnet" />
+    <link rel="manifest" href="/bittorrent/pwa/manifest.json" />
+</head>
+<body>
+    <header>
+        <a href="/bittorrent/" aria-label="Go To Home Page" title="Go To Home Page" id="logo">
+            <span>salivity.github.io/</span><span>bittorrent</span>
+        </a>
+        <nav>
+            <ul class="header-links">
+                <li><a href="https://github.com/salivity" title="Github" aria-label="Go To Github Profile Page"><svg class="svg-icon" focusable="false" aria-hidden="true" viewBox="0 0 24 24"><path d="M12 1.27a11 11 0 00-3.48 21.46c.55.09.73-.28.73-.55v-1.84c-3.03.64-3.67-1.46-3.67-1.46-.55-1.29-1.28-1.65-1.28-1.65-.92-.65.1-.65.1-.65 1.1 0 1.73 1.1 1.73 1.1.92 1.65 2.57 1.2 3.21.92a2 2 0 01.64-1.47c-2.47-.27-5.04-1.19-5.04-5.5 0-1.1.46-2.1 1.2-2.84a3.76 3.76 0 010-2.93s.91-.28 3.11 1.1c1.8-.49 3.7-.49 5.5 0 2.1-1.38 3.02-1.1 3.02-1.1a3.76 3.76 0 010 2.93c.83.74 1.2 1.74 1.2 2.94 0 4.21-2.57 5.13-5.04 5.4.45.37.82.92.82 2.02v3.03c0 .27.1.64.73.55A11 11 0 0012 1.27"></path></svg></a></li>
+                <li><a href="/bittorrent/search" title="Search" aria-label="Go To Search Page"><svg class="svg-icon" aria-hidden="true" focusable="false" viewBox="0 0 24 24"><path d="M15.5 14h-.79l-.28-.27C15.41 12.59 16 11.11 16 9.5 16 5.91 13.09 3 9.5 3S3 5.91 3 9.5 5.91 16 9.5 16c1.61 0 3.09-.59 4.23-1.57l.27.28v.79l5 4.99L20.49 19zm-6 0C7.01 14 5 11.99 5 9.5S7.01 5 9.5 5 14 7.01 14 9.5 11.99 14 9.5 14"></path></svg></a></li>
+                <li><a id="theme-toggle" title="Theme" href="javascript:void(0);" aria-label="Toggle Website Theme"></a></li>
+            </ul>
+        </nav>
+    </header>
+    <main>
+        <article><h1 id="how-torrent-clients-download-magnet-link-metadata">How Torrent
+Clients Download Magnet Link Metadata</h1>
+<p>When you click a magnet link, your torrent client receives only a
+cryptographic identifier rather than a complete blueprint of the files
+you wish to download. Unlike traditional <code>.torrent</code> files,
+which contain full file listings and piece hashes, a magnet link
+requires the client to dynamically fetch this missing metadata from
+other peers in the swarm. This process involves parsing the link's info
+hash, querying decentralized networks to locate active peers,
+negotiating protocol extensions, downloading the metadata in blocks, and
+verifying its cryptographic integrity before file transfers can
+begin.</p>
+<h3 id="1-parsing-the-magnet-uri">1. Parsing the Magnet URI</h3>
+<p>The process begins the moment the magnet URI is loaded into the
+client. The client parses the uniform resource identifier to extract
+critical parameters:</p>
+<ul>
+<li><strong>The Exact Topic (<code>xt</code>):</strong> The
+cryptographic info hash (usually a 40-character hexadecimal SHA-1 hash
+for BitTorrent v1, or a 64-character SHA-256 hash for BitTorrent v2).
+This hash serves as the unique global identifier for the swarm.</li>
+<li><strong>Trackers (<code>tr</code>):</strong> Optional URLs pointing
+to centralized tracker servers.</li>
+<li><strong>Display Name (<code>dn</code>):</strong> A temporary
+filename shown in the UI while the real metadata is pending.</li>
+</ul>
+<h3 id="2-peer-discovery">2. Peer Discovery</h3>
+<p>Because the client does not yet know the file structure, it must
+immediately find peers that possess the full <code>.torrent</code> file.
+It does this via multiple discovery mechanisms simultaneously:</p>
+<ul>
+<li><strong>Distributed Hash Table (DHT):</strong> The client queries
+its local Kademlia-based DHT routing table with a <code>get_peers</code>
+message, using the info hash as the target key. Neighboring DHT nodes
+return IP addresses and ports of peers associated with that hash.</li>
+<li><strong>Trackers:</strong> If tracker URLs are embedded in the
+magnet link, the client sends HTTP or UDP scrape and announce requests
+to obtain peer lists.</li>
+<li><strong>Peer Exchange (PEX) and Local Peer Discovery (LSD):</strong>
+Once initial connections are made, the client queries those peers for
+additional nodes or broadcasts on the local subnet.</li>
+</ul>
+<h3 id="3-the-extension-handshake-bep-10">3. The Extension Handshake
+(BEP 10)</h3>
+<p>Once the client establishes a TCP or uTP connection with a peer, both
+clients perform the standard BitTorrent protocol handshake. Immediately
+following this, they initiate the BitTorrent Extension Protocol (BEP
+10).</p>
+<p>During the BEP 10 handshake, the clients exchange a dictionary of
+supported extended features. The initiating client looks for support for
+<strong>BEP 9 (Extension for Transferring Metadata)</strong>, commonly
+identified in the handshake as <code>ut_metadata</code>. If supported,
+the remote peer sends the total byte size of the metadata dictionary
+alongside an ID number allocated for metadata messages.</p>
+<h3 id="4-requesting-metadata-blocks-bep-9">4. Requesting Metadata
+Blocks (BEP 9)</h3>
+<p>BitTorrent metadata can be several megabytes in size for torrents
+containing thousands of files. To transfer it efficiently, the client
+treats the metadata dictionary as a mini-payload divided into fixed 16
+KiB (16,384 bytes) blocks.</p>
+<ol type="1">
+<li><strong>Calculation:</strong> The client calculates how many 16 KiB
+pieces it needs based on the total metadata size reported by the
+peer.</li>
+<li><strong>Requesting (<code>msg_type: 0</code>):</strong> The client
+sends <code>request</code> messages to one or more connected peers,
+asking for specific metadata piece indexes.</li>
+<li><strong>Receiving (<code>msg_type: 1</code>):</strong> Peers respond
+with <code>data</code> messages containing the raw binary payload of the
+requested 16 KiB block.</li>
+<li><strong>Rejection Handling (<code>msg_type: 2</code>):</strong> If a
+peer is overloaded or lacks the metadata, it sends a <code>reject</code>
+message, prompting the client to request that block from a different
+peer.</li>
+</ol>
+<h3 id="5-verification-and-swarm-initialization">5. Verification and
+Swarm Initialization</h3>
+<p>After all metadata blocks are successfully received in memory:</p>
+<ol type="1">
+<li><strong>Assembly:</strong> The client concatenates the 16 KiB slices
+in sequential order to form the complete Bencoded <code>info</code>
+dictionary.</li>
+<li><strong>Hash Verification:</strong> The client generates a SHA-1 (or
+SHA-256) hash of the assembled <code>info</code> dictionary and compares
+it against the info hash originally extracted from the magnet link.</li>
+<li><strong>Failure or Success:</strong> If the generated hash does not
+match, the payload is discarded as corrupted or malicious, and the
+client restarts the request cycle. If the hash matches perfectly, the
+metadata is verified.</li>
+</ol>
+<p>Once verified, the client decodes the file tree, file sizes, piece
+lengths, and individual SHA-1 piece hashes. The UI updates to show the
+real file list, pre-allocates disk space if configured, and transitions
+the torrent task into standard data piece downloading.</p></article>
+        <div id=comments-container></div>
+
+        <script>
+            const utterancesScript = document.createElement('script');
+            
+            utterancesScript.setAttribute('src', 'https://utteranc.es/client.js');
+            utterancesScript.setAttribute('repo', 'salivity/bittorrent'); 
+            utterancesScript.setAttribute('issue-term', 'pathname'); 
+            utterancesScript.setAttribute('theme', localStorage.getItem('theme') === 'dark' ? 'github-dark' : 'github-light'); 
+            utterancesScript.setAttribute('crossorigin', 'anonymous');
+            utterancesScript.async = true;
+
+            document.getElementById('comments-container').appendChild(utterancesScript);
+        </script>
+    
+    </main>
+    <footer>
+        <nav>
+            <ul class="footer-links">
+                <li><a href="/bittorrent/privacy-policy">Privacy Policy</a></li>
+                <li><a href="/bittorrent/terms-and-conditions">Terms and Conditions</a></li>
+            </ul>
+        </nav>
+        <div class="copyright">
+            Copyright &copy; <span id="current-year"></span>
+        </div>
+    </footer>
+</body>
+</html>

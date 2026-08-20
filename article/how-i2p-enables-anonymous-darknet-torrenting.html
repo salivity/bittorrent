@@ -1,0 +1,164 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="light">
+<head>
+    <script async src="https://www.googletagmanager.com/gtag/js?id=G-R4Y4YXFHZS"></script>
+    <script>
+        window.dataLayer = window.dataLayer || [];
+
+        function gtag(){
+            dataLayer.push(arguments);
+        }
+
+        gtag('js', new Date());
+
+        gtag('config', 'G-R4Y4YXFHZS');
+    </script>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>How I2P Enables Anonymous Darknet Torrenting - bittorrent</title>
+    <meta name="description" content="The Invisible Internet Project (I2P) serves as a fully encrypted, decentralized network designed to provide strong anonymity for peer-to-peer (P2P) applications. Unlike the regular internet or general-purpose proxy networks, I2P routes all traffic intern">
+    <link rel="canonical" href="https://salivity.github.io/bittorrent/article/how-i2p-enables-anonymous-darknet-torrenting">
+    <link rel="icon" href="/bittorrent/favicon.ico">
+    <link rel="stylesheet" href="/bittorrent/css/style.css">
+    <link media="print" rel="stylesheet" href="/bittorrent/css/print.css">
+    <script src="/bittorrent/js/fuse.min.js"></script>
+    <script src="/bittorrent/js/script.js"></script>
+    <script id="MathJax-script" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/4.1.3/tex-chtml.min.js" defer></script>
+    <meta property="og:type" content="website" />
+    <meta property="og:title" content="How I2P Enables Anonymous Darknet Torrenting - bittorrent" />
+    <meta property="og:url" content="https://salivity.github.io/bittorrent/article/how-i2p-enables-anonymous-darknet-torrenting" />
+    <meta property="og:image:url" content="https://salivity.github.io/bittorrent/images/open-graph/default.webp" />
+    <meta property="og:image:secure_url" content="https://salivity.github.io/bittorrent/images/open-graph/default.webp" />
+    <meta property="og:image:width" content="1120" />
+    <meta property="og:image:height" content="630" />
+    <meta property="og:description" content="The Invisible Internet Project (I2P) serves as a fully encrypted, decentralized network designed to provide strong anonymity for peer-to-peer (P2P) applications. Unlike the regular internet or general-purpose proxy networks, I2P routes all traffic intern" />
+    <link rel="manifest" href="/bittorrent/pwa/manifest.json" />
+</head>
+<body>
+    <header>
+        <a href="/bittorrent/" aria-label="Go To Home Page" title="Go To Home Page" id="logo">
+            <span>salivity.github.io/</span><span>bittorrent</span>
+        </a>
+        <nav>
+            <ul class="header-links">
+                <li><a href="https://github.com/salivity" title="Github" aria-label="Go To Github Profile Page"><svg class="svg-icon" focusable="false" aria-hidden="true" viewBox="0 0 24 24"><path d="M12 1.27a11 11 0 00-3.48 21.46c.55.09.73-.28.73-.55v-1.84c-3.03.64-3.67-1.46-3.67-1.46-.55-1.29-1.28-1.65-1.28-1.65-.92-.65.1-.65.1-.65 1.1 0 1.73 1.1 1.73 1.1.92 1.65 2.57 1.2 3.21.92a2 2 0 01.64-1.47c-2.47-.27-5.04-1.19-5.04-5.5 0-1.1.46-2.1 1.2-2.84a3.76 3.76 0 010-2.93s.91-.28 3.11 1.1c1.8-.49 3.7-.49 5.5 0 2.1-1.38 3.02-1.1 3.02-1.1a3.76 3.76 0 010 2.93c.83.74 1.2 1.74 1.2 2.94 0 4.21-2.57 5.13-5.04 5.4.45.37.82.92.82 2.02v3.03c0 .27.1.64.73.55A11 11 0 0012 1.27"></path></svg></a></li>
+                <li><a href="/bittorrent/search" title="Search" aria-label="Go To Search Page"><svg class="svg-icon" aria-hidden="true" focusable="false" viewBox="0 0 24 24"><path d="M15.5 14h-.79l-.28-.27C15.41 12.59 16 11.11 16 9.5 16 5.91 13.09 3 9.5 3S3 5.91 3 9.5 5.91 16 9.5 16c1.61 0 3.09-.59 4.23-1.57l.27.28v.79l5 4.99L20.49 19zm-6 0C7.01 14 5 11.99 5 9.5S7.01 5 9.5 5 14 7.01 14 9.5 11.99 14 9.5 14"></path></svg></a></li>
+                <li><a id="theme-toggle" title="Theme" href="javascript:void(0);" aria-label="Toggle Website Theme"></a></li>
+            </ul>
+        </nav>
+    </header>
+    <main>
+        <article><h1 id="how-i2p-enables-anonymous-darknet-torrenting">How I2P Enables
+Anonymous Darknet Torrenting</h1>
+<p>The Invisible Internet Project (I2P) serves as a fully encrypted,
+decentralized network designed to provide strong anonymity for
+peer-to-peer (P2P) applications. Unlike the regular internet or
+general-purpose proxy networks, I2P routes all traffic internally
+through a complex system of multi-layered tunnels. This article explains
+how I2P creates a self-contained darknet environment specifically
+optimized for torrenting, highlighting its underlying mechanics,
+built-in clients, and the key differences between I2P and traditional
+torrenting methods.</p>
+<h3 id="internalized-peer-to-peer-routing">Internalized Peer-to-Peer
+Routing</h3>
+<p>Traditional torrenting on the clearnet exposes every participant's
+public IP address to the entire swarm (the collective group of peers
+downloading and uploading a file). While virtual private networks (VPNs)
+hide the IP from the swarm, they still require trust in a centralized
+provider.</p>
+<p>I2P replaces IP addresses with cryptographic identifiers known as
+"Destinations." When torrenting over I2P:</p>
+<ul>
+<li>Traffic never leaves the darknet; there are no "exit nodes"
+communicating with the clearnet.</li>
+<li>Both the seeder and the leecher communicate entirely within the I2P
+network.</li>
+<li>Neither party, nor the intermediaries relaying the traffic, can see
+the real IP addresses of the peers involved.</li>
+</ul>
+<h3 id="garlic-routing-and-unidirectional-tunnels">Garlic Routing and
+Unidirectional Tunnels</h3>
+<p>I2P uses an enhanced variation of onion routing known as
+<strong>Garlic Routing</strong>.</p>
+<ul>
+<li><strong>Unidirectional Tunnels:</strong> I2P builds separate inbound
+and outbound tunnels. When a user downloads a file chunk, the request
+travels out through one set of relay peers, and the response returns via
+a completely different path. This separation makes traffic analysis and
+correlation attacks significantly harder.</li>
+<li><strong>Message Bundling:</strong> Garlic routing bundles multiple
+messages (called "cloves") together into a single encrypted package.
+This obscures the origin, destination, and payload type, ensuring that
+relay nodes cannot distinguish a torrent chunk from a standard encrypted
+message.</li>
+</ul>
+<h3 id="decentralized-network-database-netdb">Decentralized Network
+Database (NetDB)</h3>
+<p>To coordinate torrents without relying on centralized trackers that
+could be blocked or monitored, I2P uses an internal Distributed Hash
+Table (DHT) integrated into its Network Database (NetDB).</p>
+<p>The NetDB uses a modified Kademlia algorithm to store contact
+information (RouterInfos and LeaseSets) anonymously. When a user starts
+a torrent, their client uses internal trackers (such as those hosted on
+<code>.i2p</code> domains) or the decentralized database to locate peers
+without ever exposing metadata to the outside world.</p>
+<h3 id="integrated-torrent-clients">Integrated Torrent Clients</h3>
+<p>I2P comes equipped with native tools designed to make darknet
+torrenting straightforward:</p>
+<ul>
+<li><strong>I2PSnark:</strong> A lightweight, browser-accessible
+BitTorrent client integrated directly into the standard I2P router
+console. It automatically handles the creation of anonymous tunnels for
+each torrent.</li>
+<li><strong>Third-Party Integration:</strong> Modern desktop clients
+like BiglyBT offer native I2P plugins, allowing users to participate
+simultaneously in standard clearnet swarms and hidden I2P swarms without
+mixing the two network layers.</li>
+</ul>
+<h3 id="performance-and-security-trade-offs">Performance and Security
+Trade-offs</h3>
+<p>Torrenting over I2P provides robust anonymity, but it involves
+technical trade-offs:</p>
+<ul>
+<li><strong>Bandwidth and Latency:</strong> Because every packet must be
+encrypted multiple times and routed through several volunteer nodes,
+download and upload speeds are considerably slower than clearnet
+torrenting.</li>
+<li><strong>Swarm Size:</strong> The pool of peers within I2P is
+significantly smaller than on the open internet, meaning niche files may
+have fewer seeders.</li>
+<li><strong>ISP Resistance:</strong> While an Internet Service Provider
+(ISP) can detect that an individual is running an I2P router, deep
+packet inspection cannot determine what files are being transferred,
+which <code>.i2p</code> sites are visited, or whether the user is
+actively torrenting.</li>
+</ul></article>
+        <div id=comments-container></div>
+
+        <script>
+            const utterancesScript = document.createElement('script');
+            
+            utterancesScript.setAttribute('src', 'https://utteranc.es/client.js');
+            utterancesScript.setAttribute('repo', 'salivity/bittorrent'); 
+            utterancesScript.setAttribute('issue-term', 'pathname'); 
+            utterancesScript.setAttribute('theme', localStorage.getItem('theme') === 'dark' ? 'github-dark' : 'github-light'); 
+            utterancesScript.setAttribute('crossorigin', 'anonymous');
+            utterancesScript.async = true;
+
+            document.getElementById('comments-container').appendChild(utterancesScript);
+        </script>
+    
+    </main>
+    <footer>
+        <nav>
+            <ul class="footer-links">
+                <li><a href="/bittorrent/privacy-policy">Privacy Policy</a></li>
+                <li><a href="/bittorrent/terms-and-conditions">Terms and Conditions</a></li>
+            </ul>
+        </nav>
+        <div class="copyright">
+            Copyright &copy; <span id="current-year"></span>
+        </div>
+    </footer>
+</body>
+</html>

@@ -1,0 +1,179 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="light">
+<head>
+    <script async src="https://www.googletagmanager.com/gtag/js?id=G-R4Y4YXFHZS"></script>
+    <script>
+        window.dataLayer = window.dataLayer || [];
+
+        function gtag(){
+            dataLayer.push(arguments);
+        }
+
+        gtag('js', new Date());
+
+        gtag('config', 'G-R4Y4YXFHZS');
+    </script>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>How DHT announce_peer Registers a Torrent IP - bittorrent</title>
+    <meta name="description" content="The announcepeer message is a core Remote Procedure Call (RPC) in the BitTorrent Distributed Hash Table (DHT) network that allows a node to advertise itself as an active participant in a specific torrent swarm. This article explains the technical process">
+    <link rel="canonical" href="https://salivity.github.io/bittorrent/article/how-dht-announce-peer-registers-a-torrent-ip">
+    <link rel="icon" href="/bittorrent/favicon.ico">
+    <link rel="stylesheet" href="/bittorrent/css/style.css">
+    <link media="print" rel="stylesheet" href="/bittorrent/css/print.css">
+    <script src="/bittorrent/js/fuse.min.js"></script>
+    <script src="/bittorrent/js/script.js"></script>
+    <script id="MathJax-script" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/4.1.3/tex-chtml.min.js" defer></script>
+    <meta property="og:type" content="website" />
+    <meta property="og:title" content="How DHT announce_peer Registers a Torrent IP - bittorrent" />
+    <meta property="og:url" content="https://salivity.github.io/bittorrent/article/how-dht-announce-peer-registers-a-torrent-ip" />
+    <meta property="og:image:url" content="https://salivity.github.io/bittorrent/images/open-graph/default.webp" />
+    <meta property="og:image:secure_url" content="https://salivity.github.io/bittorrent/images/open-graph/default.webp" />
+    <meta property="og:image:width" content="1120" />
+    <meta property="og:image:height" content="630" />
+    <meta property="og:description" content="The announcepeer message is a core Remote Procedure Call (RPC) in the BitTorrent Distributed Hash Table (DHT) network that allows a node to advertise itself as an active participant in a specific torrent swarm. This article explains the technical process" />
+    <link rel="manifest" href="/bittorrent/pwa/manifest.json" />
+</head>
+<body>
+    <header>
+        <a href="/bittorrent/" aria-label="Go To Home Page" title="Go To Home Page" id="logo">
+            <span>salivity.github.io/</span><span>bittorrent</span>
+        </a>
+        <nav>
+            <ul class="header-links">
+                <li><a href="https://github.com/salivity" title="Github" aria-label="Go To Github Profile Page"><svg class="svg-icon" focusable="false" aria-hidden="true" viewBox="0 0 24 24"><path d="M12 1.27a11 11 0 00-3.48 21.46c.55.09.73-.28.73-.55v-1.84c-3.03.64-3.67-1.46-3.67-1.46-.55-1.29-1.28-1.65-1.28-1.65-.92-.65.1-.65.1-.65 1.1 0 1.73 1.1 1.73 1.1.92 1.65 2.57 1.2 3.21.92a2 2 0 01.64-1.47c-2.47-.27-5.04-1.19-5.04-5.5 0-1.1.46-2.1 1.2-2.84a3.76 3.76 0 010-2.93s.91-.28 3.11 1.1c1.8-.49 3.7-.49 5.5 0 2.1-1.38 3.02-1.1 3.02-1.1a3.76 3.76 0 010 2.93c.83.74 1.2 1.74 1.2 2.94 0 4.21-2.57 5.13-5.04 5.4.45.37.82.92.82 2.02v3.03c0 .27.1.64.73.55A11 11 0 0012 1.27"></path></svg></a></li>
+                <li><a href="/bittorrent/search" title="Search" aria-label="Go To Search Page"><svg class="svg-icon" aria-hidden="true" focusable="false" viewBox="0 0 24 24"><path d="M15.5 14h-.79l-.28-.27C15.41 12.59 16 11.11 16 9.5 16 5.91 13.09 3 9.5 3S3 5.91 3 9.5 5.91 16 9.5 16c1.61 0 3.09-.59 4.23-1.57l.27.28v.79l5 4.99L20.49 19zm-6 0C7.01 14 5 11.99 5 9.5S7.01 5 9.5 5 14 7.01 14 9.5 11.99 14 9.5 14"></path></svg></a></li>
+                <li><a id="theme-toggle" title="Theme" href="javascript:void(0);" aria-label="Toggle Website Theme"></a></li>
+            </ul>
+        </nav>
+    </header>
+    <main>
+        <article><h1 id="how-dht-announce_peer-registers-a-torrent-ip">How DHT
+announce_peer Registers a Torrent IP</h1>
+<p>The <code>announce_peer</code> message is a core Remote Procedure
+Call (RPC) in the BitTorrent Distributed Hash Table (DHT) network that
+allows a node to advertise itself as an active participant in a specific
+torrent swarm. This article explains the technical process behind the
+<code>announce_peer</code> mechanism, detailing how nodes query the DHT,
+acquire validation tokens, verify network addresses, and store peer
+contact information to enable decentralized file sharing without relying
+on a central tracker.</p>
+<h2 id="the-dht-peer-discovery-workflow">The DHT Peer Discovery
+Workflow</h2>
+<p>In the BitTorrent DHT (based on the Kademlia routing algorithm),
+swarm metadata and peer locations are distributed across participating
+nodes. To register an IP address as actively downloading or seeding a
+20-byte torrent <code>info_hash</code>, a client executes a multi-step
+sequence designed to ensure security and prevent address spoofing.</p>
+<h3 id="1-acquiring-a-write-token-via-get_peers">1. Acquiring a Write
+Token via <code>get_peers</code></h3>
+<p>Before a node can execute an <code>announce_peer</code> request, it
+must first send a <code>get_peers</code> query to the <span
+class="math inline">\(K\)</span> closest nodes to the target
+<code>info_hash</code>.</p>
+<p>When a remote node receives a <code>get_peers</code> message, it
+generates a short-lived cryptographic token and returns it in the
+response. This token is typically generated by hashing the requester’s
+external IP address, a timestamp, and a rotating secret key unique to
+the node:</p>
+<p><span class="math display">\[\text{Token} =
+\text{SHA1}(\text{Requester IP} + \text{Secret} + \text{Time
+Window})\]</span></p>
+<p>This token serves as proof-of-work and address verification,
+preventing malicious actors from registering arbitrary IP addresses in
+the DHT routing table without receiving data at that address.</p>
+<h3 id="2-transmitting-the-announce_peer-rpc">2. Transmitting the
+<code>announce_peer</code> RPC</h3>
+<p>Once the client receives the token, it constructs an
+<code>announce_peer</code> message and sends it to the target node over
+UDP using the KRPC protocol. The payload of the
+<code>announce_peer</code> query contains specific key-value pairs
+encoded in Bencode format:</p>
+<ul>
+<li><strong><code>id</code></strong>: The 20-byte DHT Node ID of the
+sending client.</li>
+<li><strong><code>info_hash</code></strong>: The 20-byte target torrent
+identifier.</li>
+<li><strong><code>port</code></strong>: The TCP/uTP port number the
+client is listening on for peer-to-peer data transfers.</li>
+<li><strong><code>token</code></strong>: The cryptographic token
+previously received in the <code>get_peers</code> response.</li>
+<li><strong><code>implied_port</code></strong> <em>(optional)</em>: A
+flag (0 or 1). If set to 1, it instructs the receiving node to ignore
+the explicit <code>port</code> parameter and use the source UDP port
+from the incoming packet header instead (useful for NAT traversal).</li>
+</ul>
+<h3 id="3-token-verification">3. Token Verification</h3>
+<p>Upon receiving the <code>announce_peer</code> query, the remote node
+validates the request before committing any data to its internal
+storage:</p>
+<ol type="1">
+<li><strong>Hash Verification</strong>: The node verifies the
+<code>token</code> by recalculating the hash using the sender's incoming
+IP address from the UDP packet header, the current secret, and the valid
+time window.</li>
+<li><strong>Rejection of Invalid Tokens</strong>: If the token does not
+match or has expired (usually after 10–15 minutes), the node drops the
+request or returns an error response, preventing IP spoofing
+attacks.</li>
+</ol>
+<h3 id="4-extracting-and-registering-the-peer-contact-info">4.
+Extracting and Registering the Peer Contact Info</h3>
+<p>Once the token passes verification, the node extracts the networking
+information necessary to register the peer:</p>
+<ul>
+<li><strong>IP Address</strong>: The receiving node does not trust an IP
+address string inside the message payload. Instead, it extracts the IP
+address directly from the incoming UDP packet header.</li>
+<li><strong>Port</strong>: The node determines the port based on the
+<code>implied_port</code> flag. If <code>implied_port</code> is
+<code>1</code>, it reads the port from the UDP header; if
+<code>0</code>, it uses the numeric <code>port</code> argument supplied
+in the payload.</li>
+</ul>
+<p>The node then combines the extracted IP address and port into a
+compact 6-byte binary format (4 bytes for the IPv4 address and 2 bytes
+for the port in network byte order).</p>
+<h3 id="5-storing-the-record">5. Storing the Record</h3>
+<p>The receiving node stores the compact peer string in its local
+in-memory peer dictionary. This data structure maps each 20-byte
+<code>info_hash</code> to a list of active peer contact values.</p>
+<p>The entry is stored alongside a timestamp. To ensure that stale or
+disconnected peers do not persist indefinitely, entries expire
+automatically after a set timeout (typically 20 to 30 minutes) unless
+refreshed by subsequent <code>announce_peer</code> messages.</p>
+<h3 id="6-serving-the-swarm">6. Serving the Swarm</h3>
+<p>With the IP address registered under the target
+<code>info_hash</code>, any future client that sends a
+<code>get_peers</code> query for that hash to this DHT node will receive
+the newly registered IP and port in the <code>values</code> list,
+enabling direct peer-to-peer connections across the swarm.</p></article>
+        <div id=comments-container></div>
+
+        <script>
+            const utterancesScript = document.createElement('script');
+            
+            utterancesScript.setAttribute('src', 'https://utteranc.es/client.js');
+            utterancesScript.setAttribute('repo', 'salivity/bittorrent'); 
+            utterancesScript.setAttribute('issue-term', 'pathname'); 
+            utterancesScript.setAttribute('theme', localStorage.getItem('theme') === 'dark' ? 'github-dark' : 'github-light'); 
+            utterancesScript.setAttribute('crossorigin', 'anonymous');
+            utterancesScript.async = true;
+
+            document.getElementById('comments-container').appendChild(utterancesScript);
+        </script>
+    
+    </main>
+    <footer>
+        <nav>
+            <ul class="footer-links">
+                <li><a href="/bittorrent/privacy-policy">Privacy Policy</a></li>
+                <li><a href="/bittorrent/terms-and-conditions">Terms and Conditions</a></li>
+            </ul>
+        </nav>
+        <div class="copyright">
+            Copyright &copy; <span id="current-year"></span>
+        </div>
+    </footer>
+</body>
+</html>

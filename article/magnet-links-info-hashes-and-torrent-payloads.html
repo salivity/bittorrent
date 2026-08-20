@@ -1,0 +1,185 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="light">
+<head>
+    <script async src="https://www.googletagmanager.com/gtag/js?id=G-R4Y4YXFHZS"></script>
+    <script>
+        window.dataLayer = window.dataLayer || [];
+
+        function gtag(){
+            dataLayer.push(arguments);
+        }
+
+        gtag('js', new Date());
+
+        gtag('config', 'G-R4Y4YXFHZS');
+    </script>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Magnet Links, Info Hashes, and Torrent Payloads - bittorrent</title>
+    <meta name="description" content="BitTorrent relies on a precise cryptographic and structural hierarchy to identify, locate, and verify files across a decentralized network. This article explains the structural relationship connecting the user-facing magnet URI, the cryptographic info ha">
+    <link rel="canonical" href="https://salivity.github.io/bittorrent/article/magnet-links-info-hashes-and-torrent-payloads">
+    <link rel="icon" href="/bittorrent/favicon.ico">
+    <link rel="stylesheet" href="/bittorrent/css/style.css">
+    <link media="print" rel="stylesheet" href="/bittorrent/css/print.css">
+    <script src="/bittorrent/js/fuse.min.js"></script>
+    <script src="/bittorrent/js/script.js"></script>
+    <script id="MathJax-script" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/4.1.3/tex-chtml.min.js" defer></script>
+    <meta property="og:type" content="website" />
+    <meta property="og:title" content="Magnet Links, Info Hashes, and Torrent Payloads - bittorrent" />
+    <meta property="og:url" content="https://salivity.github.io/bittorrent/article/magnet-links-info-hashes-and-torrent-payloads" />
+    <meta property="og:image:url" content="https://salivity.github.io/bittorrent/images/open-graph/default.webp" />
+    <meta property="og:image:secure_url" content="https://salivity.github.io/bittorrent/images/open-graph/default.webp" />
+    <meta property="og:image:width" content="1120" />
+    <meta property="og:image:height" content="630" />
+    <meta property="og:description" content="BitTorrent relies on a precise cryptographic and structural hierarchy to identify, locate, and verify files across a decentralized network. This article explains the structural relationship connecting the user-facing magnet URI, the cryptographic info ha" />
+    <link rel="manifest" href="/bittorrent/pwa/manifest.json" />
+</head>
+<body>
+    <header>
+        <a href="/bittorrent/" aria-label="Go To Home Page" title="Go To Home Page" id="logo">
+            <span>salivity.github.io/</span><span>bittorrent</span>
+        </a>
+        <nav>
+            <ul class="header-links">
+                <li><a href="https://github.com/salivity" title="Github" aria-label="Go To Github Profile Page"><svg class="svg-icon" focusable="false" aria-hidden="true" viewBox="0 0 24 24"><path d="M12 1.27a11 11 0 00-3.48 21.46c.55.09.73-.28.73-.55v-1.84c-3.03.64-3.67-1.46-3.67-1.46-.55-1.29-1.28-1.65-1.28-1.65-.92-.65.1-.65.1-.65 1.1 0 1.73 1.1 1.73 1.1.92 1.65 2.57 1.2 3.21.92a2 2 0 01.64-1.47c-2.47-.27-5.04-1.19-5.04-5.5 0-1.1.46-2.1 1.2-2.84a3.76 3.76 0 010-2.93s.91-.28 3.11 1.1c1.8-.49 3.7-.49 5.5 0 2.1-1.38 3.02-1.1 3.02-1.1a3.76 3.76 0 010 2.93c.83.74 1.2 1.74 1.2 2.94 0 4.21-2.57 5.13-5.04 5.4.45.37.82.92.82 2.02v3.03c0 .27.1.64.73.55A11 11 0 0012 1.27"></path></svg></a></li>
+                <li><a href="/bittorrent/search" title="Search" aria-label="Go To Search Page"><svg class="svg-icon" aria-hidden="true" focusable="false" viewBox="0 0 24 24"><path d="M15.5 14h-.79l-.28-.27C15.41 12.59 16 11.11 16 9.5 16 5.91 13.09 3 9.5 3S3 5.91 3 9.5 5.91 16 9.5 16c1.61 0 3.09-.59 4.23-1.57l.27.28v.79l5 4.99L20.49 19zm-6 0C7.01 14 5 11.99 5 9.5S7.01 5 9.5 5 14 7.01 14 9.5 11.99 14 9.5 14"></path></svg></a></li>
+                <li><a id="theme-toggle" title="Theme" href="javascript:void(0);" aria-label="Toggle Website Theme"></a></li>
+            </ul>
+        </nav>
+    </header>
+    <main>
+        <article><h1 id="magnet-links-info-hashes-and-torrent-payloads">Magnet Links,
+Info Hashes, and Torrent Payloads</h1>
+<p>BitTorrent relies on a precise cryptographic and structural hierarchy
+to identify, locate, and verify files across a decentralized network.
+This article explains the structural relationship connecting the
+user-facing magnet URI, the cryptographic info hash, and the ultimate
+data payload transferred between peers.</p>
+<h2 id="the-hierarchy-from-data-to-link">The Hierarchy: From Data to
+Link</h2>
+<p>The relationship among these three components is hierarchical and
+cryptographic, moving from raw data to a network identifier:</p>
+<ol type="1">
+<li><strong>Payload:</strong> The actual target files.</li>
+<li><strong>Metadata (Info Dictionary):</strong> The blueprint mapping
+the payload into verifiable chunks.</li>
+<li><strong>Info Hash:</strong> A cryptographic digest identifying the
+metadata.</li>
+<li><strong>Magnet URI:</strong> A formatted string that wraps the info
+hash with bootstrap network parameters.</li>
+</ol>
+<hr />
+<pre><code>[Torrent Payload] (Files / Data Chunks)
+       ▲
+       │ Verified by piece hashes inside
+       ▼
+[Info Dictionary] (File paths, lengths, piece length, piece hashes)
+       ▲
+       │ Cryptographically hashed (SHA-1 or SHA-256)
+       ▼
+  [Info Hash] (Unique 20-byte / 32-byte identifier)
+       ▲
+       │ Embedded via &#39;xt=urn:btih:&#39; parameter
+       ▼
+ [Magnet URI] (magnet:?xt=urn:btih:&lt;info_hash&gt;&amp;dn=...&amp;tr=...)</code></pre>
+<hr />
+<h2 id="1-the-torrent-payload">1. The Torrent Payload</h2>
+<p>The payload is the final collection of files or directories requested
+by the user.</p>
+<p>In the BitTorrent protocol, the payload is treated as a continuous
+byte stream divided into fixed-size segments called
+<strong>pieces</strong> (typically between 256 KB and 16 MB). Each
+individual piece is cryptographically hashed to allow independent
+verification during the download process.</p>
+<h2 id="2-the-info-dictionary-and-the-info-hash">2. The Info Dictionary
+and the Info Hash</h2>
+<p>To describe the payload, a <code>.torrent</code> file contains a
+specific structure called the <strong><code>info</code>
+dictionary</strong> (encoded in Bencode format). The <code>info</code>
+dictionary contains:</p>
+<ul>
+<li>The name of the file or root directory.</li>
+<li>Total file sizes and relative directory paths.</li>
+<li>The uniform piece length.</li>
+<li>A concatenated list of the cryptographic hashes of every individual
+payload piece.</li>
+</ul>
+<p>The <strong>info hash</strong> is created by taking the raw Bencoded
+<code>info</code> dictionary and computing its cryptographic hash:</p>
+<ul>
+<li><strong>BitTorrent v1:</strong> SHA-1 hash (20 bytes / 40
+hexadecimal characters).</li>
+<li><strong>BitTorrent v2:</strong> SHA-256 hash (32 bytes / 64
+hexadecimal characters).</li>
+</ul>
+<p>Because the info hash is a digest of the metadata—which itself
+contains the hashes of all payload pieces—any modification to a single
+byte in the payload or file structure produces a completely different
+info hash. This makes the info hash an immutable, globally unique
+identifier for that specific dataset.</p>
+<h2 id="3-the-magnet-uri">3. The Magnet URI</h2>
+<p>A Magnet URI (Uniform Resource Identifier) is a standardized text
+string that allows peers to join a BitTorrent swarm without needing to
+pre-download a static <code>.torrent</code> file.</p>
+<p>The structural core of every BitTorrent magnet link is the
+<strong>Exact Topic (<code>xt</code>)</strong> parameter, which directly
+embeds the info hash:</p>
+<pre class="text"><code>magnet:?xt=urn:btih:d3b07384d113edec49eaa6238ad5ff00fc19d7d1&amp;dn=Ubuntu+ISO&amp;tr=https%3A%2F%2Ftracker.example.com</code></pre>
+<ul>
+<li><strong><code>xt=urn:btih:</code> (or <code>urn:btmh:</code> in
+v2):</strong> Contains the info hash that uniquely identifies the
+swarm.</li>
+<li><strong><code>dn</code> (Display Name):</strong> An optional
+human-readable title (does not affect file integrity).</li>
+<li><strong><code>tr</code> (Tracker):</strong> Optional tracker URLs
+used to locate initial peers.</li>
+</ul>
+<h2 id="the-resolution-process-in-practice">The Resolution Process in
+Practice</h2>
+<p>When a BitTorrent client processes a download, the relationship
+operates in reverse:</p>
+<ol type="1">
+<li><strong>Extraction:</strong> The client reads the magnet URI and
+extracts the <strong>info hash</strong>.</li>
+<li><strong>Discovery:</strong> The client uses the info hash to query
+Distributed Hash Tables (DHT) or trackers to find peers hosting that
+exact hash.</li>
+<li><strong>Metadata Exchange:</strong> Through peer-to-peer extension
+protocols (such as BEP 9), the client downloads the raw
+<code>info</code> dictionary from connected peers and validates it by
+confirming its hash matches the info hash from the magnet link.</li>
+<li><strong>Payload Acquisition:</strong> With the validated
+<code>info</code> dictionary in hand, the client downloads the
+<strong>payload</strong> pieces from the swarm, validating each piece
+against the hash table embedded inside the <code>info</code>
+dictionary.</li>
+</ol></article>
+        <div id=comments-container></div>
+
+        <script>
+            const utterancesScript = document.createElement('script');
+            
+            utterancesScript.setAttribute('src', 'https://utteranc.es/client.js');
+            utterancesScript.setAttribute('repo', 'salivity/bittorrent'); 
+            utterancesScript.setAttribute('issue-term', 'pathname'); 
+            utterancesScript.setAttribute('theme', localStorage.getItem('theme') === 'dark' ? 'github-dark' : 'github-light'); 
+            utterancesScript.setAttribute('crossorigin', 'anonymous');
+            utterancesScript.async = true;
+
+            document.getElementById('comments-container').appendChild(utterancesScript);
+        </script>
+    
+    </main>
+    <footer>
+        <nav>
+            <ul class="footer-links">
+                <li><a href="/bittorrent/privacy-policy">Privacy Policy</a></li>
+                <li><a href="/bittorrent/terms-and-conditions">Terms and Conditions</a></li>
+            </ul>
+        </nav>
+        <div class="copyright">
+            Copyright &copy; <span id="current-year"></span>
+        </div>
+    </footer>
+</body>
+</html>

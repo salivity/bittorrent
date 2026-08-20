@@ -1,0 +1,165 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="light">
+<head>
+    <script async src="https://www.googletagmanager.com/gtag/js?id=G-R4Y4YXFHZS"></script>
+    <script>
+        window.dataLayer = window.dataLayer || [];
+
+        function gtag(){
+            dataLayer.push(arguments);
+        }
+
+        gtag('js', new Date());
+
+        gtag('config', 'G-R4Y4YXFHZS');
+    </script>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>BitTorrent Peer Handshake Verification Explained - bittorrent</title>
+    <meta name="description" content="The BitTorrent protocol relies on a mandatory, fixed-structure handshake to establish and verify communication between two peers before any data exchange can occur. This article details the exact structure of the 68-byte handshake message, how clients va">
+    <link rel="canonical" href="https://salivity.github.io/bittorrent/article/bittorrent-peer-handshake-verification-explained">
+    <link rel="icon" href="/bittorrent/favicon.ico">
+    <link rel="stylesheet" href="/bittorrent/css/style.css">
+    <link media="print" rel="stylesheet" href="/bittorrent/css/print.css">
+    <script src="/bittorrent/js/fuse.min.js"></script>
+    <script src="/bittorrent/js/script.js"></script>
+    <script id="MathJax-script" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/4.1.3/tex-chtml.min.js" defer></script>
+    <meta property="og:type" content="website" />
+    <meta property="og:title" content="BitTorrent Peer Handshake Verification Explained - bittorrent" />
+    <meta property="og:url" content="https://salivity.github.io/bittorrent/article/bittorrent-peer-handshake-verification-explained" />
+    <meta property="og:image:url" content="https://salivity.github.io/bittorrent/images/open-graph/default.webp" />
+    <meta property="og:image:secure_url" content="https://salivity.github.io/bittorrent/images/open-graph/default.webp" />
+    <meta property="og:image:width" content="1120" />
+    <meta property="og:image:height" content="630" />
+    <meta property="og:description" content="The BitTorrent protocol relies on a mandatory, fixed-structure handshake to establish and verify communication between two peers before any data exchange can occur. This article details the exact structure of the 68-byte handshake message, how clients va" />
+    <link rel="manifest" href="/bittorrent/pwa/manifest.json" />
+</head>
+<body>
+    <header>
+        <a href="/bittorrent/" aria-label="Go To Home Page" title="Go To Home Page" id="logo">
+            <span>salivity.github.io/</span><span>bittorrent</span>
+        </a>
+        <nav>
+            <ul class="header-links">
+                <li><a href="https://github.com/salivity" title="Github" aria-label="Go To Github Profile Page"><svg class="svg-icon" focusable="false" aria-hidden="true" viewBox="0 0 24 24"><path d="M12 1.27a11 11 0 00-3.48 21.46c.55.09.73-.28.73-.55v-1.84c-3.03.64-3.67-1.46-3.67-1.46-.55-1.29-1.28-1.65-1.28-1.65-.92-.65.1-.65.1-.65 1.1 0 1.73 1.1 1.73 1.1.92 1.65 2.57 1.2 3.21.92a2 2 0 01.64-1.47c-2.47-.27-5.04-1.19-5.04-5.5 0-1.1.46-2.1 1.2-2.84a3.76 3.76 0 010-2.93s.91-.28 3.11 1.1c1.8-.49 3.7-.49 5.5 0 2.1-1.38 3.02-1.1 3.02-1.1a3.76 3.76 0 010 2.93c.83.74 1.2 1.74 1.2 2.94 0 4.21-2.57 5.13-5.04 5.4.45.37.82.92.82 2.02v3.03c0 .27.1.64.73.55A11 11 0 0012 1.27"></path></svg></a></li>
+                <li><a href="/bittorrent/search" title="Search" aria-label="Go To Search Page"><svg class="svg-icon" aria-hidden="true" focusable="false" viewBox="0 0 24 24"><path d="M15.5 14h-.79l-.28-.27C15.41 12.59 16 11.11 16 9.5 16 5.91 13.09 3 9.5 3S3 5.91 3 9.5 5.91 16 9.5 16c1.61 0 3.09-.59 4.23-1.57l.27.28v.79l5 4.99L20.49 19zm-6 0C7.01 14 5 11.99 5 9.5S7.01 5 9.5 5 14 7.01 14 9.5 11.99 14 9.5 14"></path></svg></a></li>
+                <li><a id="theme-toggle" title="Theme" href="javascript:void(0);" aria-label="Toggle Website Theme"></a></li>
+            </ul>
+        </nav>
+    </header>
+    <main>
+        <article><h1 id="bittorrent-peer-handshake-verification-explained">BitTorrent
+Peer Handshake Verification Explained</h1>
+<p>The BitTorrent protocol relies on a mandatory, fixed-structure
+handshake to establish and verify communication between two peers before
+any data exchange can occur. This article details the exact structure of
+the 68-byte handshake message, how clients validate the protocol
+identifier, the process of matching the cryptographic infohash against
+active swarms, and the validation of unique peer IDs to prevent
+communication errors and self-connections.</p>
+<h3 id="the-handshake-packet-structure">The Handshake Packet
+Structure</h3>
+<p>When a BitTorrent client initiates a TCP connection to a remote peer,
+it immediately sends a raw 68-byte handshake message. The message
+consists of five distinct fields transmitted in sequence:</p>
+<ol type="1">
+<li><strong>Protocol Length (<code>pstrlen</code>)</strong>: A single
+byte defining the length of the protocol identifier string. In standard
+BitTorrent (version 1.0), this value is <code>19</code> (0x13 in
+hex).</li>
+<li><strong>Protocol Identifier (<code>pstr</code>)</strong>: A byte
+string containing the protocol name. Standard implementations use the
+ASCII string <code>"BitTorrent protocol"</code>.</li>
+<li><strong>Reserved Bytes (<code>reserved</code>)</strong>: An 8-byte
+extension field. All bits were originally set to zero, but modern
+extensions (such as Fast Extension BEP 6 or Extension Protocol BEP 10)
+use specific bits within these 8 bytes to signal extended feature
+support.</li>
+<li><strong>Infohash (<code>info_hash</code>)</strong>: A 20-byte SHA-1
+hash of the <code>info</code> dictionary extracted from the torrent’s
+<code>.torrent</code> metainfo file.</li>
+<li><strong>Peer ID (<code>peer_id</code>)</strong>: A 20-byte string
+chosen by the client to uniquely identify itself across the swarm.</li>
+</ol>
+<h3 id="verification-steps">Verification Steps</h3>
+<p>Upon receiving the initial bytes over a connection, the receiving
+peer executes a strict sequence of verification checks:</p>
+<h4 id="1-protocol-string-validation">1. Protocol String Validation</h4>
+<p>The receiving client reads the first byte (<code>pstrlen</code>) and
+verifies that it matches the expected length of 19. It then reads the
+subsequent 19 bytes to ensure the string exactly matches
+<code>"BitTorrent protocol"</code>. If the length or string does not
+match, the connection is deemed non-BitTorrent traffic and is
+immediately closed.</p>
+<h4 id="2-infohash-matching">2. Infohash Matching</h4>
+<p>The receiver reads the 20-byte <code>info_hash</code> sent by the
+initiator and compares it against its internal table of currently active
+torrents.</p>
+<ul>
+<li><strong>If matched</strong>: The receiver confirms both peers are
+participating in the exact same swarm.</li>
+<li><strong>If mismatched or unknown</strong>: The receiving peer drops
+the connection immediately, as it cannot serve or receive data for an
+unmanaged swarm.</li>
+</ul>
+<h4 id="3-handshake-response-and-asymmetry-handling">3. Handshake
+Response and Asymmetry Handling</h4>
+<ul>
+<li><strong>Outbound Connections</strong>: When client A connects to
+client B, client A sends its handshake first. Client A waits for client
+B’s handshake response and verifies that client B’s 20-byte
+<code>info_hash</code> matches the hash client A requested.</li>
+<li><strong>Inbound Connections</strong>: When client B receives an
+inbound handshake, it validates the infohash, and if recognized, sends
+its own matching 68-byte handshake back to client A.</li>
+</ul>
+<h4 id="4-peer-id-verification-and-loop-prevention">4. Peer ID
+Verification and Loop Prevention</h4>
+<p>Once the infohash is verified, the client inspects the 20-byte
+<code>peer_id</code>:</p>
+<ul>
+<li><strong>Self-Connection Detection</strong>: A client compares the
+received <code>peer_id</code> to its own ID. If they match, the client
+has connected to itself (e.g., via NAT loopback or duplicate tracker
+entries) and terminates the socket immediately.</li>
+<li><strong>Tracker Consistency</strong>: If the remote peer was
+obtained from a tracker that included the peer's expected ID, the client
+may verify that the received <code>peer_id</code> matches the tracker’s
+record, dropping connections that mismatch to prevent
+impersonation.</li>
+</ul>
+<h3 id="post-handshake-transition">Post-Handshake Transition</h3>
+<p>Only after all five fields are fully parsed and verified does the
+state of the connection change to active. The peers may then interpret
+subsequent data on the wire as standard length-prefixed BitTorrent
+messages, such as <code>bitfield</code>, <code>have</code>,
+<code>unchoke</code>, and <code>request</code>.</p></article>
+        <div id=comments-container></div>
+
+        <script>
+            const utterancesScript = document.createElement('script');
+            
+            utterancesScript.setAttribute('src', 'https://utteranc.es/client.js');
+            utterancesScript.setAttribute('repo', 'salivity/bittorrent'); 
+            utterancesScript.setAttribute('issue-term', 'pathname'); 
+            utterancesScript.setAttribute('theme', localStorage.getItem('theme') === 'dark' ? 'github-dark' : 'github-light'); 
+            utterancesScript.setAttribute('crossorigin', 'anonymous');
+            utterancesScript.async = true;
+
+            document.getElementById('comments-container').appendChild(utterancesScript);
+        </script>
+    
+    </main>
+    <footer>
+        <nav>
+            <ul class="footer-links">
+                <li><a href="/bittorrent/privacy-policy">Privacy Policy</a></li>
+                <li><a href="/bittorrent/terms-and-conditions">Terms and Conditions</a></li>
+            </ul>
+        </nav>
+        <div class="copyright">
+            Copyright &copy; <span id="current-year"></span>
+        </div>
+    </footer>
+</body>
+</html>

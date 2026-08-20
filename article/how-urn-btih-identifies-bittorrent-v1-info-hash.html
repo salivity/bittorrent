@@ -1,0 +1,161 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="light">
+<head>
+    <script async src="https://www.googletagmanager.com/gtag/js?id=G-R4Y4YXFHZS"></script>
+    <script>
+        window.dataLayer = window.dataLayer || [];
+
+        function gtag(){
+            dataLayer.push(arguments);
+        }
+
+        gtag('js', new Date());
+
+        gtag('config', 'G-R4Y4YXFHZS');
+    </script>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>How URN BTIH Identifies BitTorrent v1 Info Hash - bittorrent</title>
+    <meta name="description" content="Magnet URIs rely on Uniform Resource Names (URNs) to identify files across decentralized peer-to-peer networks instead of pointing to a specific server location. In the BitTorrent ecosystem, the urn:btih namespace designates the "BitTorrent Info Hash," w">
+    <link rel="canonical" href="https://salivity.github.io/bittorrent/article/how-urn-btih-identifies-bittorrent-v1-info-hash">
+    <link rel="icon" href="/bittorrent/favicon.ico">
+    <link rel="stylesheet" href="/bittorrent/css/style.css">
+    <link media="print" rel="stylesheet" href="/bittorrent/css/print.css">
+    <script src="/bittorrent/js/fuse.min.js"></script>
+    <script src="/bittorrent/js/script.js"></script>
+    <script id="MathJax-script" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/4.1.3/tex-chtml.min.js" defer></script>
+    <meta property="og:type" content="website" />
+    <meta property="og:title" content="How URN BTIH Identifies BitTorrent v1 Info Hash - bittorrent" />
+    <meta property="og:url" content="https://salivity.github.io/bittorrent/article/how-urn-btih-identifies-bittorrent-v1-info-hash" />
+    <meta property="og:image:url" content="https://salivity.github.io/bittorrent/images/open-graph/default.webp" />
+    <meta property="og:image:secure_url" content="https://salivity.github.io/bittorrent/images/open-graph/default.webp" />
+    <meta property="og:image:width" content="1120" />
+    <meta property="og:image:height" content="630" />
+    <meta property="og:description" content="Magnet URIs rely on Uniform Resource Names (URNs) to identify files across decentralized peer-to-peer networks instead of pointing to a specific server location. In the BitTorrent ecosystem, the urn:btih namespace designates the "BitTorrent Info Hash," w" />
+    <link rel="manifest" href="/bittorrent/pwa/manifest.json" />
+</head>
+<body>
+    <header>
+        <a href="/bittorrent/" aria-label="Go To Home Page" title="Go To Home Page" id="logo">
+            <span>salivity.github.io/</span><span>bittorrent</span>
+        </a>
+        <nav>
+            <ul class="header-links">
+                <li><a href="https://github.com/salivity" title="Github" aria-label="Go To Github Profile Page"><svg class="svg-icon" focusable="false" aria-hidden="true" viewBox="0 0 24 24"><path d="M12 1.27a11 11 0 00-3.48 21.46c.55.09.73-.28.73-.55v-1.84c-3.03.64-3.67-1.46-3.67-1.46-.55-1.29-1.28-1.65-1.28-1.65-.92-.65.1-.65.1-.65 1.1 0 1.73 1.1 1.73 1.1.92 1.65 2.57 1.2 3.21.92a2 2 0 01.64-1.47c-2.47-.27-5.04-1.19-5.04-5.5 0-1.1.46-2.1 1.2-2.84a3.76 3.76 0 010-2.93s.91-.28 3.11 1.1c1.8-.49 3.7-.49 5.5 0 2.1-1.38 3.02-1.1 3.02-1.1a3.76 3.76 0 010 2.93c.83.74 1.2 1.74 1.2 2.94 0 4.21-2.57 5.13-5.04 5.4.45.37.82.92.82 2.02v3.03c0 .27.1.64.73.55A11 11 0 0012 1.27"></path></svg></a></li>
+                <li><a href="/bittorrent/search" title="Search" aria-label="Go To Search Page"><svg class="svg-icon" aria-hidden="true" focusable="false" viewBox="0 0 24 24"><path d="M15.5 14h-.79l-.28-.27C15.41 12.59 16 11.11 16 9.5 16 5.91 13.09 3 9.5 3S3 5.91 3 9.5 5.91 16 9.5 16c1.61 0 3.09-.59 4.23-1.57l.27.28v.79l5 4.99L20.49 19zm-6 0C7.01 14 5 11.99 5 9.5S7.01 5 9.5 5 14 7.01 14 9.5 11.99 14 9.5 14"></path></svg></a></li>
+                <li><a id="theme-toggle" title="Theme" href="javascript:void(0);" aria-label="Toggle Website Theme"></a></li>
+            </ul>
+        </nav>
+    </header>
+    <main>
+        <article><h1 id="how-urn-btih-identifies-bittorrent-v1-info-hash">How URN BTIH
+Identifies BitTorrent v1 Info Hash</h1>
+<p>Magnet URIs rely on Uniform Resource Names (URNs) to identify files
+across decentralized peer-to-peer networks instead of pointing to a
+specific server location. In the BitTorrent ecosystem, the
+<code>urn:btih</code> namespace designates the "BitTorrent Info Hash,"
+which serves as the unique cryptographic fingerprint for a standard
+BitTorrent v1 torrent. This article explains how the
+<code>urn:btih</code> scheme operates within a magnet link, its encoding
+standards, and how clients interpret this identifier to locate and
+download content across the swarm.</p>
+<h3 id="the-role-of-urnbtih-in-magnet-links">The Role of
+<code>urn:btih</code> in Magnet Links</h3>
+<p>A standard magnet URI contains key-value pairs separated by
+ampersands. The most critical parameter is the "exact topic"
+(<code>xt</code>), which defines the unique content identifier. The
+<code>urn:btih</code> namespace specifically instructs the client that
+the following string is a BitTorrent v1 info hash.</p>
+<p>A standard structure appears as follows:</p>
+<p><code>magnet:?xt=urn:btih:&lt;info-hash&gt;</code></p>
+<p>When a BitTorrent client parses this URI, the <code>urn:btih:</code>
+prefix informs the engine that the payload is not a generic file hash
+(such as SHA-256 or MD5), but a hash derived specifically from the
+<code>info</code> dictionary of a BitTorrent metainfo file.</p>
+<h3 id="how-the-v1-info-hash-is-generated">How the v1 Info Hash is
+Generated</h3>
+<p>In BitTorrent v1, the info hash is a 160-bit (20-byte) cryptographic
+hash generated using the SHA-1 algorithm. The input for this hash is
+strictly the bencoded <code>info</code> dictionary from the torrent's
+metadata, which contains:</p>
+<ul>
+<li>The piece length.</li>
+<li>The concatenation of all 20-byte SHA-1 piece hashes.</li>
+<li>File names, paths, and byte lengths.</li>
+<li>Torrent privacy flags.</li>
+</ul>
+<p>Because any modification to the file contents, file order, or piece
+size alters the <code>info</code> dictionary, the resulting SHA-1 hash
+is unique to that specific dataset.</p>
+<h3 id="encoding-formats-hexadecimal-vs-base32">Encoding Formats:
+Hexadecimal vs. Base32</h3>
+<p>The 20-byte raw SHA-1 output must be converted into text to be safely
+transmitted in a URI. The <code>urn:btih</code> namespace accepts two
+standard string representations:</p>
+<ol type="1">
+<li><strong>Hexadecimal (Hex):</strong> A 40-character string using
+characters <code>0–9</code> and <code>a–f</code> (case-insensitive).
+This represents 2 hex characters per byte (20 bytes × 2 = 40
+characters).</li>
+<li><strong>Base32:</strong> A 32-character string using the standard
+Base32 alphabet <code>A–Z</code> and <code>2–7</code>
+(case-insensitive). Base32 encodes 5 bits per character (160 bits / 5 =
+32 characters).</li>
+</ol>
+<p>BitTorrent clients detect the length of the string after
+<code>urn:btih:</code> to determine the encoding format. If the string
+is 40 characters long, the client parses it as hex; if it is 32
+characters long, it decodes it as Base32. Both representations yield the
+exact same 20-byte binary hash internally.</p>
+<h3 id="swarm-discovery-via-the-info-hash">Swarm Discovery via the Info
+Hash</h3>
+<p>Once the 20-byte info hash is decoded from the <code>urn:btih</code>
+parameter, the client uses it to connect to the peer-to-peer network
+through several mechanisms:</p>
+<ul>
+<li><strong>Distributed Hash Table (DHT):</strong> The client searches
+the Kademlia-based DHT for nodes whose Node IDs are mathematically
+closest to the info hash.</li>
+<li><strong>Trackers:</strong> If tracker URLs are provided via the
+<code>tr</code> parameter in the magnet link, the client queries those
+trackers using the info hash.</li>
+<li><strong>Peer Exchange (PEX):</strong> Once connected to initial
+peers, the client queries them for additional peers associated with that
+info hash.</li>
+</ul>
+<p>Because the magnet link does not initially contain the full file
+metadata (such as individual file names or piece definitions), the
+client uses the BEP 9 (Extension for Peers to Send Metadata Files)
+protocol to download the actual <code>info</code> dictionary directly
+from connected peers. The client verifies the downloaded metadata
+against the <code>urn:btih</code> hash to ensure the data has not been
+modified or corrupted before downloading the actual files.</p></article>
+        <div id=comments-container></div>
+
+        <script>
+            const utterancesScript = document.createElement('script');
+            
+            utterancesScript.setAttribute('src', 'https://utteranc.es/client.js');
+            utterancesScript.setAttribute('repo', 'salivity/bittorrent'); 
+            utterancesScript.setAttribute('issue-term', 'pathname'); 
+            utterancesScript.setAttribute('theme', localStorage.getItem('theme') === 'dark' ? 'github-dark' : 'github-light'); 
+            utterancesScript.setAttribute('crossorigin', 'anonymous');
+            utterancesScript.async = true;
+
+            document.getElementById('comments-container').appendChild(utterancesScript);
+        </script>
+    
+    </main>
+    <footer>
+        <nav>
+            <ul class="footer-links">
+                <li><a href="/bittorrent/privacy-policy">Privacy Policy</a></li>
+                <li><a href="/bittorrent/terms-and-conditions">Terms and Conditions</a></li>
+            </ul>
+        </nav>
+        <div class="copyright">
+            Copyright &copy; <span id="current-year"></span>
+        </div>
+    </footer>
+</body>
+</html>

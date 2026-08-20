@@ -1,0 +1,144 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="light">
+<head>
+    <script async src="https://www.googletagmanager.com/gtag/js?id=G-R4Y4YXFHZS"></script>
+    <script>
+        window.dataLayer = window.dataLayer || [];
+
+        function gtag(){
+            dataLayer.push(arguments);
+        }
+
+        gtag('js', new Date());
+
+        gtag('config', 'G-R4Y4YXFHZS');
+    </script>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>How Private Tracker Bonus Point Systems Work - bittorrent</title>
+    <meta name="description" content="Private torrent trackers rely on bonus point systems to reward members for keeping files available over extended periods, ensuring the long-term survival of rare and niche content. By offering a passive, time-based currency in exchange for active seeding">
+    <link rel="canonical" href="https://salivity.github.io/bittorrent/article/how-private-tracker-bonus-point-systems-work">
+    <link rel="icon" href="/bittorrent/favicon.ico">
+    <link rel="stylesheet" href="/bittorrent/css/style.css">
+    <link media="print" rel="stylesheet" href="/bittorrent/css/print.css">
+    <script src="/bittorrent/js/fuse.min.js"></script>
+    <script src="/bittorrent/js/script.js"></script>
+    <script id="MathJax-script" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/4.1.3/tex-chtml.min.js" defer></script>
+    <meta property="og:type" content="website" />
+    <meta property="og:title" content="How Private Tracker Bonus Point Systems Work - bittorrent" />
+    <meta property="og:url" content="https://salivity.github.io/bittorrent/article/how-private-tracker-bonus-point-systems-work" />
+    <meta property="og:image:url" content="https://salivity.github.io/bittorrent/images/open-graph/default.webp" />
+    <meta property="og:image:secure_url" content="https://salivity.github.io/bittorrent/images/open-graph/default.webp" />
+    <meta property="og:image:width" content="1120" />
+    <meta property="og:image:height" content="630" />
+    <meta property="og:description" content="Private torrent trackers rely on bonus point systems to reward members for keeping files available over extended periods, ensuring the long-term survival of rare and niche content. By offering a passive, time-based currency in exchange for active seeding" />
+    <link rel="manifest" href="/bittorrent/pwa/manifest.json" />
+</head>
+<body>
+    <header>
+        <a href="/bittorrent/" aria-label="Go To Home Page" title="Go To Home Page" id="logo">
+            <span>salivity.github.io/</span><span>bittorrent</span>
+        </a>
+        <nav>
+            <ul class="header-links">
+                <li><a href="https://github.com/salivity" title="Github" aria-label="Go To Github Profile Page"><svg class="svg-icon" focusable="false" aria-hidden="true" viewBox="0 0 24 24"><path d="M12 1.27a11 11 0 00-3.48 21.46c.55.09.73-.28.73-.55v-1.84c-3.03.64-3.67-1.46-3.67-1.46-.55-1.29-1.28-1.65-1.28-1.65-.92-.65.1-.65.1-.65 1.1 0 1.73 1.1 1.73 1.1.92 1.65 2.57 1.2 3.21.92a2 2 0 01.64-1.47c-2.47-.27-5.04-1.19-5.04-5.5 0-1.1.46-2.1 1.2-2.84a3.76 3.76 0 010-2.93s.91-.28 3.11 1.1c1.8-.49 3.7-.49 5.5 0 2.1-1.38 3.02-1.1 3.02-1.1a3.76 3.76 0 010 2.93c.83.74 1.2 1.74 1.2 2.94 0 4.21-2.57 5.13-5.04 5.4.45.37.82.92.82 2.02v3.03c0 .27.1.64.73.55A11 11 0 0012 1.27"></path></svg></a></li>
+                <li><a href="/bittorrent/search" title="Search" aria-label="Go To Search Page"><svg class="svg-icon" aria-hidden="true" focusable="false" viewBox="0 0 24 24"><path d="M15.5 14h-.79l-.28-.27C15.41 12.59 16 11.11 16 9.5 16 5.91 13.09 3 9.5 3S3 5.91 3 9.5 5.91 16 9.5 16c1.61 0 3.09-.59 4.23-1.57l.27.28v.79l5 4.99L20.49 19zm-6 0C7.01 14 5 11.99 5 9.5S7.01 5 9.5 5 14 7.01 14 9.5 11.99 14 9.5 14"></path></svg></a></li>
+                <li><a id="theme-toggle" title="Theme" href="javascript:void(0);" aria-label="Toggle Website Theme"></a></li>
+            </ul>
+        </nav>
+    </header>
+    <main>
+        <article><h1 id="how-private-tracker-bonus-point-systems-work">How Private
+Tracker Bonus Point Systems Work</h1>
+<p>Private torrent trackers rely on bonus point systems to reward
+members for keeping files available over extended periods, ensuring the
+long-term survival of rare and niche content. By offering a passive,
+time-based currency in exchange for active seeding, these systems allow
+users to build upload credit and access perks even when no other peers
+are actively downloading from them. This overview explores how these
+systems operate, how points are calculated, and why they are essential
+for maintaining a healthy tracker ecosystem.</p>
+<h3 id="the-mechanism-of-earning-bonus-points">The Mechanism of Earning
+Bonus Points</h3>
+<p>On standard BitTorrent networks, users only gain upload credit when
+another peer downloads data from them. On private trackers, however,
+bonus point systems grant points continuously simply for maintaining an
+active connection to the torrent swarm as a seeder.</p>
+<p>The rate at which a user accumulates bonus points is typically
+determined by a mathematical formula that factors in several
+variables:</p>
+<ul>
+<li><strong>Time Seeded:</strong> Points accrue exponentially or
+linearly based on how long a torrent remains actively seeded.</li>
+<li><strong>File Size:</strong> Larger torrents generally yield more
+points per hour than smaller files to compensate for the local storage
+space they consume.</li>
+<li><strong>Seeder Count:</strong> Torrents with fewer seeders often
+grant a multiplier. Seeding a rare file with only one or two seeders
+awards significantly more points than seeding a popular file with
+hundreds of seeders.</li>
+</ul>
+<h3 id="countering-the-limitations-of-ratio-requirements">Countering the
+Limitations of Ratio Requirements</h3>
+<p>Private trackers strictly enforce a share ratio (the ratio of
+uploaded data to downloaded data). On trackers with high-speed seedbox
+users or low-activity torrents, ordinary users with standard home
+connections struggle to gain upload credit naturally.</p>
+<p>Bonus point systems solve this imbalance by decoupling rewards from
+direct data transfer. Users do not need to compete for bandwidth on
+popular, newly released torrents. Instead, they can seed older, inactive
+torrents to passively accumulate points, ensuring that their accounts
+remain in good standing regardless of their internet connection
+speed.</p>
+<h3 id="redemption-and-tracker-economy">Redemption and Tracker
+Economy</h3>
+<p>Accumulated bonus points can be spent in the tracker's internal
+store. Common redemption options include:</p>
+<ul>
+<li><strong>Upload Credit:</strong> Converting points directly into
+gigabytes or terabytes of upload buffer to improve ratio
+statistics.</li>
+<li><strong>Freeleech Tokens:</strong> Purchasing tokens that allow
+downloading specific torrents without the downloaded data counting
+against the user's ratio.</li>
+<li><strong>Invitations and Account Perks:</strong> Buying invite codes
+for new users, custom forum titles, or temporary VIP status.</li>
+<li><strong>Pardon Systems:</strong> Removing recorded "hit-and-run"
+penalties or warning strikes on an account.</li>
+</ul>
+<h3 id="preserving-data-longevity">Preserving Data Longevity</h3>
+<p>The primary objective of the bonus point system is content
+preservation. Without an incentive, users naturally delete files once
+they meet the minimum seeding time requirement, leading to dead
+torrents. By scaling rewards to favor rare, large, and long-held files,
+private trackers create a self-sustaining archive where users are
+actively motivated to keep data accessible indefinitely.</p></article>
+        <div id=comments-container></div>
+
+        <script>
+            const utterancesScript = document.createElement('script');
+            
+            utterancesScript.setAttribute('src', 'https://utteranc.es/client.js');
+            utterancesScript.setAttribute('repo', 'salivity/bittorrent'); 
+            utterancesScript.setAttribute('issue-term', 'pathname'); 
+            utterancesScript.setAttribute('theme', localStorage.getItem('theme') === 'dark' ? 'github-dark' : 'github-light'); 
+            utterancesScript.setAttribute('crossorigin', 'anonymous');
+            utterancesScript.async = true;
+
+            document.getElementById('comments-container').appendChild(utterancesScript);
+        </script>
+    
+    </main>
+    <footer>
+        <nav>
+            <ul class="footer-links">
+                <li><a href="/bittorrent/privacy-policy">Privacy Policy</a></li>
+                <li><a href="/bittorrent/terms-and-conditions">Terms and Conditions</a></li>
+            </ul>
+        </nav>
+        <div class="copyright">
+            Copyright &copy; <span id="current-year"></span>
+        </div>
+    </footer>
+</body>
+</html>

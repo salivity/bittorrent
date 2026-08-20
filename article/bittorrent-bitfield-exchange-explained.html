@@ -1,0 +1,150 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="light">
+<head>
+    <script async src="https://www.googletagmanager.com/gtag/js?id=G-R4Y4YXFHZS"></script>
+    <script>
+        window.dataLayer = window.dataLayer || [];
+
+        function gtag(){
+            dataLayer.push(arguments);
+        }
+
+        gtag('js', new Date());
+
+        gtag('config', 'G-R4Y4YXFHZS');
+    </script>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>BitTorrent Bitfield Exchange Explained - bittorrent</title>
+    <meta name="description" content="The bitfield exchange is an essential communication phase in the BitTorrent protocol where two newly connected peers inform each other which specific pieces of a torrent file they possess. Occurring immediately after the initial connection handshake, thi">
+    <link rel="canonical" href="https://salivity.github.io/bittorrent/article/bittorrent-bitfield-exchange-explained">
+    <link rel="icon" href="/bittorrent/favicon.ico">
+    <link rel="stylesheet" href="/bittorrent/css/style.css">
+    <link media="print" rel="stylesheet" href="/bittorrent/css/print.css">
+    <script src="/bittorrent/js/fuse.min.js"></script>
+    <script src="/bittorrent/js/script.js"></script>
+    <script id="MathJax-script" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/4.1.3/tex-chtml.min.js" defer></script>
+    <meta property="og:type" content="website" />
+    <meta property="og:title" content="BitTorrent Bitfield Exchange Explained - bittorrent" />
+    <meta property="og:url" content="https://salivity.github.io/bittorrent/article/bittorrent-bitfield-exchange-explained" />
+    <meta property="og:image:url" content="https://salivity.github.io/bittorrent/images/open-graph/default.webp" />
+    <meta property="og:image:secure_url" content="https://salivity.github.io/bittorrent/images/open-graph/default.webp" />
+    <meta property="og:image:width" content="1120" />
+    <meta property="og:image:height" content="630" />
+    <meta property="og:description" content="The bitfield exchange is an essential communication phase in the BitTorrent protocol where two newly connected peers inform each other which specific pieces of a torrent file they possess. Occurring immediately after the initial connection handshake, thi" />
+    <link rel="manifest" href="/bittorrent/pwa/manifest.json" />
+</head>
+<body>
+    <header>
+        <a href="/bittorrent/" aria-label="Go To Home Page" title="Go To Home Page" id="logo">
+            <span>salivity.github.io/</span><span>bittorrent</span>
+        </a>
+        <nav>
+            <ul class="header-links">
+                <li><a href="https://github.com/salivity" title="Github" aria-label="Go To Github Profile Page"><svg class="svg-icon" focusable="false" aria-hidden="true" viewBox="0 0 24 24"><path d="M12 1.27a11 11 0 00-3.48 21.46c.55.09.73-.28.73-.55v-1.84c-3.03.64-3.67-1.46-3.67-1.46-.55-1.29-1.28-1.65-1.28-1.65-.92-.65.1-.65.1-.65 1.1 0 1.73 1.1 1.73 1.1.92 1.65 2.57 1.2 3.21.92a2 2 0 01.64-1.47c-2.47-.27-5.04-1.19-5.04-5.5 0-1.1.46-2.1 1.2-2.84a3.76 3.76 0 010-2.93s.91-.28 3.11 1.1c1.8-.49 3.7-.49 5.5 0 2.1-1.38 3.02-1.1 3.02-1.1a3.76 3.76 0 010 2.93c.83.74 1.2 1.74 1.2 2.94 0 4.21-2.57 5.13-5.04 5.4.45.37.82.92.82 2.02v3.03c0 .27.1.64.73.55A11 11 0 0012 1.27"></path></svg></a></li>
+                <li><a href="/bittorrent/search" title="Search" aria-label="Go To Search Page"><svg class="svg-icon" aria-hidden="true" focusable="false" viewBox="0 0 24 24"><path d="M15.5 14h-.79l-.28-.27C15.41 12.59 16 11.11 16 9.5 16 5.91 13.09 3 9.5 3S3 5.91 3 9.5 5.91 16 9.5 16c1.61 0 3.09-.59 4.23-1.57l.27.28v.79l5 4.99L20.49 19zm-6 0C7.01 14 5 11.99 5 9.5S7.01 5 9.5 5 14 7.01 14 9.5 11.99 14 9.5 14"></path></svg></a></li>
+                <li><a id="theme-toggle" title="Theme" href="javascript:void(0);" aria-label="Toggle Website Theme"></a></li>
+            </ul>
+        </nav>
+    </header>
+    <main>
+        <article><h1 id="bittorrent-bitfield-exchange-explained">BitTorrent Bitfield
+Exchange Explained</h1>
+<p>The bitfield exchange is an essential communication phase in the
+BitTorrent protocol where two newly connected peers inform each other
+which specific pieces of a torrent file they possess. Occurring
+immediately after the initial connection handshake, this exchange allows
+both clients to quickly establish a baseline of available data,
+calculate piece availability across the swarm, and determine whether
+they should express interest in downloading from one another.</p>
+<h3 id="timing-and-role-in-the-handshake">Timing and Role in the
+Handshake</h3>
+<p>Once two peers complete their TCP and protocol-level handshakes, they
+enter the messaging phase. If a peer possesses at least one piece of the
+torrent, the very first message it typically transmits is the
+<code>bitfield</code> message. Sending a bitfield is optional; clients
+that possess zero pieces (complete downloaders starting from scratch)
+usually omit it entirely rather than sending an all-zero payload.</p>
+<h3 id="structure-of-the-bitfield-payload">Structure of the Bitfield
+Payload</h3>
+<p>The <code>bitfield</code> message consists of a standard BitTorrent
+message length prefix, a single-byte message identifier
+(<code>ID 5</code>), and a payload formatted as a packed byte array:</p>
+<ul>
+<li><strong>Bit Mapping:</strong> Each bit in the payload corresponds
+directly to a piece index in the torrent, starting with the most
+significant bit of the first byte representing piece index
+<code>0</code>.</li>
+<li><strong>Values:</strong> A bit set to <code>1</code> indicates the
+peer has verified and completed that piece, while a <code>0</code>
+indicates the piece is missing.</li>
+<li><strong>Padding:</strong> Because piece counts rarely divide evenly
+into full 8-bit bytes, any unused bits at the end of the final byte are
+set to <code>0</code>.</li>
+</ul>
+<h3 id="validation-and-error-handling">Validation and Error
+Handling</h3>
+<p>Upon receiving a bitfield, the client validates the payload against
+the metadata provided by the torrent's <code>.torrent</code> file:</p>
+<ul>
+<li><strong>Length Check:</strong> The receiving peer calculates the
+expected byte length based on the total piece count. If the bitfield
+length is incorrect, the connection is considered corrupt and terminated
+immediately.</li>
+<li><strong>Spare Bit Verification:</strong> The recipient verifies that
+any trailing padding bits are strictly set to <code>0</code>. If any
+trailing bits are set to <code>1</code>, the client drops the connection
+to prevent protocol errors or malicious activity.</li>
+</ul>
+<h3 id="state-updating-and-interest-determination">State Updating and
+Interest Determination</h3>
+<p>Once validated, the receiving peer updates its internal map of what
+the remote peer owns. It then compares this map against its own missing
+pieces:</p>
+<ul>
+<li><strong>Expressing Interest:</strong> If the remote peer has at
+least one piece that the local peer needs, the local peer marks the
+connection state as "interested" and sends an <code>interested</code>
+message (<code>ID 2</code>).</li>
+<li><strong>Lack of Interest:</strong> If the remote peer possesses no
+unique pieces needed by the local client, the local peer sets its state
+to "not interested" and sends a <code>not interested</code> message
+(<code>ID 3</code>).</li>
+</ul>
+<h3 id="transition-to-real-time-updates">Transition to Real-Time
+Updates</h3>
+<p>The <code>bitfield</code> message is only sent once per peer
+connection. Any pieces that a peer completes after this initial exchange
+are not communicated via a new bitfield; instead, they are announced
+individually in real time using lightweight <code>have</code> messages
+(<code>ID 4</code>), which contain only the integer index of the newly
+completed piece.</p></article>
+        <div id=comments-container></div>
+
+        <script>
+            const utterancesScript = document.createElement('script');
+            
+            utterancesScript.setAttribute('src', 'https://utteranc.es/client.js');
+            utterancesScript.setAttribute('repo', 'salivity/bittorrent'); 
+            utterancesScript.setAttribute('issue-term', 'pathname'); 
+            utterancesScript.setAttribute('theme', localStorage.getItem('theme') === 'dark' ? 'github-dark' : 'github-light'); 
+            utterancesScript.setAttribute('crossorigin', 'anonymous');
+            utterancesScript.async = true;
+
+            document.getElementById('comments-container').appendChild(utterancesScript);
+        </script>
+    
+    </main>
+    <footer>
+        <nav>
+            <ul class="footer-links">
+                <li><a href="/bittorrent/privacy-policy">Privacy Policy</a></li>
+                <li><a href="/bittorrent/terms-and-conditions">Terms and Conditions</a></li>
+            </ul>
+        </nav>
+        <div class="copyright">
+            Copyright &copy; <span id="current-year"></span>
+        </div>
+    </footer>
+</body>
+</html>

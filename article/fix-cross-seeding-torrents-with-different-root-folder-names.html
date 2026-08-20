@@ -1,0 +1,152 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="light">
+<head>
+    <script async src="https://www.googletagmanager.com/gtag/js?id=G-R4Y4YXFHZS"></script>
+    <script>
+        window.dataLayer = window.dataLayer || [];
+
+        function gtag(){
+            dataLayer.push(arguments);
+        }
+
+        gtag('js', new Date());
+
+        gtag('config', 'G-R4Y4YXFHZS');
+    </script>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Fix Cross-Seeding Torrents with Different Root Folder Names - bittorrent</title>
+    <meta name="description" content="Cross-seeding is the practice of seeding identical data across multiple trackers to improve ratio and data availability, but differences in root folder names can disrupt the process. When trackers package the exact same files inside differently named top">
+    <link rel="canonical" href="https://salivity.github.io/bittorrent/article/fix-cross-seeding-torrents-with-different-root-folder-names">
+    <link rel="icon" href="/bittorrent/favicon.ico">
+    <link rel="stylesheet" href="/bittorrent/css/style.css">
+    <link media="print" rel="stylesheet" href="/bittorrent/css/print.css">
+    <script src="/bittorrent/js/fuse.min.js"></script>
+    <script src="/bittorrent/js/script.js"></script>
+    <script id="MathJax-script" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/4.1.3/tex-chtml.min.js" defer></script>
+    <meta property="og:type" content="website" />
+    <meta property="og:title" content="Fix Cross-Seeding Torrents with Different Root Folder Names - bittorrent" />
+    <meta property="og:url" content="https://salivity.github.io/bittorrent/article/fix-cross-seeding-torrents-with-different-root-folder-names" />
+    <meta property="og:image:url" content="https://salivity.github.io/bittorrent/images/open-graph/default.webp" />
+    <meta property="og:image:secure_url" content="https://salivity.github.io/bittorrent/images/open-graph/default.webp" />
+    <meta property="og:image:width" content="1120" />
+    <meta property="og:image:height" content="630" />
+    <meta property="og:description" content="Cross-seeding is the practice of seeding identical data across multiple trackers to improve ratio and data availability, but differences in root folder names can disrupt the process. When trackers package the exact same files inside differently named top" />
+    <link rel="manifest" href="/bittorrent/pwa/manifest.json" />
+</head>
+<body>
+    <header>
+        <a href="/bittorrent/" aria-label="Go To Home Page" title="Go To Home Page" id="logo">
+            <span>salivity.github.io/</span><span>bittorrent</span>
+        </a>
+        <nav>
+            <ul class="header-links">
+                <li><a href="https://github.com/salivity" title="Github" aria-label="Go To Github Profile Page"><svg class="svg-icon" focusable="false" aria-hidden="true" viewBox="0 0 24 24"><path d="M12 1.27a11 11 0 00-3.48 21.46c.55.09.73-.28.73-.55v-1.84c-3.03.64-3.67-1.46-3.67-1.46-.55-1.29-1.28-1.65-1.28-1.65-.92-.65.1-.65.1-.65 1.1 0 1.73 1.1 1.73 1.1.92 1.65 2.57 1.2 3.21.92a2 2 0 01.64-1.47c-2.47-.27-5.04-1.19-5.04-5.5 0-1.1.46-2.1 1.2-2.84a3.76 3.76 0 010-2.93s.91-.28 3.11 1.1c1.8-.49 3.7-.49 5.5 0 2.1-1.38 3.02-1.1 3.02-1.1a3.76 3.76 0 010 2.93c.83.74 1.2 1.74 1.2 2.94 0 4.21-2.57 5.13-5.04 5.4.45.37.82.92.82 2.02v3.03c0 .27.1.64.73.55A11 11 0 0012 1.27"></path></svg></a></li>
+                <li><a href="/bittorrent/search" title="Search" aria-label="Go To Search Page"><svg class="svg-icon" aria-hidden="true" focusable="false" viewBox="0 0 24 24"><path d="M15.5 14h-.79l-.28-.27C15.41 12.59 16 11.11 16 9.5 16 5.91 13.09 3 9.5 3S3 5.91 3 9.5 5.91 16 9.5 16c1.61 0 3.09-.59 4.23-1.57l.27.28v.79l5 4.99L20.49 19zm-6 0C7.01 14 5 11.99 5 9.5S7.01 5 9.5 5 14 7.01 14 9.5 11.99 14 9.5 14"></path></svg></a></li>
+                <li><a id="theme-toggle" title="Theme" href="javascript:void(0);" aria-label="Toggle Website Theme"></a></li>
+            </ul>
+        </nav>
+    </header>
+    <main>
+        <article><h1 id="fix-cross-seeding-torrents-with-different-root-folder-names">Fix
+Cross-Seeding Torrents with Different Root Folder Names</h1>
+<p>Cross-seeding is the practice of seeding identical data across
+multiple trackers to improve ratio and data availability, but
+differences in root folder names can disrupt the process. When trackers
+package the exact same files inside differently named top-level
+directories, torrent clients fail to automatically locate the existing
+data, leading to failed rechecks or accidental duplicate downloads. This
+guide explains why this naming conflict occurs and details practical
+methods—including client path mapping, hardlinking, and automated
+tooling—to resolve it efficiently without duplicating disk space.</p>
+<h2 id="how-root-folder-name-differences-affect-cross-seeding">How Root
+Folder Name Differences Affect Cross-Seeding</h2>
+<p>A torrent's metadata (.torrent file) specifies the directory
+structure of the payload, starting with the root folder name. When a
+torrent client performs a piece check, it looks for the exact file paths
+defined inside that metadata.</p>
+<p>When two trackers distribute the same release with different root
+folder names (for example, <code>Movie.2024.1080p-GROUP</code> versus
+<code>Movie (2024) [1080p]</code>), the client treats them as separate
+file trees. If you add the second torrent pointing to the directory of
+the first, the client searches for files inside a folder name that does
+not exist on your drive. As a result:</p>
+<ul>
+<li><strong>Hash Checks Fail:</strong> The client cannot locate the
+files, registering the progress at 0%.</li>
+<li><strong>Unintended Redownloads:</strong> If the torrent is started
+automatically, the client creates a new folder and begins downloading
+identical data, wasting bandwidth and storage.</li>
+</ul>
+<h2 id="methods-to-resolve-root-folder-mismatches">Methods to Resolve
+Root Folder Mismatches</h2>
+<h3 id="1-renaming-the-root-folder-in-the-torrent-client">1. Renaming
+the Root Folder in the Torrent Client</h3>
+<p>Many advanced BitTorrent clients (such as qBittorrent, rTorrent, and
+Deluge) allow users to remap internal folder names directly within the
+user interface.</p>
+<ol type="1">
+<li>Add the new <code>.torrent</code> file in a <strong>paused</strong>
+or <strong>stopped</strong> state.</li>
+<li>Open the torrent's <strong>Content</strong> or
+<strong>Files</strong> tab.</li>
+<li>Right-click the root folder and select <strong>Rename</strong>.</li>
+<li>Change the root folder name to match the name of the folder
+currently residing on your storage.</li>
+<li>Force a <strong>Recheck</strong> on the torrent. Once verification
+reaches 100%, resume seeding.</li>
+</ol>
+<h3 id="2-using-hardlinks-to-support-multiple-folder-names">2. Using
+Hardlinks to Support Multiple Folder Names</h3>
+<p>If you need to keep both torrents active simultaneously and your
+client does not support internal remapping, hardlinking is the standard
+file-system solution. Hardlinks allow multiple directory structures to
+point to the exact same physical data on disk without consuming
+additional storage.</p>
+<ul>
+<li><strong>Linux / macOS:</strong> Use the command line to create a
+hardlinked copy of the directory:
+<code>cp -al "/path/to/original_folder" "/path/to/new_folder_name"</code></li>
+<li><strong>Windows:</strong> Use PowerShell or command line utilities:
+<code>New-Item -ItemType HardLink</code> or client-integrated linking
+tools.</li>
+</ul>
+<p>Once created, point the second torrent to the location of the newly
+named directory and perform a hash check.</p>
+<h3 id="3-automated-resolution-with-cross-seeding-tools">3. Automated
+Resolution with Cross-Seeding Tools</h3>
+<p>Dedicated utilities (such as <code>cross-seed</code>) automate
+detection and resolution of root folder variations. These tools analyze
+your completed torrents, search supported trackers for matching content,
+and automatically generate hardlinks with the proper destination folder
+names. This eliminates manual configuration and allows cross-seeding
+across diverse naming conventions at scale.</p></article>
+        <div id=comments-container></div>
+
+        <script>
+            const utterancesScript = document.createElement('script');
+            
+            utterancesScript.setAttribute('src', 'https://utteranc.es/client.js');
+            utterancesScript.setAttribute('repo', 'salivity/bittorrent'); 
+            utterancesScript.setAttribute('issue-term', 'pathname'); 
+            utterancesScript.setAttribute('theme', localStorage.getItem('theme') === 'dark' ? 'github-dark' : 'github-light'); 
+            utterancesScript.setAttribute('crossorigin', 'anonymous');
+            utterancesScript.async = true;
+
+            document.getElementById('comments-container').appendChild(utterancesScript);
+        </script>
+    
+    </main>
+    <footer>
+        <nav>
+            <ul class="footer-links">
+                <li><a href="/bittorrent/privacy-policy">Privacy Policy</a></li>
+                <li><a href="/bittorrent/terms-and-conditions">Terms and Conditions</a></li>
+            </ul>
+        </nav>
+        <div class="copyright">
+            Copyright &copy; <span id="current-year"></span>
+        </div>
+    </footer>
+</body>
+</html>

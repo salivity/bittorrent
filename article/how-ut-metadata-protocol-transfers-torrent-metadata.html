@@ -1,0 +1,158 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="light">
+<head>
+    <script async src="https://www.googletagmanager.com/gtag/js?id=G-R4Y4YXFHZS"></script>
+    <script>
+        window.dataLayer = window.dataLayer || [];
+
+        function gtag(){
+            dataLayer.push(arguments);
+        }
+
+        gtag('js', new Date());
+
+        gtag('config', 'G-R4Y4YXFHZS');
+    </script>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>How ut_metadata Protocol Transfers Torrent Metadata - bittorrent</title>
+    <meta name="description" content="The utmetadata extension is a BitTorrent enhancement that allows clients to fetch the metadata (the .torrent file's info dictionary) directly from swarm peers rather than relying on a centralized web server. By establishing an extension handshake, calcul">
+    <link rel="canonical" href="https://salivity.github.io/bittorrent/article/how-ut-metadata-protocol-transfers-torrent-metadata">
+    <link rel="icon" href="/bittorrent/favicon.ico">
+    <link rel="stylesheet" href="/bittorrent/css/style.css">
+    <link media="print" rel="stylesheet" href="/bittorrent/css/print.css">
+    <script src="/bittorrent/js/fuse.min.js"></script>
+    <script src="/bittorrent/js/script.js"></script>
+    <script id="MathJax-script" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/4.1.3/tex-chtml.min.js" defer></script>
+    <meta property="og:type" content="website" />
+    <meta property="og:title" content="How ut_metadata Protocol Transfers Torrent Metadata - bittorrent" />
+    <meta property="og:url" content="https://salivity.github.io/bittorrent/article/how-ut-metadata-protocol-transfers-torrent-metadata" />
+    <meta property="og:image:url" content="https://salivity.github.io/bittorrent/images/open-graph/default.webp" />
+    <meta property="og:image:secure_url" content="https://salivity.github.io/bittorrent/images/open-graph/default.webp" />
+    <meta property="og:image:width" content="1120" />
+    <meta property="og:image:height" content="630" />
+    <meta property="og:description" content="The utmetadata extension is a BitTorrent enhancement that allows clients to fetch the metadata (the .torrent file's info dictionary) directly from swarm peers rather than relying on a centralized web server. By establishing an extension handshake, calcul" />
+    <link rel="manifest" href="/bittorrent/pwa/manifest.json" />
+</head>
+<body>
+    <header>
+        <a href="/bittorrent/" aria-label="Go To Home Page" title="Go To Home Page" id="logo">
+            <span>salivity.github.io/</span><span>bittorrent</span>
+        </a>
+        <nav>
+            <ul class="header-links">
+                <li><a href="https://github.com/salivity" title="Github" aria-label="Go To Github Profile Page"><svg class="svg-icon" focusable="false" aria-hidden="true" viewBox="0 0 24 24"><path d="M12 1.27a11 11 0 00-3.48 21.46c.55.09.73-.28.73-.55v-1.84c-3.03.64-3.67-1.46-3.67-1.46-.55-1.29-1.28-1.65-1.28-1.65-.92-.65.1-.65.1-.65 1.1 0 1.73 1.1 1.73 1.1.92 1.65 2.57 1.2 3.21.92a2 2 0 01.64-1.47c-2.47-.27-5.04-1.19-5.04-5.5 0-1.1.46-2.1 1.2-2.84a3.76 3.76 0 010-2.93s.91-.28 3.11 1.1c1.8-.49 3.7-.49 5.5 0 2.1-1.38 3.02-1.1 3.02-1.1a3.76 3.76 0 010 2.93c.83.74 1.2 1.74 1.2 2.94 0 4.21-2.57 5.13-5.04 5.4.45.37.82.92.82 2.02v3.03c0 .27.1.64.73.55A11 11 0 0012 1.27"></path></svg></a></li>
+                <li><a href="/bittorrent/search" title="Search" aria-label="Go To Search Page"><svg class="svg-icon" aria-hidden="true" focusable="false" viewBox="0 0 24 24"><path d="M15.5 14h-.79l-.28-.27C15.41 12.59 16 11.11 16 9.5 16 5.91 13.09 3 9.5 3S3 5.91 3 9.5 5.91 16 9.5 16c1.61 0 3.09-.59 4.23-1.57l.27.28v.79l5 4.99L20.49 19zm-6 0C7.01 14 5 11.99 5 9.5S7.01 5 9.5 5 14 7.01 14 9.5 11.99 14 9.5 14"></path></svg></a></li>
+                <li><a id="theme-toggle" title="Theme" href="javascript:void(0);" aria-label="Toggle Website Theme"></a></li>
+            </ul>
+        </nav>
+    </header>
+    <main>
+        <article><h1 id="how-ut_metadata-protocol-transfers-torrent-metadata">How
+ut_metadata Protocol Transfers Torrent Metadata</h1>
+<p>The <code>ut_metadata</code> extension is a BitTorrent enhancement
+that allows clients to fetch the metadata (the <code>.torrent</code>
+file's <code>info</code> dictionary) directly from swarm peers rather
+than relying on a centralized web server. By establishing an extension
+handshake, calculating the total payload size, segmenting the raw
+bencoded dictionary into fixed 16 KiB pieces, and validating the final
+assembly against the magnet link's info-hash, peers can efficiently
+share and reconstruct the complete torrent file on the fly.</p>
+<h3 id="extension-handshake-and-negotiation">Extension Handshake and
+Negotiation</h3>
+<p>The <code>ut_metadata</code> extension operates on top of the
+BitTorrent Extension Protocol (BEP 10). When two peers connect, they
+exchange an extension handshake dictionary containing the key
+<code>m</code>, which maps supported extension names to local message
+IDs.</p>
+<p>During this handshake, a peer advertising the metadata will
+include:</p>
+<ul>
+<li><strong>The Extension ID:</strong> An arbitrary integer mapped to
+<code>"ut_metadata"</code>.</li>
+<li><strong><code>metadata_size</code>:</strong> The total byte size of
+the raw <code>info</code> dictionary.</li>
+</ul>
+<p>Once this handshake is complete, both clients know which message ID
+to route metadata requests to and the exact size of the payload to be
+transferred.</p>
+<h3 id="dividing-the-metadata-into-pieces">Dividing the Metadata into
+Pieces</h3>
+<p>Unlike standard BitTorrent payload data, which can have variable
+piece sizes, <code>ut_metadata</code> standardizes metadata segmentation
+to fixed blocks:</p>
+<ol type="1">
+<li><strong>Chunk Size:</strong> The raw, bencoded <code>info</code>
+dictionary is divided into chunks of <strong>16 KiB (16,384
+bytes)</strong> each.</li>
+<li><strong>Piece Indexing:</strong> The total number of pieces is
+calculated as <code>ceil(metadata_size / 16384)</code>.</li>
+<li><strong>Numbering:</strong> Pieces are indexed sequentially starting
+from <code>0</code> up to <code>N - 1</code>. The final piece contains
+the remainder bytes and may be smaller than 16 KiB.</li>
+</ol>
+<h3 id="the-message-exchange-cycle">The Message Exchange Cycle</h3>
+<p>All communication occurs using bencoded message headers appended with
+raw data, categorizing communication into three standard message
+types:</p>
+<ul>
+<li><strong>Request (<code>msg_type: 0</code>):</strong> A client
+wishing to download metadata sends a request dictionary specifying the
+target <code>piece</code> index.</li>
+<li><strong>Data (<code>msg_type: 1</code>):</strong> The serving peer
+responds with a message that includes a bencoded header detailing the
+<code>msg_type</code>, <code>piece</code> index, and
+<code>total_size</code>, immediately followed by the raw binary chunk
+corresponding to that piece.</li>
+<li><strong>Reject (<code>msg_type: 2</code>):</strong> If a peer does
+not possess the requested metadata or cannot serve it, it sends a reject
+message with the requested <code>piece</code> index so the requesting
+client can query another peer.</li>
+</ul>
+<h3 id="reassembly-and-verification">Reassembly and Verification</h3>
+<p>Because the client downloads pieces out of order and across multiple
+peers, verification is crucial before proceeding with the main file
+download:</p>
+<ol type="1">
+<li><strong>Buffer Assembly:</strong> The client writes each incoming 16
+KiB slice into a pre-allocated memory buffer based on its
+<code>piece</code> index and offset (<code>piece * 16384</code>).</li>
+<li><strong>Cryptographic Validation:</strong> Once all pieces are
+received, the client computes the SHA-1 hash (or SHA-256 in BitTorrent
+v2) across the entire assembled byte array.</li>
+<li><strong>Info-Hash Matching:</strong> The calculated hash is compared
+against the info-hash specified in the original magnet link. If the
+hashes match, the client successfully parses the bencoded data to obtain
+the file list, tracker list, and piece hashes needed to begin the actual
+content download. If the hash does not match, the assembled data is
+discarded as corrupted or malicious.</li>
+</ol></article>
+        <div id=comments-container></div>
+
+        <script>
+            const utterancesScript = document.createElement('script');
+            
+            utterancesScript.setAttribute('src', 'https://utteranc.es/client.js');
+            utterancesScript.setAttribute('repo', 'salivity/bittorrent'); 
+            utterancesScript.setAttribute('issue-term', 'pathname'); 
+            utterancesScript.setAttribute('theme', localStorage.getItem('theme') === 'dark' ? 'github-dark' : 'github-light'); 
+            utterancesScript.setAttribute('crossorigin', 'anonymous');
+            utterancesScript.async = true;
+
+            document.getElementById('comments-container').appendChild(utterancesScript);
+        </script>
+    
+    </main>
+    <footer>
+        <nav>
+            <ul class="footer-links">
+                <li><a href="/bittorrent/privacy-policy">Privacy Policy</a></li>
+                <li><a href="/bittorrent/terms-and-conditions">Terms and Conditions</a></li>
+            </ul>
+        </nav>
+        <div class="copyright">
+            Copyright &copy; <span id="current-year"></span>
+        </div>
+    </footer>
+</body>
+</html>

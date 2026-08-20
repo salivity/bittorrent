@@ -1,0 +1,163 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="light">
+<head>
+    <script async src="https://www.googletagmanager.com/gtag/js?id=G-R4Y4YXFHZS"></script>
+    <script>
+        window.dataLayer = window.dataLayer || [];
+
+        function gtag(){
+            dataLayer.push(arguments);
+        }
+
+        gtag('js', new Date());
+
+        gtag('config', 'G-R4Y4YXFHZS');
+    </script>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>How Private Trackers Enforce Share Ratios - bittorrent</title>
+    <meta name="description" content="Private torrent trackers maintain healthy sharing ecosystems by requiring users to give back as much data as they take. To enforce these download-to-upload share ratios, private trackers rely on a closed infrastructure built around unique account passkey">
+    <link rel="canonical" href="https://salivity.github.io/bittorrent/article/how-private-trackers-enforce-share-ratios">
+    <link rel="icon" href="/bittorrent/favicon.ico">
+    <link rel="stylesheet" href="/bittorrent/css/style.css">
+    <link media="print" rel="stylesheet" href="/bittorrent/css/print.css">
+    <script src="/bittorrent/js/fuse.min.js"></script>
+    <script src="/bittorrent/js/script.js"></script>
+    <script id="MathJax-script" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/4.1.3/tex-chtml.min.js" defer></script>
+    <meta property="og:type" content="website" />
+    <meta property="og:title" content="How Private Trackers Enforce Share Ratios - bittorrent" />
+    <meta property="og:url" content="https://salivity.github.io/bittorrent/article/how-private-trackers-enforce-share-ratios" />
+    <meta property="og:image:url" content="https://salivity.github.io/bittorrent/images/open-graph/default.webp" />
+    <meta property="og:image:secure_url" content="https://salivity.github.io/bittorrent/images/open-graph/default.webp" />
+    <meta property="og:image:width" content="1120" />
+    <meta property="og:image:height" content="630" />
+    <meta property="og:description" content="Private torrent trackers maintain healthy sharing ecosystems by requiring users to give back as much data as they take. To enforce these download-to-upload share ratios, private trackers rely on a closed infrastructure built around unique account passkey" />
+    <link rel="manifest" href="/bittorrent/pwa/manifest.json" />
+</head>
+<body>
+    <header>
+        <a href="/bittorrent/" aria-label="Go To Home Page" title="Go To Home Page" id="logo">
+            <span>salivity.github.io/</span><span>bittorrent</span>
+        </a>
+        <nav>
+            <ul class="header-links">
+                <li><a href="https://github.com/salivity" title="Github" aria-label="Go To Github Profile Page"><svg class="svg-icon" focusable="false" aria-hidden="true" viewBox="0 0 24 24"><path d="M12 1.27a11 11 0 00-3.48 21.46c.55.09.73-.28.73-.55v-1.84c-3.03.64-3.67-1.46-3.67-1.46-.55-1.29-1.28-1.65-1.28-1.65-.92-.65.1-.65.1-.65 1.1 0 1.73 1.1 1.73 1.1.92 1.65 2.57 1.2 3.21.92a2 2 0 01.64-1.47c-2.47-.27-5.04-1.19-5.04-5.5 0-1.1.46-2.1 1.2-2.84a3.76 3.76 0 010-2.93s.91-.28 3.11 1.1c1.8-.49 3.7-.49 5.5 0 2.1-1.38 3.02-1.1 3.02-1.1a3.76 3.76 0 010 2.93c.83.74 1.2 1.74 1.2 2.94 0 4.21-2.57 5.13-5.04 5.4.45.37.82.92.82 2.02v3.03c0 .27.1.64.73.55A11 11 0 0012 1.27"></path></svg></a></li>
+                <li><a href="/bittorrent/search" title="Search" aria-label="Go To Search Page"><svg class="svg-icon" aria-hidden="true" focusable="false" viewBox="0 0 24 24"><path d="M15.5 14h-.79l-.28-.27C15.41 12.59 16 11.11 16 9.5 16 5.91 13.09 3 9.5 3S3 5.91 3 9.5 5.91 16 9.5 16c1.61 0 3.09-.59 4.23-1.57l.27.28v.79l5 4.99L20.49 19zm-6 0C7.01 14 5 11.99 5 9.5S7.01 5 9.5 5 14 7.01 14 9.5 11.99 14 9.5 14"></path></svg></a></li>
+                <li><a id="theme-toggle" title="Theme" href="javascript:void(0);" aria-label="Toggle Website Theme"></a></li>
+            </ul>
+        </nav>
+    </header>
+    <main>
+        <article><h1 id="how-private-trackers-enforce-share-ratios">How Private Trackers
+Enforce Share Ratios</h1>
+<p>Private torrent trackers maintain healthy sharing ecosystems by
+requiring users to give back as much data as they take. To enforce these
+download-to-upload share ratios, private trackers rely on a closed
+infrastructure built around unique account passkeys, strict client
+whitelisting, periodic tracker announcements, and automated penalty
+systems. These components work together to accurately monitor individual
+data transfers, detect tampering, and restrict or ban accounts that fail
+to meet the minimum ratio requirements.</p>
+<h3 id="unique-user-passkeys">Unique User Passkeys</h3>
+<p>Unlike public trackers that only track general swarm metrics, private
+trackers assign a unique alphanumeric passkey to every registered user.
+When a user downloads a <code>.torrent</code> file from the site, their
+personalized passkey is embedded into the tracker's announce URL.</p>
+<p>Whenever the user's torrent client connects to the swarm, it uses
+this specific URL to communicate. This ensures that every byte of data
+uploaded or downloaded by that client is directly attributed to that
+single user account in the site’s database, regardless of changing IP
+addresses.</p>
+<h3 id="periodic-client-announcements">Periodic Client
+Announcements</h3>
+<p>The BitTorrent protocol relies on regular updates called "announces."
+At predetermined intervals (typically every 30 to 60 minutes), as well
+as during events like starting, pausing, or completing a download, the
+torrent client sends an HTTP or HTTPS request to the tracker.</p>
+<p>This announce request contains detailed statistical parameters,
+including:</p>
+<ul>
+<li><code>uploaded</code>: The total number of bytes sent to other peers
+since the last report.</li>
+<li><code>downloaded</code>: The total number of bytes received since
+the last report.</li>
+<li><code>left</code>: The remaining number of bytes required to
+complete the file.</li>
+</ul>
+<p>The tracker processes these values, adds them to the user’s lifetime
+statistics, and recalculates the account's overall share ratio.</p>
+<h3 id="torrent-client-whitelisting">Torrent Client Whitelisting</h3>
+<p>Because the tracker relies on data reported directly by the user's
+software, it is vulnerable to modified clients sending fake upload
+statistics (ratio cheating). Private trackers combat this through strict
+client whitelisting.</p>
+<p>Trackers only accept connections from vetted, open-source, or
+well-established clients with known, predictable behaviors (such as
+specific stable versions of qBittorrent, Transmission, or rTorrent).
+Connecting with an unapproved client, a banned version with known bugs,
+or software designed to spoof transfer stats results in an immediate
+connection drop or an automatic account flag.</p>
+<h3 id="anti-cheat-and-anomaly-detection">Anti-Cheat and Anomaly
+Detection</h3>
+<p>Trackers employ server-side scripts to detect fraudulent activity.
+These automated systems flag accounts exhibiting statistical anomalies,
+such as:</p>
+<ul>
+<li>Reporting upload speeds that exceed realistic network hardware
+limits.</li>
+<li>Uploading substantial amounts of data to swarms with no active
+leechers (downloaders).</li>
+<li>Mismatched transfer totals where the reported uploaded data cannot
+be correlated with the data downloaded by other verified peers in the
+same swarm.</li>
+</ul>
+<p>Users flagged by anti-cheat systems are automatically reviewed by
+staff or banned immediately.</p>
+<h3 id="ratio-rules-warnings-and-account-bans">Ratio Rules, Warnings,
+and Account Bans</h3>
+<p>Trackers define minimum required ratios, often scaled based on the
+total amount of data a user has downloaded. If an account falls below
+the threshold:</p>
+<ol type="1">
+<li><strong>Warning Period:</strong> The system automatically places the
+account on ratio watch, granting a grace period (often 1 to 2 weeks) to
+improve the ratio.</li>
+<li><strong>Leech Revocation:</strong> If the ratio remains below the
+threshold, downloading privileges are revoked, restricting the user to
+only seeding currently downloaded files.</li>
+<li><strong>Account Termination:</strong> Continued failure to meet
+requirements results in permanent account suspension.</li>
+</ol>
+<p>To assist users in maintaining their ratios, trackers frequently
+implement features like "Freeleech" (where downloaded data is not
+counted against the user) and Seedbox bonus points, which can be
+exchanged for artificial upload credit.</p></article>
+        <div id=comments-container></div>
+
+        <script>
+            const utterancesScript = document.createElement('script');
+            
+            utterancesScript.setAttribute('src', 'https://utteranc.es/client.js');
+            utterancesScript.setAttribute('repo', 'salivity/bittorrent'); 
+            utterancesScript.setAttribute('issue-term', 'pathname'); 
+            utterancesScript.setAttribute('theme', localStorage.getItem('theme') === 'dark' ? 'github-dark' : 'github-light'); 
+            utterancesScript.setAttribute('crossorigin', 'anonymous');
+            utterancesScript.async = true;
+
+            document.getElementById('comments-container').appendChild(utterancesScript);
+        </script>
+    
+    </main>
+    <footer>
+        <nav>
+            <ul class="footer-links">
+                <li><a href="/bittorrent/privacy-policy">Privacy Policy</a></li>
+                <li><a href="/bittorrent/terms-and-conditions">Terms and Conditions</a></li>
+            </ul>
+        </nav>
+        <div class="copyright">
+            Copyright &copy; <span id="current-year"></span>
+        </div>
+    </footer>
+</body>
+</html>

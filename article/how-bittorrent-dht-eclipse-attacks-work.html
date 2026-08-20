@@ -1,0 +1,172 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="light">
+<head>
+    <script async src="https://www.googletagmanager.com/gtag/js?id=G-R4Y4YXFHZS"></script>
+    <script>
+        window.dataLayer = window.dataLayer || [];
+
+        function gtag(){
+            dataLayer.push(arguments);
+        }
+
+        gtag('js', new Date());
+
+        gtag('config', 'G-R4Y4YXFHZS');
+    </script>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>How BitTorrent DHT Eclipse Attacks Work - bittorrent</title>
+    <meta name="description" content="An eclipse attack on BitTorrent’s Distributed Hash Table (DHT) network occurs when a malicious actor systematically isolates a specific peer or an entire content hash by surrounding it with attacker-controlled nodes. By manipulating the routing tables">
+    <link rel="canonical" href="https://salivity.github.io/bittorrent/article/how-bittorrent-dht-eclipse-attacks-work">
+    <link rel="icon" href="/bittorrent/favicon.ico">
+    <link rel="stylesheet" href="/bittorrent/css/style.css">
+    <link media="print" rel="stylesheet" href="/bittorrent/css/print.css">
+    <script src="/bittorrent/js/fuse.min.js"></script>
+    <script src="/bittorrent/js/script.js"></script>
+    <script id="MathJax-script" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/4.1.3/tex-chtml.min.js" defer></script>
+    <meta property="og:type" content="website" />
+    <meta property="og:title" content="How BitTorrent DHT Eclipse Attacks Work - bittorrent" />
+    <meta property="og:url" content="https://salivity.github.io/bittorrent/article/how-bittorrent-dht-eclipse-attacks-work" />
+    <meta property="og:image:url" content="https://salivity.github.io/bittorrent/images/open-graph/default.webp" />
+    <meta property="og:image:secure_url" content="https://salivity.github.io/bittorrent/images/open-graph/default.webp" />
+    <meta property="og:image:width" content="1120" />
+    <meta property="og:image:height" content="630" />
+    <meta property="og:description" content="An eclipse attack on BitTorrent’s Distributed Hash Table (DHT) network occurs when a malicious actor systematically isolates a specific peer or an entire content hash by surrounding it with attacker-controlled nodes. By manipulating the routing tables" />
+    <link rel="manifest" href="/bittorrent/pwa/manifest.json" />
+</head>
+<body>
+    <header>
+        <a href="/bittorrent/" aria-label="Go To Home Page" title="Go To Home Page" id="logo">
+            <span>salivity.github.io/</span><span>bittorrent</span>
+        </a>
+        <nav>
+            <ul class="header-links">
+                <li><a href="https://github.com/salivity" title="Github" aria-label="Go To Github Profile Page"><svg class="svg-icon" focusable="false" aria-hidden="true" viewBox="0 0 24 24"><path d="M12 1.27a11 11 0 00-3.48 21.46c.55.09.73-.28.73-.55v-1.84c-3.03.64-3.67-1.46-3.67-1.46-.55-1.29-1.28-1.65-1.28-1.65-.92-.65.1-.65.1-.65 1.1 0 1.73 1.1 1.73 1.1.92 1.65 2.57 1.2 3.21.92a2 2 0 01.64-1.47c-2.47-.27-5.04-1.19-5.04-5.5 0-1.1.46-2.1 1.2-2.84a3.76 3.76 0 010-2.93s.91-.28 3.11 1.1c1.8-.49 3.7-.49 5.5 0 2.1-1.38 3.02-1.1 3.02-1.1a3.76 3.76 0 010 2.93c.83.74 1.2 1.74 1.2 2.94 0 4.21-2.57 5.13-5.04 5.4.45.37.82.92.82 2.02v3.03c0 .27.1.64.73.55A11 11 0 0012 1.27"></path></svg></a></li>
+                <li><a href="/bittorrent/search" title="Search" aria-label="Go To Search Page"><svg class="svg-icon" aria-hidden="true" focusable="false" viewBox="0 0 24 24"><path d="M15.5 14h-.79l-.28-.27C15.41 12.59 16 11.11 16 9.5 16 5.91 13.09 3 9.5 3S3 5.91 3 9.5 5.91 16 9.5 16c1.61 0 3.09-.59 4.23-1.57l.27.28v.79l5 4.99L20.49 19zm-6 0C7.01 14 5 11.99 5 9.5S7.01 5 9.5 5 14 7.01 14 9.5 11.99 14 9.5 14"></path></svg></a></li>
+                <li><a id="theme-toggle" title="Theme" href="javascript:void(0);" aria-label="Toggle Website Theme"></a></li>
+            </ul>
+        </nav>
+    </header>
+    <main>
+        <article><h1 id="how-bittorrent-dht-eclipse-attacks-work">How BitTorrent DHT
+Eclipse Attacks Work</h1>
+<p>An eclipse attack on BitTorrent’s Distributed Hash Table (DHT)
+network occurs when a malicious actor systematically isolates a specific
+peer or an entire content hash by surrounding it with
+attacker-controlled nodes. By manipulating the routing tables that
+govern peer discovery, the attacker controls all inbound and outbound
+communication for the victim. This article breaks down the mechanics of
+the BitTorrent DHT, explains how attackers execute an eclipse attack
+using the XOR metric, details the practical impact on peer-to-peer file
+sharing, and covers the primary mitigation strategies used to defend the
+network.</p>
+<h3 id="the-foundation-of-bittorrent-dht">The Foundation of BitTorrent
+DHT</h3>
+<p>BitTorrent relies on the Kademlia-based Mainline DHT (MLDHT) protocol
+to enable trackerless peer discovery. In this architecture:</p>
+<ul>
+<li><strong>Node IDs:</strong> Every participating node generates a
+160-bit identifier.</li>
+<li><strong>XOR Metric:</strong> The "distance" between two nodes (or
+between a node and an <code>infohash</code>) is calculated using the
+bitwise XOR operation.</li>
+<li><strong>Routing Tables (k-buckets):</strong> Each node maintains a
+list of known contacts, organized into buckets based on their XOR
+distance. Nodes keep more contacts that are closer to their own ID and
+fewer contacts that are further away.</li>
+<li><strong>Lookups:</strong> When a user searches for peers sharing a
+torrent, their client sends lookup messages to nodes progressively
+closer in XOR distance to the target <code>infohash</code>.</li>
+</ul>
+<h3 id="execution-steps-of-an-eclipse-attack">Execution Steps of an
+Eclipse Attack</h3>
+<p>An eclipse attack targets the DHT by exploiting the rules nodes use
+to populate and update their routing tables.</p>
+<h4 id="1-generating-sybil-node-ids">1. Generating Sybil Node IDs</h4>
+<p>Because DHT node IDs are historically arbitrary, an attacker can
+launch thousands of virtual nodes (a Sybil attack). The attacker
+calculates node IDs that have minimal XOR distance to either:</p>
+<ul>
+<li><strong>A specific target peer:</strong> To isolate an individual
+user.</li>
+<li><strong>A specific torrent <code>infohash</code>:</strong> To censor
+or hijack distribution for a particular file.</li>
+</ul>
+<h4 id="2-poisoning-the-victims-routing-table">2. Poisoning the Victim's
+Routing Table</h4>
+<p>BitTorrent nodes update their <code>k-buckets</code> when they
+receive queries or responses from other peers. The attacker floods the
+target node with DHT messages (such as <code>ping</code>,
+<code>find_node</code>, or <code>get_peers</code>) originating from the
+attacker-controlled Sybil identities.</p>
+<p>Because DHT protocols prefer responsive nodes, the victim's routing
+table gradually replaces stale legitimate nodes with the attacker's
+active nodes. Eventually, all entries in the victim’s closest
+<code>k-buckets</code> belong to the attacker.</p>
+<h4 id="3-total-information-control">3. Total Information Control</h4>
+<p>Once the target's routing table is saturated, the victim is fully
+"eclipsed." Any lookup queries sent by the victim will only be forwarded
+to the attacker’s nodes.</p>
+<h3 id="consequences-of-a-dht-eclipse-attack">Consequences of a DHT
+Eclipse Attack</h3>
+<ul>
+<li><strong>Content Censorship:</strong> If the attacker targets an
+<code>infohash</code>, any peer searching for that file will only reach
+attacker nodes. The attacker can return empty peer lists, effectively
+making the torrent unreachable on trackerless networks.</li>
+<li><strong>Peer Isolation and Man-in-the-Middle:</strong> By isolating
+a single peer, an attacker can prevent the target from downloading
+pieces, feed them corrupted data, or control what peers the victim
+connects to.</li>
+<li><strong>Network Monitoring and De-anonymization:</strong> The
+attacker gains complete visibility over the queries generated by the
+target, making it easier to log IP addresses and correlate file
+downloads with specific users.</li>
+</ul>
+<h3 id="defense-and-mitigation">Defense and Mitigation</h3>
+<p>To prevent eclipse attacks, the BitTorrent protocol introduced
+security enhancements, most notably <strong>BEP 42 (DHT Security
+Extension)</strong>:</p>
+<ul>
+<li><strong>IP-Restricted Node IDs:</strong> Nodes must derive their
+160-bit Node ID directly from their external IP address using a
+cryptographic hashing algorithm with a time-based salt. This drastically
+limits an attacker's ability to arbitrarily generate node IDs that sit
+close to a victim's ID.</li>
+<li><strong>Bucket Diversity:</strong> Clients enforce strict limits on
+the number of nodes accepted from the same IP prefix (e.g.,
+<code>/24</code> for IPv4) within a single routing bucket.</li>
+<li><strong>Hardened Replacement Policies:</strong> Modern
+implementations prioritize long-standing, verified nodes over newly
+introduced nodes, making it harder for a rapid flood of Sybil
+announcements to overwrite established routing paths.</li>
+</ul></article>
+        <div id=comments-container></div>
+
+        <script>
+            const utterancesScript = document.createElement('script');
+            
+            utterancesScript.setAttribute('src', 'https://utteranc.es/client.js');
+            utterancesScript.setAttribute('repo', 'salivity/bittorrent'); 
+            utterancesScript.setAttribute('issue-term', 'pathname'); 
+            utterancesScript.setAttribute('theme', localStorage.getItem('theme') === 'dark' ? 'github-dark' : 'github-light'); 
+            utterancesScript.setAttribute('crossorigin', 'anonymous');
+            utterancesScript.async = true;
+
+            document.getElementById('comments-container').appendChild(utterancesScript);
+        </script>
+    
+    </main>
+    <footer>
+        <nav>
+            <ul class="footer-links">
+                <li><a href="/bittorrent/privacy-policy">Privacy Policy</a></li>
+                <li><a href="/bittorrent/terms-and-conditions">Terms and Conditions</a></li>
+            </ul>
+        </nav>
+        <div class="copyright">
+            Copyright &copy; <span id="current-year"></span>
+        </div>
+    </footer>
+</body>
+</html>

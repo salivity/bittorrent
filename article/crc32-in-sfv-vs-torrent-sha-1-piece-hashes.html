@@ -1,0 +1,144 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="light">
+<head>
+    <script async src="https://www.googletagmanager.com/gtag/js?id=G-R4Y4YXFHZS"></script>
+    <script>
+        window.dataLayer = window.dataLayer || [];
+
+        function gtag(){
+            dataLayer.push(arguments);
+        }
+
+        gtag('js', new Date());
+
+        gtag('config', 'G-R4Y4YXFHZS');
+    </script>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>CRC32 in SFV vs Torrent SHA-1 Piece Hashes - bittorrent</title>
+    <meta name="description" content="Both CRC32 checksums found in Simple File Verification (SFV) files and SHA-1 piece hashes in BitTorrent metadata are designed to verify data integrity, but they differ fundamentally in algorithm strength, verification granularity, error recovery, and ope">
+    <link rel="canonical" href="https://salivity.github.io/bittorrent/article/crc32-in-sfv-vs-torrent-sha-1-piece-hashes">
+    <link rel="icon" href="/bittorrent/favicon.ico">
+    <link rel="stylesheet" href="/bittorrent/css/style.css">
+    <link media="print" rel="stylesheet" href="/bittorrent/css/print.css">
+    <script src="/bittorrent/js/fuse.min.js"></script>
+    <script src="/bittorrent/js/script.js"></script>
+    <script id="MathJax-script" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/4.1.3/tex-chtml.min.js" defer></script>
+    <meta property="og:type" content="website" />
+    <meta property="og:title" content="CRC32 in SFV vs Torrent SHA-1 Piece Hashes - bittorrent" />
+    <meta property="og:url" content="https://salivity.github.io/bittorrent/article/crc32-in-sfv-vs-torrent-sha-1-piece-hashes" />
+    <meta property="og:image:url" content="https://salivity.github.io/bittorrent/images/open-graph/default.webp" />
+    <meta property="og:image:secure_url" content="https://salivity.github.io/bittorrent/images/open-graph/default.webp" />
+    <meta property="og:image:width" content="1120" />
+    <meta property="og:image:height" content="630" />
+    <meta property="og:description" content="Both CRC32 checksums found in Simple File Verification (SFV) files and SHA-1 piece hashes in BitTorrent metadata are designed to verify data integrity, but they differ fundamentally in algorithm strength, verification granularity, error recovery, and ope" />
+    <link rel="manifest" href="/bittorrent/pwa/manifest.json" />
+</head>
+<body>
+    <header>
+        <a href="/bittorrent/" aria-label="Go To Home Page" title="Go To Home Page" id="logo">
+            <span>salivity.github.io/</span><span>bittorrent</span>
+        </a>
+        <nav>
+            <ul class="header-links">
+                <li><a href="https://github.com/salivity" title="Github" aria-label="Go To Github Profile Page"><svg class="svg-icon" focusable="false" aria-hidden="true" viewBox="0 0 24 24"><path d="M12 1.27a11 11 0 00-3.48 21.46c.55.09.73-.28.73-.55v-1.84c-3.03.64-3.67-1.46-3.67-1.46-.55-1.29-1.28-1.65-1.28-1.65-.92-.65.1-.65.1-.65 1.1 0 1.73 1.1 1.73 1.1.92 1.65 2.57 1.2 3.21.92a2 2 0 01.64-1.47c-2.47-.27-5.04-1.19-5.04-5.5 0-1.1.46-2.1 1.2-2.84a3.76 3.76 0 010-2.93s.91-.28 3.11 1.1c1.8-.49 3.7-.49 5.5 0 2.1-1.38 3.02-1.1 3.02-1.1a3.76 3.76 0 010 2.93c.83.74 1.2 1.74 1.2 2.94 0 4.21-2.57 5.13-5.04 5.4.45.37.82.92.82 2.02v3.03c0 .27.1.64.73.55A11 11 0 0012 1.27"></path></svg></a></li>
+                <li><a href="/bittorrent/search" title="Search" aria-label="Go To Search Page"><svg class="svg-icon" aria-hidden="true" focusable="false" viewBox="0 0 24 24"><path d="M15.5 14h-.79l-.28-.27C15.41 12.59 16 11.11 16 9.5 16 5.91 13.09 3 9.5 3S3 5.91 3 9.5 5.91 16 9.5 16c1.61 0 3.09-.59 4.23-1.57l.27.28v.79l5 4.99L20.49 19zm-6 0C7.01 14 5 11.99 5 9.5S7.01 5 9.5 5 14 7.01 14 9.5 11.99 14 9.5 14"></path></svg></a></li>
+                <li><a id="theme-toggle" title="Theme" href="javascript:void(0);" aria-label="Toggle Website Theme"></a></li>
+            </ul>
+        </nav>
+    </header>
+    <main>
+        <article><h1 id="crc32-in-sfv-vs-torrent-sha-1-piece-hashes">CRC32 in SFV vs
+Torrent SHA-1 Piece Hashes</h1>
+<p>Both CRC32 checksums found in Simple File Verification (SFV) files
+and SHA-1 piece hashes in BitTorrent metadata are designed to verify
+data integrity, but they differ fundamentally in algorithm strength,
+verification granularity, error recovery, and operational purpose. While
+SFV files validate complete files after a download finishes using a
+lightweight, non-cryptographic checksum, BitTorrent uses cryptographic
+SHA-1 hashes to continuously validate small, fixed-size chunks of data
+during the download process itself.</p>
+<h2 id="algorithm-strength-and-collision-resistance">Algorithm Strength
+and Collision Resistance</h2>
+<ul>
+<li><strong>CRC32 (SFV):</strong> A 32-bit (4-byte) Cyclic Redundancy
+Check. It is a non-cryptographic checksum designed strictly to detect
+accidental errors, such as network bit flips or storage corruption.
+Because the output space is only <span
+class="math inline">\(2^{32}\)</span> (approx. 4.29 billion
+possibilities), hash collisions are easy to produce intentionally.</li>
+<li><strong>SHA-1 (BitTorrent):</strong> A 160-bit (20-byte)
+cryptographic hash function. Although SHA-1 is deprecated for
+high-security applications like digital certificates due to theoretical
+collision attacks, it remains vastly more collision-resistant than
+CRC32. In BitTorrent, it effectively prevents malicious peers from
+injecting spoofed data into a swarm.</li>
+</ul>
+<h2 id="granularity-and-verification-scope">Granularity and Verification
+Scope</h2>
+<ul>
+<li><strong>Per-File (SFV):</strong> An SFV file contains one CRC32
+checksum per whole file. Verification cannot occur until the entire file
+has been downloaded or extracted.</li>
+<li><strong>Per-Piece (BitTorrent):</strong> A torrent file splits the
+entire payload—whether a single file or thousands of files—into uniform
+"pieces" (typically between 256 KB and 16 MB). Each piece has its own
+dedicated SHA-1 hash listed in the torrent's <code>.torrent</code>
+metadata. Verification happens continuously in real time as each piece
+arrives from the peer-to-peer network.</li>
+</ul>
+<h2 id="error-recovery-and-bandwidth-efficiency">Error Recovery and
+Bandwidth Efficiency</h2>
+<ul>
+<li><strong>SFV Handling:</strong> If a file fails an SFV CRC32 check,
+there is no native mechanism within the SFV format to identify which
+part of the file is damaged. Users typically have to re-download the
+entire file or rely on external parity archives (like PAR2) to repair
+the damaged sectors.</li>
+<li><strong>BitTorrent Handling:</strong> If a downloaded piece fails
+its SHA-1 hash check, the BitTorrent client simply discards that single
+piece (a few megabytes) and re-downloads it from another peer. The rest
+of the valid data remains intact, saving significant bandwidth and
+time.</li>
+</ul>
+<h2 id="primary-roles-and-implementation">Primary Roles and
+Implementation</h2>
+<ul>
+<li><strong>SFV Files:</strong> Primarily used in traditional
+file-sharing environments (such as Usenet, FTP, and the Warez scene) as
+an external, post-transfer validation tool to ensure split RAR archives
+or disk images match the original release.</li>
+<li><strong>Torrent Hashes:</strong> Deeply integrated into the core
+BitTorrent transfer protocol. SHA-1 piece hashes enable trustless
+peer-to-peer distribution by ensuring that untrusted peers cannot
+distribute corrupted or tampered data without immediate detection.</li>
+</ul></article>
+        <div id=comments-container></div>
+
+        <script>
+            const utterancesScript = document.createElement('script');
+            
+            utterancesScript.setAttribute('src', 'https://utteranc.es/client.js');
+            utterancesScript.setAttribute('repo', 'salivity/bittorrent'); 
+            utterancesScript.setAttribute('issue-term', 'pathname'); 
+            utterancesScript.setAttribute('theme', localStorage.getItem('theme') === 'dark' ? 'github-dark' : 'github-light'); 
+            utterancesScript.setAttribute('crossorigin', 'anonymous');
+            utterancesScript.async = true;
+
+            document.getElementById('comments-container').appendChild(utterancesScript);
+        </script>
+    
+    </main>
+    <footer>
+        <nav>
+            <ul class="footer-links">
+                <li><a href="/bittorrent/privacy-policy">Privacy Policy</a></li>
+                <li><a href="/bittorrent/terms-and-conditions">Terms and Conditions</a></li>
+            </ul>
+        </nav>
+        <div class="copyright">
+            Copyright &copy; <span id="current-year"></span>
+        </div>
+    </footer>
+</body>
+</html>
