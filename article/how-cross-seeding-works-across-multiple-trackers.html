@@ -1,0 +1,149 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="light">
+<head>
+    <script async src="https://www.googletagmanager.com/gtag/js?id=G-R4Y4YXFHZS"></script>
+    <script>
+        window.dataLayer = window.dataLayer || [];
+
+        function gtag(){
+            dataLayer.push(arguments);
+        }
+
+        gtag('js', new Date());
+
+        gtag('config', 'G-R4Y4YXFHZS');
+    </script>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>How Cross-Seeding Works Across Multiple Trackers - bittorrent</title>
+    <meta name="description" content="Cross-seeding is a method in peer-to-peer file sharing that allows users to seed an identical local dataset across multiple torrent trackers simultaneously without duplicating storage. By downloading different .torrent files that share the same underlyin">
+    <link rel="canonical" href="https://salivity.github.io/bittorrent/article/how-cross-seeding-works-across-multiple-trackers">
+    <link rel="icon" href="/bittorrent/favicon.ico">
+    <link rel="stylesheet" href="/bittorrent/css/style.css">
+    <link media="print" rel="stylesheet" href="/bittorrent/css/print.css">
+    <script src="/bittorrent/js/fuse.min.js"></script>
+    <script src="/bittorrent/js/script.js"></script>
+    <script id="MathJax-script" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/4.1.3/tex-chtml.min.js" defer></script>
+    <script src="/monetize/monetize.js"></script>
+    <meta property="og:type" content="website" />
+    <meta property="og:title" content="How Cross-Seeding Works Across Multiple Trackers - bittorrent" />
+    <meta property="og:url" content="https://salivity.github.io/bittorrent/article/how-cross-seeding-works-across-multiple-trackers" />
+    <meta property="og:image:url" content="https://salivity.github.io/bittorrent/images/open-graph/default.webp" />
+    <meta property="og:image:secure_url" content="https://salivity.github.io/bittorrent/images/open-graph/default.webp" />
+    <meta property="og:image:width" content="1120" />
+    <meta property="og:image:height" content="630" />
+    <meta property="og:description" content="Cross-seeding is a method in peer-to-peer file sharing that allows users to seed an identical local dataset across multiple torrent trackers simultaneously without duplicating storage. By downloading different .torrent files that share the same underlyin" />
+    <link rel="manifest" href="/bittorrent/pwa/manifest.json" />
+</head>
+<body>
+    <header>
+        <a href="/bittorrent/" aria-label="Go To Home Page" title="Go To Home Page" id="logo">
+            <span>salivity.github.io/</span><span>bittorrent</span>
+        </a>
+        <nav>
+            <ul class="header-links">
+                <li><a href="https://github.com/salivity" title="Github" aria-label="Go To Github Profile Page"><svg class="svg-icon" focusable="false" aria-hidden="true" viewBox="0 0 24 24"><path d="M12 1.27a11 11 0 00-3.48 21.46c.55.09.73-.28.73-.55v-1.84c-3.03.64-3.67-1.46-3.67-1.46-.55-1.29-1.28-1.65-1.28-1.65-.92-.65.1-.65.1-.65 1.1 0 1.73 1.1 1.73 1.1.92 1.65 2.57 1.2 3.21.92a2 2 0 01.64-1.47c-2.47-.27-5.04-1.19-5.04-5.5 0-1.1.46-2.1 1.2-2.84a3.76 3.76 0 010-2.93s.91-.28 3.11 1.1c1.8-.49 3.7-.49 5.5 0 2.1-1.38 3.02-1.1 3.02-1.1a3.76 3.76 0 010 2.93c.83.74 1.2 1.74 1.2 2.94 0 4.21-2.57 5.13-5.04 5.4.45.37.82.92.82 2.02v3.03c0 .27.1.64.73.55A11 11 0 0012 1.27"></path></svg></a></li>
+                <li><a href="/bittorrent/search" title="Search" aria-label="Go To Search Page"><svg class="svg-icon" aria-hidden="true" focusable="false" viewBox="0 0 24 24"><path d="M15.5 14h-.79l-.28-.27C15.41 12.59 16 11.11 16 9.5 16 5.91 13.09 3 9.5 3S3 5.91 3 9.5 5.91 16 9.5 16c1.61 0 3.09-.59 4.23-1.57l.27.28v.79l5 4.99L20.49 19zm-6 0C7.01 14 5 11.99 5 9.5S7.01 5 9.5 5 14 7.01 14 9.5 11.99 14 9.5 14"></path></svg></a></li>
+                <li><a id="theme-toggle" title="Theme" href="javascript:void(0);" aria-label="Toggle Website Theme"></a></li>
+            </ul>
+        </nav>
+    </header>
+    <main>
+        <article><h1 id="how-cross-seeding-works-across-multiple-trackers">How
+Cross-Seeding Works Across Multiple Trackers</h1>
+<p>Cross-seeding is a method in peer-to-peer file sharing that allows
+users to seed an identical local dataset across multiple torrent
+trackers simultaneously without duplicating storage. By downloading
+different <code>.torrent</code> files that share the same underlying
+data payload and pointing them to the exact same file directory on a
+local drive, users can contribute to multiple swarms at once. This
+article explains the technical mechanics of cross-seeding, the
+requirements for data matching, and the primary benefits of the
+process.</p>
+<h2 id="the-technical-mechanism-behind-cross-seeding">The Technical
+Mechanism Behind Cross-Seeding</h2>
+<p>Every torrent distribution relies on a <code>.torrent</code> file or
+magnet link containing cryptographic metadata. Even when two different
+trackers distribute the exact same movie, software, or album, their
+<code>.torrent</code> files are distinct. This distinction occurs
+because trackers include unique announce URLs, custom piece sizes, or
+passkeys, which generate completely different "info-hashes" for the
+torrents.</p>
+<p>Because modern torrent clients identify active transfers by their
+info-hash rather than their file path, a client treats each
+<code>.torrent</code> file as an independent task. When you add a second
+<code>.torrent</code> file for an existing dataset:</p>
+<ol type="1">
+<li><strong>Path Mapping:</strong> You set the download directory to the
+folder containing the already-completed files.</li>
+<li><strong>Hash Verification:</strong> The torrent client performs a
+"force recheck," comparing the cryptographic hashes of the local data
+chunks against the piece definitions in the new <code>.torrent</code>
+file.</li>
+<li><strong>Instant Seeding:</strong> Once the verification reaches
+100%, the client marks the torrent as complete and immediately enters
+seeding mode without redownloading any data.</li>
+</ol>
+<h2 id="requirements-for-successful-cross-seeding">Requirements for
+Successful Cross-Seeding</h2>
+<p>For cross-seeding to work properly, the local files must perfectly
+match the specifications expected by the second <code>.torrent</code>
+file:</p>
+<ul>
+<li><strong>Exact File Content:</strong> The raw data of the files must
+be identical byte-for-byte. Any modification, such as retagging an audio
+file or altering a text document, will cause the hash check to fail for
+those specific pieces.</li>
+<li><strong>Matching Directory Structure and Naming:</strong> The file
+names and folder hierarchies must match the layout defined inside the
+<code>.torrent</code> file. If Tracker A packages files inside a
+subfolder and Tracker B does not, the user must adjust the local file
+path or client settings to align the paths.</li>
+<li><strong>Piece Size Compatibility:</strong> The files must be split
+identically. If a release group on Tracker A created a release with 2 MB
+piece sizes and Tracker B created the release with 4 MB piece sizes, the
+total file payload remains identical, but the client must verify the
+entire dataset against the respective piece layouts.</li>
+</ul>
+<h2 id="benefits-of-cross-seeding">Benefits of Cross-Seeding</h2>
+<ul>
+<li><strong>Storage Efficiency:</strong> Cross-seeding eliminates the
+need to store duplicate copies of large files across multiple
+drives.</li>
+<li><strong>Ratio and Credit Building:</strong> Users can earn upload
+credit, seed time, and bonus points on multiple private trackers using a
+single copy of a file.</li>
+<li><strong>Swarm Health and Redundancy:</strong> By increasing the
+number of active seeders across different communities, cross-seeding
+preserves rare content and improves download availability across the
+entire peer-to-peer ecosystem.</li>
+</ul></article>
+        <div id=comments-container></div>
+
+        <script>
+            const utterancesScript = document.createElement('script');
+            
+            utterancesScript.setAttribute('src', 'https://utteranc.es/client.js');
+            utterancesScript.setAttribute('repo', 'salivity/bittorrent'); 
+            utterancesScript.setAttribute('issue-term', 'pathname'); 
+            utterancesScript.setAttribute('theme', localStorage.getItem('theme') === 'dark' ? 'github-dark' : 'github-light'); 
+            utterancesScript.setAttribute('crossorigin', 'anonymous');
+            utterancesScript.async = true;
+
+            document.getElementById('comments-container').appendChild(utterancesScript);
+        </script>
+    
+    </main>
+    <footer>
+        <nav>
+            <ul class="footer-links">
+                <li><a href="/bittorrent/privacy-policy">Privacy Policy</a></li>
+                <li><a href="/bittorrent/terms-and-conditions">Terms and Conditions</a></li>
+            </ul>
+        </nav>
+        <div class="copyright">
+            Copyright &copy; <span id="current-year"></span>
+        </div>
+    </footer>
+</body>
+</html>

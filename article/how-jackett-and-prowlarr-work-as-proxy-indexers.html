@@ -1,0 +1,147 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="light">
+<head>
+    <script async src="https://www.googletagmanager.com/gtag/js?id=G-R4Y4YXFHZS"></script>
+    <script>
+        window.dataLayer = window.dataLayer || [];
+
+        function gtag(){
+            dataLayer.push(arguments);
+        }
+
+        gtag('js', new Date());
+
+        gtag('config', 'G-R4Y4YXFHZS');
+    </script>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>How Jackett and Prowlarr Work as Proxy Indexers - bittorrent</title>
+    <meta name="description" content="Jackett and Prowlarr act as intermediary proxy servers that translate search queries and automate communications between torrent trackers and automated media management applications like Sonarr, Radarr, and Lidarr. By standardizing diverse tracker APIs a">
+    <link rel="canonical" href="https://salivity.github.io/bittorrent/article/how-jackett-and-prowlarr-work-as-proxy-indexers">
+    <link rel="icon" href="/bittorrent/favicon.ico">
+    <link rel="stylesheet" href="/bittorrent/css/style.css">
+    <link media="print" rel="stylesheet" href="/bittorrent/css/print.css">
+    <script src="/bittorrent/js/fuse.min.js"></script>
+    <script src="/bittorrent/js/script.js"></script>
+    <script id="MathJax-script" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/4.1.3/tex-chtml.min.js" defer></script>
+    <script src="/monetize/monetize.js"></script>
+    <meta property="og:type" content="website" />
+    <meta property="og:title" content="How Jackett and Prowlarr Work as Proxy Indexers - bittorrent" />
+    <meta property="og:url" content="https://salivity.github.io/bittorrent/article/how-jackett-and-prowlarr-work-as-proxy-indexers" />
+    <meta property="og:image:url" content="https://salivity.github.io/bittorrent/images/open-graph/default.webp" />
+    <meta property="og:image:secure_url" content="https://salivity.github.io/bittorrent/images/open-graph/default.webp" />
+    <meta property="og:image:width" content="1120" />
+    <meta property="og:image:height" content="630" />
+    <meta property="og:description" content="Jackett and Prowlarr act as intermediary proxy servers that translate search queries and automate communications between torrent trackers and automated media management applications like Sonarr, Radarr, and Lidarr. By standardizing diverse tracker APIs a" />
+    <link rel="manifest" href="/bittorrent/pwa/manifest.json" />
+</head>
+<body>
+    <header>
+        <a href="/bittorrent/" aria-label="Go To Home Page" title="Go To Home Page" id="logo">
+            <span>salivity.github.io/</span><span>bittorrent</span>
+        </a>
+        <nav>
+            <ul class="header-links">
+                <li><a href="https://github.com/salivity" title="Github" aria-label="Go To Github Profile Page"><svg class="svg-icon" focusable="false" aria-hidden="true" viewBox="0 0 24 24"><path d="M12 1.27a11 11 0 00-3.48 21.46c.55.09.73-.28.73-.55v-1.84c-3.03.64-3.67-1.46-3.67-1.46-.55-1.29-1.28-1.65-1.28-1.65-.92-.65.1-.65.1-.65 1.1 0 1.73 1.1 1.73 1.1.92 1.65 2.57 1.2 3.21.92a2 2 0 01.64-1.47c-2.47-.27-5.04-1.19-5.04-5.5 0-1.1.46-2.1 1.2-2.84a3.76 3.76 0 010-2.93s.91-.28 3.11 1.1c1.8-.49 3.7-.49 5.5 0 2.1-1.38 3.02-1.1 3.02-1.1a3.76 3.76 0 010 2.93c.83.74 1.2 1.74 1.2 2.94 0 4.21-2.57 5.13-5.04 5.4.45.37.82.92.82 2.02v3.03c0 .27.1.64.73.55A11 11 0 0012 1.27"></path></svg></a></li>
+                <li><a href="/bittorrent/search" title="Search" aria-label="Go To Search Page"><svg class="svg-icon" aria-hidden="true" focusable="false" viewBox="0 0 24 24"><path d="M15.5 14h-.79l-.28-.27C15.41 12.59 16 11.11 16 9.5 16 5.91 13.09 3 9.5 3S3 5.91 3 9.5 5.91 16 9.5 16c1.61 0 3.09-.59 4.23-1.57l.27.28v.79l5 4.99L20.49 19zm-6 0C7.01 14 5 11.99 5 9.5S7.01 5 9.5 5 14 7.01 14 9.5 11.99 14 9.5 14"></path></svg></a></li>
+                <li><a id="theme-toggle" title="Theme" href="javascript:void(0);" aria-label="Toggle Website Theme"></a></li>
+            </ul>
+        </nav>
+    </header>
+    <main>
+        <article><h1 id="how-jackett-and-prowlarr-work-as-proxy-indexers">How Jackett and
+Prowlarr Work as Proxy Indexers</h1>
+<p>Jackett and Prowlarr act as intermediary proxy servers that translate
+search queries and automate communications between torrent trackers and
+automated media management applications like Sonarr, Radarr, and Lidarr.
+By standardizing diverse tracker APIs and web interfaces into a single
+unified format, these tools eliminate the need to manually configure and
+maintain individual tracker scrapers across multiple downloading
+applications.</p>
+<h3 id="the-translation-layer-torznab-protocol">The Translation Layer
+(Torznab Protocol)</h3>
+<p>Torrent trackers do not follow a single, standardized API; some offer
+custom API endpoints, while others only provide raw web search
+interfaces that require HTML scraping. Applications like Sonarr and
+Radarr rely on a standardized protocol known as Torznab (an extension of
+the Newznab format created for Usenet).</p>
+<p>Jackett and Prowlarr act as translation layers. When an application
+sends a standardized Torznab search query, the proxy indexer accepts the
+request, translates it into the specific format required by the target
+torrent tracker, executes the search, parses the results, and returns
+them to the application in the standardized Torznab XML/JSON format.</p>
+<h3 id="centralized-management-and-syncing">Centralized Management and
+Syncing</h3>
+<p>Without a proxy indexer, a user managing multiple media applications
+(e.g., Sonarr for TV shows, Radarr for movies, Readarr for books) would
+need to manually input API keys, credentials, and search rules for every
+tracker into every separate application.</p>
+<p>A proxy indexer centralizes this configuration:</p>
+<ul>
+<li><strong>Single Configuration Point:</strong> Trackers are added,
+updated, or removed in one web dashboard.</li>
+<li><strong>Automated Application Sync (Prowlarr):</strong> Prowlarr
+integrates directly with the "Arr" application suite, automatically
+pushing newly configured indexers to all connected apps without
+requiring manual setup on each client.</li>
+<li><strong>Universal Search:</strong> Both tools provide a built-in
+search UI, allowing users to query dozens of public and private trackers
+simultaneously from a single search bar.</li>
+</ul>
+<h3 id="handling-site-scraping-cookies-and-cloudflare">Handling Site
+Scraping, Cookies, and Cloudflare</h3>
+<p>Public and semi-private torrent sites frequently change their
+layouts, domain names, or anti-bot protections.</p>
+<ul>
+<li><strong>Site Scrapers:</strong> Jackett and Prowlarr maintain
+constantly updated definition files to ensure searches continue working
+when a site changes its HTML structure.</li>
+<li><strong>Authentication and Cloudflare:</strong> They manage login
+sessions, store authentication cookies for private trackers, and
+integrate with companion tools (such as FlareSolverr) to bypass
+Cloudflare anti-bot challenges that standard download clients cannot
+resolve on their own.</li>
+</ul>
+<h3 id="performance-monitoring-and-rate-limiting">Performance Monitoring
+and Rate Limiting</h3>
+<p>Proxy indexers optimize traffic sent to torrent trackers to prevent
+bans and minimize latency:</p>
+<ul>
+<li><strong>Rate Limiting:</strong> Queries are throttled to comply with
+private tracker API limits and avoid IP bans.</li>
+<li><strong>Failure Handling:</strong> If a tracker goes offline, the
+proxy temporarily flags it as degraded or disabled to prevent search
+timeouts in connected applications.</li>
+<li><strong>Health and Statistics:</strong> Users receive real-time
+metrics on response times, successful queries, and failure rates across
+all configured indexers.</li>
+</ul></article>
+        <div id=comments-container></div>
+
+        <script>
+            const utterancesScript = document.createElement('script');
+            
+            utterancesScript.setAttribute('src', 'https://utteranc.es/client.js');
+            utterancesScript.setAttribute('repo', 'salivity/bittorrent'); 
+            utterancesScript.setAttribute('issue-term', 'pathname'); 
+            utterancesScript.setAttribute('theme', localStorage.getItem('theme') === 'dark' ? 'github-dark' : 'github-light'); 
+            utterancesScript.setAttribute('crossorigin', 'anonymous');
+            utterancesScript.async = true;
+
+            document.getElementById('comments-container').appendChild(utterancesScript);
+        </script>
+    
+    </main>
+    <footer>
+        <nav>
+            <ul class="footer-links">
+                <li><a href="/bittorrent/privacy-policy">Privacy Policy</a></li>
+                <li><a href="/bittorrent/terms-and-conditions">Terms and Conditions</a></li>
+            </ul>
+        </nav>
+        <div class="copyright">
+            Copyright &copy; <span id="current-year"></span>
+        </div>
+    </footer>
+</body>
+</html>

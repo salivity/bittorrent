@@ -1,0 +1,138 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="light">
+<head>
+    <script async src="https://www.googletagmanager.com/gtag/js?id=G-R4Y4YXFHZS"></script>
+    <script>
+        window.dataLayer = window.dataLayer || [];
+
+        function gtag(){
+            dataLayer.push(arguments);
+        }
+
+        gtag('js', new Date());
+
+        gtag('config', 'G-R4Y4YXFHZS');
+    </script>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>How Torrent Clients Resume Interrupted Downloads - bittorrent</title>
+    <meta name="description" content="When a BitTorrent download is paused, canceled, or abruptly interrupted by a system crash or loss of connection, the torrent client does not need to start over from scratch. Instead, it relies on cryptographic hash checks, piece-based file segmentation,">
+    <link rel="canonical" href="https://salivity.github.io/bittorrent/article/how-torrent-clients-resume-interrupted-downloads">
+    <link rel="icon" href="/bittorrent/favicon.ico">
+    <link rel="stylesheet" href="/bittorrent/css/style.css">
+    <link media="print" rel="stylesheet" href="/bittorrent/css/print.css">
+    <script src="/bittorrent/js/fuse.min.js"></script>
+    <script src="/bittorrent/js/script.js"></script>
+    <script id="MathJax-script" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/4.1.3/tex-chtml.min.js" defer></script>
+    <script src="/monetize/monetize.js"></script>
+    <meta property="og:type" content="website" />
+    <meta property="og:title" content="How Torrent Clients Resume Interrupted Downloads - bittorrent" />
+    <meta property="og:url" content="https://salivity.github.io/bittorrent/article/how-torrent-clients-resume-interrupted-downloads" />
+    <meta property="og:image:url" content="https://salivity.github.io/bittorrent/images/open-graph/default.webp" />
+    <meta property="og:image:secure_url" content="https://salivity.github.io/bittorrent/images/open-graph/default.webp" />
+    <meta property="og:image:width" content="1120" />
+    <meta property="og:image:height" content="630" />
+    <meta property="og:description" content="When a BitTorrent download is paused, canceled, or abruptly interrupted by a system crash or loss of connection, the torrent client does not need to start over from scratch. Instead, it relies on cryptographic hash checks, piece-based file segmentation," />
+    <link rel="manifest" href="/bittorrent/pwa/manifest.json" />
+</head>
+<body>
+    <header>
+        <a href="/bittorrent/" aria-label="Go To Home Page" title="Go To Home Page" id="logo">
+            <span>salivity.github.io/</span><span>bittorrent</span>
+        </a>
+        <nav>
+            <ul class="header-links">
+                <li><a href="https://github.com/salivity" title="Github" aria-label="Go To Github Profile Page"><svg class="svg-icon" focusable="false" aria-hidden="true" viewBox="0 0 24 24"><path d="M12 1.27a11 11 0 00-3.48 21.46c.55.09.73-.28.73-.55v-1.84c-3.03.64-3.67-1.46-3.67-1.46-.55-1.29-1.28-1.65-1.28-1.65-.92-.65.1-.65.1-.65 1.1 0 1.73 1.1 1.73 1.1.92 1.65 2.57 1.2 3.21.92a2 2 0 01.64-1.47c-2.47-.27-5.04-1.19-5.04-5.5 0-1.1.46-2.1 1.2-2.84a3.76 3.76 0 010-2.93s.91-.28 3.11 1.1c1.8-.49 3.7-.49 5.5 0 2.1-1.38 3.02-1.1 3.02-1.1a3.76 3.76 0 010 2.93c.83.74 1.2 1.74 1.2 2.94 0 4.21-2.57 5.13-5.04 5.4.45.37.82.92.82 2.02v3.03c0 .27.1.64.73.55A11 11 0 0012 1.27"></path></svg></a></li>
+                <li><a href="/bittorrent/search" title="Search" aria-label="Go To Search Page"><svg class="svg-icon" aria-hidden="true" focusable="false" viewBox="0 0 24 24"><path d="M15.5 14h-.79l-.28-.27C15.41 12.59 16 11.11 16 9.5 16 5.91 13.09 3 9.5 3S3 5.91 3 9.5 5.91 16 9.5 16c1.61 0 3.09-.59 4.23-1.57l.27.28v.79l5 4.99L20.49 19zm-6 0C7.01 14 5 11.99 5 9.5S7.01 5 9.5 5 14 7.01 14 9.5 11.99 14 9.5 14"></path></svg></a></li>
+                <li><a id="theme-toggle" title="Theme" href="javascript:void(0);" aria-label="Toggle Website Theme"></a></li>
+            </ul>
+        </nav>
+    </header>
+    <main>
+        <article><h1 id="how-torrent-clients-resume-interrupted-downloads">How Torrent
+Clients Resume Interrupted Downloads</h1>
+<p>When a BitTorrent download is paused, canceled, or abruptly
+interrupted by a system crash or loss of connection, the torrent client
+does not need to start over from scratch. Instead, it relies on
+cryptographic hash checks, piece-based file segmentation, and local
+resume logs to quickly identify which portions of the file are already
+saved correctly on your storage drive and only request the missing
+pieces from the peer network.</p>
+<h3 id="the-piece-architecture-and-metadata">The Piece Architecture and
+Metadata</h3>
+<p>BitTorrent does not treat files as single, continuous streams.
+Instead, the torrent creator splits the target file (or collection of
+files) into thousands of small, fixed-size chunks known as "pieces,"
+typically ranging from 256 KB to 16 MB each.</p>
+<p>When a torrent is created, a cryptographic hash (historically SHA-1,
+or SHA-256 in BitTorrent v2) is calculated for every individual piece.
+This complete list of hashes is stored directly inside the
+<code>.torrent</code> metadata file or downloaded via a magnet link.</p>
+<h3 id="the-bitfield-and-fast-resume-state">The Bitfield and Fast Resume
+State</h3>
+<p>During active downloads, the torrent client tracks progress using a
+simple data structure called a <strong>bitfield</strong>—a compact
+binary map where each bit represents a piece of the file (1 for complete
+and verified, 0 for missing).</p>
+<p>Under normal operation, when you pause a torrent or shut down the
+application, the client writes a "fast resume" file to your disk. This
+file saves the current bitfield, the locations of incomplete chunks, and
+file modification timestamps. When reopened, the client simply reads
+this local state file and instantly resumes downloading the missing bits
+without re-reading the actual files on your drive.</p>
+<h3 id="the-hash-checking-process">The Hash Checking Process</h3>
+<p>If a download is interrupted abruptly (such as during a power outage
+or application crash), the fast resume state might become missing or
+invalid. In this scenario, the client initiates a <strong>hash
+check</strong> (often displayed as "Checking..."):</p>
+<ol type="1">
+<li><strong>Reading Local Files:</strong> The client reads the existing
+data already written to your hard drive, chunk by chunk, matching the
+piece size defined in the torrent metadata.</li>
+<li><strong>Generating Hashes:</strong> It runs the cryptographic hash
+algorithm across each local piece.</li>
+<li><strong>Comparing Hashes:</strong> It compares the calculated hash
+against the master hash list from the torrent metadata.</li>
+<li><strong>Validation:</strong>
+<ul>
+<li>If the hashes match, the client marks that piece as verified (sets
+the bit to 1).</li>
+<li>If the hashes do not match (indicating corruption or partial data),
+the piece is discarded and marked as missing (sets the bit to 0).</li>
+</ul></li>
+</ol>
+<h3 id="requesting-only-missing-data">Requesting Only Missing Data</h3>
+<p>Once the hash check or fast-resume validation is complete, the
+torrent client sends its updated bitfield to connected peers and
+requests only the specific pieces marked as missing. Because completed
+pieces are independently validated and permanently written to disk, the
+client never has to re-download valid data.</p></article>
+        <div id=comments-container></div>
+
+        <script>
+            const utterancesScript = document.createElement('script');
+            
+            utterancesScript.setAttribute('src', 'https://utteranc.es/client.js');
+            utterancesScript.setAttribute('repo', 'salivity/bittorrent'); 
+            utterancesScript.setAttribute('issue-term', 'pathname'); 
+            utterancesScript.setAttribute('theme', localStorage.getItem('theme') === 'dark' ? 'github-dark' : 'github-light'); 
+            utterancesScript.setAttribute('crossorigin', 'anonymous');
+            utterancesScript.async = true;
+
+            document.getElementById('comments-container').appendChild(utterancesScript);
+        </script>
+    
+    </main>
+    <footer>
+        <nav>
+            <ul class="footer-links">
+                <li><a href="/bittorrent/privacy-policy">Privacy Policy</a></li>
+                <li><a href="/bittorrent/terms-and-conditions">Terms and Conditions</a></li>
+            </ul>
+        </nav>
+        <div class="copyright">
+            Copyright &copy; <span id="current-year"></span>
+        </div>
+    </footer>
+</body>
+</html>

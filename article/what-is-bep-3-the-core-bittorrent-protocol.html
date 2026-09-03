@@ -1,0 +1,185 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="light">
+<head>
+    <script async src="https://www.googletagmanager.com/gtag/js?id=G-R4Y4YXFHZS"></script>
+    <script>
+        window.dataLayer = window.dataLayer || [];
+
+        function gtag(){
+            dataLayer.push(arguments);
+        }
+
+        gtag('js', new Date());
+
+        gtag('config', 'G-R4Y4YXFHZS');
+    </script>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>What Is BEP 3: The Core BitTorrent Protocol - bittorrent</title>
+    <meta name="description" content="BitTorrent Enhancement Proposal 3 (BEP 3) is the official specification that formalizes the original core BitTorrent peer-to-peer file-sharing protocol. This article outlines what BEP 3 entails, breaks down its core technical components—including Benco">
+    <link rel="canonical" href="https://salivity.github.io/bittorrent/article/what-is-bep-3-the-core-bittorrent-protocol">
+    <link rel="icon" href="/bittorrent/favicon.ico">
+    <link rel="stylesheet" href="/bittorrent/css/style.css">
+    <link media="print" rel="stylesheet" href="/bittorrent/css/print.css">
+    <script src="/bittorrent/js/fuse.min.js"></script>
+    <script src="/bittorrent/js/script.js"></script>
+    <script id="MathJax-script" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/4.1.3/tex-chtml.min.js" defer></script>
+    <script src="/monetize/monetize.js"></script>
+    <meta property="og:type" content="website" />
+    <meta property="og:title" content="What Is BEP 3: The Core BitTorrent Protocol - bittorrent" />
+    <meta property="og:url" content="https://salivity.github.io/bittorrent/article/what-is-bep-3-the-core-bittorrent-protocol" />
+    <meta property="og:image:url" content="https://salivity.github.io/bittorrent/images/open-graph/default.webp" />
+    <meta property="og:image:secure_url" content="https://salivity.github.io/bittorrent/images/open-graph/default.webp" />
+    <meta property="og:image:width" content="1120" />
+    <meta property="og:image:height" content="630" />
+    <meta property="og:description" content="BitTorrent Enhancement Proposal 3 (BEP 3) is the official specification that formalizes the original core BitTorrent peer-to-peer file-sharing protocol. This article outlines what BEP 3 entails, breaks down its core technical components—including Benco" />
+    <link rel="manifest" href="/bittorrent/pwa/manifest.json" />
+</head>
+<body>
+    <header>
+        <a href="/bittorrent/" aria-label="Go To Home Page" title="Go To Home Page" id="logo">
+            <span>salivity.github.io/</span><span>bittorrent</span>
+        </a>
+        <nav>
+            <ul class="header-links">
+                <li><a href="https://github.com/salivity" title="Github" aria-label="Go To Github Profile Page"><svg class="svg-icon" focusable="false" aria-hidden="true" viewBox="0 0 24 24"><path d="M12 1.27a11 11 0 00-3.48 21.46c.55.09.73-.28.73-.55v-1.84c-3.03.64-3.67-1.46-3.67-1.46-.55-1.29-1.28-1.65-1.28-1.65-.92-.65.1-.65.1-.65 1.1 0 1.73 1.1 1.73 1.1.92 1.65 2.57 1.2 3.21.92a2 2 0 01.64-1.47c-2.47-.27-5.04-1.19-5.04-5.5 0-1.1.46-2.1 1.2-2.84a3.76 3.76 0 010-2.93s.91-.28 3.11 1.1c1.8-.49 3.7-.49 5.5 0 2.1-1.38 3.02-1.1 3.02-1.1a3.76 3.76 0 010 2.93c.83.74 1.2 1.74 1.2 2.94 0 4.21-2.57 5.13-5.04 5.4.45.37.82.92.82 2.02v3.03c0 .27.1.64.73.55A11 11 0 0012 1.27"></path></svg></a></li>
+                <li><a href="/bittorrent/search" title="Search" aria-label="Go To Search Page"><svg class="svg-icon" aria-hidden="true" focusable="false" viewBox="0 0 24 24"><path d="M15.5 14h-.79l-.28-.27C15.41 12.59 16 11.11 16 9.5 16 5.91 13.09 3 9.5 3S3 5.91 3 9.5 5.91 16 9.5 16c1.61 0 3.09-.59 4.23-1.57l.27.28v.79l5 4.99L20.49 19zm-6 0C7.01 14 5 11.99 5 9.5S7.01 5 9.5 5 14 7.01 14 9.5 11.99 14 9.5 14"></path></svg></a></li>
+                <li><a id="theme-toggle" title="Theme" href="javascript:void(0);" aria-label="Toggle Website Theme"></a></li>
+            </ul>
+        </nav>
+    </header>
+    <main>
+        <article><h1 id="what-is-bep-3-the-core-bittorrent-protocol">What Is BEP 3: The
+Core BitTorrent Protocol</h1>
+<p>BitTorrent Enhancement Proposal 3 (BEP 3) is the official
+specification that formalizes the original core BitTorrent peer-to-peer
+file-sharing protocol. This article outlines what BEP 3 entails, breaks
+down its core technical components—including Bencoding,
+<code>.torrent</code> metadata files, tracker communication, and the
+peer-to-peer wire protocol—and explains why it serves as the essential
+baseline upon which all BitTorrent software and modern network
+extensions operate.</p>
+<hr />
+<h2 id="what-is-bep-3">What Is BEP 3?</h2>
+<p>BEP 3, titled "The BitTorrent Protocol Specification," documents the
+fundamental protocol originally created by Bram Cohen in 2001. In the
+BitTorrent ecosystem, BEPs (BitTorrent Enhancement Proposals) serve as
+formal design documents that describe new features, standards, or
+mechanisms for the protocol.</p>
+<p>BEP 3 was created to standardize the existing core protocol
+mechanics, establishing a universal standard so that independent
+developers could build interoperable clients, trackers, and tools.</p>
+<hr />
+<h2 id="core-technical-components-defined-in-bep-3">Core Technical
+Components Defined in BEP 3</h2>
+<p>BEP 3 standardizes four primary layers required for decentralized
+file distribution:</p>
+<h3 id="1-bencoding">1. Bencoding</h3>
+<p>Bencoding is the lightweight data serialization format used across
+the BitTorrent protocol. BEP 3 defines four basic Bencoded types:</p>
+<ul>
+<li><strong>Integers:</strong> Encoded as <code>i&lt;integer&gt;e</code>
+(e.g., <code>i42e</code> for 42).</li>
+<li><strong>Byte Strings:</strong> Encoded as
+<code>&lt;length&gt;:&lt;contents&gt;</code> (e.g., <code>4:spam</code>
+for "spam").</li>
+<li><strong>Lists:</strong> Encoded as <code>l&lt;contents&gt;e</code>
+(e.g., <code>l4:spami42ee</code>).</li>
+<li><strong>Dictionaries:</strong> Encoded as
+<code>d&lt;key&gt;&lt;value&gt;e</code>, where keys must be strings and
+sorted lexicographically.</li>
+</ul>
+<p>Bencoding is robust against platform differences, endianness, and
+encoding errors, making it ideal for network transmission and file
+hashing.</p>
+<h3 id="2-metainfo-files-torrent">2. Metainfo Files
+(<code>.torrent</code>)</h3>
+<p>BEP 3 defines the structure of the standard <code>.torrent</code>
+file, which contains the metadata necessary to download and verify
+files:</p>
+<ul>
+<li><strong>announce:</strong> The URL of the tracker.</li>
+<li><strong>info dictionary:</strong> Includes file names, file lengths,
+piece length (typically 256 KB to a few megabytes), and a concatenated
+string of 20-byte SHA-1 hashes for every piece of the payload.</li>
+</ul>
+<h3 id="3-the-tracker-protocol">3. The Tracker Protocol</h3>
+<p>The tracker is a central server that coordinates peers without
+hosting the actual payload. BEP 3 defines the HTTP-based communication
+between clients and trackers:</p>
+<ul>
+<li><strong>Announce Requests:</strong> Sent via HTTP GET containing
+parameters such as <code>info_hash</code> (the SHA-1 hash of the
+bencoded <code>info</code> dictionary), <code>peer_id</code>,
+<code>port</code>, <code>uploaded</code>, <code>downloaded</code>, and
+<code>left</code>.</li>
+<li><strong>Announce Responses:</strong> Returns interval times,
+seed/leecher counts, and a list of active peer IP addresses and
+ports.</li>
+</ul>
+<h3 id="4-the-peer-wire-protocol-pwp">4. The Peer Wire Protocol
+(PWP)</h3>
+<p>Once a client obtains peer addresses from the tracker, it uses the
+Peer Wire Protocol over TCP to exchange data directly. BEP 3
+defines:</p>
+<ul>
+<li><strong>Handshake:</strong> A fixed-format message verifying the
+protocol string, <code>info_hash</code>, and <code>peer_id</code>.</li>
+<li><strong>State Management:</strong> Flags for
+<code>choked</code>/<code>unchoked</code> (whether a peer is allowed to
+request data) and
+<code>interested</code>/<code>not interested</code>.</li>
+<li><strong>Data Transfer Messages:</strong> Messages including
+<code>have</code> (announcing piece availability), <code>bitfield</code>
+(sending overall availability map), <code>request</code> (requesting
+specific blocks within a piece), and <code>piece</code> (transmitting
+payload data).</li>
+</ul>
+<hr />
+<h2 id="why-bep-3-is-the-foundational-specification">Why BEP 3 Is the
+Foundational Specification</h2>
+<p>BEP 3 is considered foundational for several critical reasons:</p>
+<ul>
+<li><strong>Interoperability Baseline:</strong> Every BitTorrent
+client—regardless of operating system, programming language, or
+platform—must implement BEP 3 at a minimum to participate in a
+swarm.</li>
+<li><strong>Built-in Integrity Verification:</strong> By mandating SHA-1
+hashing on discrete pieces, BEP 3 solved the issue of data corruption
+and malicious tampering in peer-to-peer file transfers, allowing clients
+to re-download only corrupted pieces rather than the entire file.</li>
+<li><strong>Foundation for Future Extensions:</strong> Subsequent
+innovations such as Distributed Hash Tables for trackerless transfers
+(BEP 5), Magnet Links (BEP 9), and Peer Exchange (BEP 11) do not replace
+BEP 3; instead, they build directly on top of the data framing,
+bencoding, and state machines established in this specification.</li>
+</ul></article>
+        <div id=comments-container></div>
+
+        <script>
+            const utterancesScript = document.createElement('script');
+            
+            utterancesScript.setAttribute('src', 'https://utteranc.es/client.js');
+            utterancesScript.setAttribute('repo', 'salivity/bittorrent'); 
+            utterancesScript.setAttribute('issue-term', 'pathname'); 
+            utterancesScript.setAttribute('theme', localStorage.getItem('theme') === 'dark' ? 'github-dark' : 'github-light'); 
+            utterancesScript.setAttribute('crossorigin', 'anonymous');
+            utterancesScript.async = true;
+
+            document.getElementById('comments-container').appendChild(utterancesScript);
+        </script>
+    
+    </main>
+    <footer>
+        <nav>
+            <ul class="footer-links">
+                <li><a href="/bittorrent/privacy-policy">Privacy Policy</a></li>
+                <li><a href="/bittorrent/terms-and-conditions">Terms and Conditions</a></li>
+            </ul>
+        </nav>
+        <div class="copyright">
+            Copyright &copy; <span id="current-year"></span>
+        </div>
+    </footer>
+</body>
+</html>

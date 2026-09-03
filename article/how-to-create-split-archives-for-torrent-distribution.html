@@ -1,0 +1,173 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="light">
+<head>
+    <script async src="https://www.googletagmanager.com/gtag/js?id=G-R4Y4YXFHZS"></script>
+    <script>
+        window.dataLayer = window.dataLayer || [];
+
+        function gtag(){
+            dataLayer.push(arguments);
+        }
+
+        gtag('js', new Date());
+
+        gtag('config', 'G-R4Y4YXFHZS');
+    </script>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>How to Create Split Archives for Torrent Distribution - bittorrent</title>
+    <meta name="description" content="Creating a multi-volume split archive for torrent distribution involves dividing large payloads into smaller, uniform segments using archiving utilities like WinRAR, 7-Zip, or the command-line RAR tool. This guide covers selecting the right format, setti">
+    <link rel="canonical" href="https://salivity.github.io/bittorrent/article/how-to-create-split-archives-for-torrent-distribution">
+    <link rel="icon" href="/bittorrent/favicon.ico">
+    <link rel="stylesheet" href="/bittorrent/css/style.css">
+    <link media="print" rel="stylesheet" href="/bittorrent/css/print.css">
+    <script src="/bittorrent/js/fuse.min.js"></script>
+    <script src="/bittorrent/js/script.js"></script>
+    <script id="MathJax-script" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/4.1.3/tex-chtml.min.js" defer></script>
+    <script src="/monetize/monetize.js"></script>
+    <meta property="og:type" content="website" />
+    <meta property="og:title" content="How to Create Split Archives for Torrent Distribution - bittorrent" />
+    <meta property="og:url" content="https://salivity.github.io/bittorrent/article/how-to-create-split-archives-for-torrent-distribution" />
+    <meta property="og:image:url" content="https://salivity.github.io/bittorrent/images/open-graph/default.webp" />
+    <meta property="og:image:secure_url" content="https://salivity.github.io/bittorrent/images/open-graph/default.webp" />
+    <meta property="og:image:width" content="1120" />
+    <meta property="og:image:height" content="630" />
+    <meta property="og:description" content="Creating a multi-volume split archive for torrent distribution involves dividing large payloads into smaller, uniform segments using archiving utilities like WinRAR, 7-Zip, or the command-line RAR tool. This guide covers selecting the right format, setti" />
+    <link rel="manifest" href="/bittorrent/pwa/manifest.json" />
+</head>
+<body>
+    <header>
+        <a href="/bittorrent/" aria-label="Go To Home Page" title="Go To Home Page" id="logo">
+            <span>salivity.github.io/</span><span>bittorrent</span>
+        </a>
+        <nav>
+            <ul class="header-links">
+                <li><a href="https://github.com/salivity" title="Github" aria-label="Go To Github Profile Page"><svg class="svg-icon" focusable="false" aria-hidden="true" viewBox="0 0 24 24"><path d="M12 1.27a11 11 0 00-3.48 21.46c.55.09.73-.28.73-.55v-1.84c-3.03.64-3.67-1.46-3.67-1.46-.55-1.29-1.28-1.65-1.28-1.65-.92-.65.1-.65.1-.65 1.1 0 1.73 1.1 1.73 1.1.92 1.65 2.57 1.2 3.21.92a2 2 0 01.64-1.47c-2.47-.27-5.04-1.19-5.04-5.5 0-1.1.46-2.1 1.2-2.84a3.76 3.76 0 010-2.93s.91-.28 3.11 1.1c1.8-.49 3.7-.49 5.5 0 2.1-1.38 3.02-1.1 3.02-1.1a3.76 3.76 0 010 2.93c.83.74 1.2 1.74 1.2 2.94 0 4.21-2.57 5.13-5.04 5.4.45.37.82.92.82 2.02v3.03c0 .27.1.64.73.55A11 11 0 0012 1.27"></path></svg></a></li>
+                <li><a href="/bittorrent/search" title="Search" aria-label="Go To Search Page"><svg class="svg-icon" aria-hidden="true" focusable="false" viewBox="0 0 24 24"><path d="M15.5 14h-.79l-.28-.27C15.41 12.59 16 11.11 16 9.5 16 5.91 13.09 3 9.5 3S3 5.91 3 9.5 5.91 16 9.5 16c1.61 0 3.09-.59 4.23-1.57l.27.28v.79l5 4.99L20.49 19zm-6 0C7.01 14 5 11.99 5 9.5S7.01 5 9.5 5 14 7.01 14 9.5 11.99 14 9.5 14"></path></svg></a></li>
+                <li><a id="theme-toggle" title="Theme" href="javascript:void(0);" aria-label="Toggle Website Theme"></a></li>
+            </ul>
+        </nav>
+    </header>
+    <main>
+        <article><h1 id="how-to-create-split-archives-for-torrent-distribution">How to
+Create Split Archives for Torrent Distribution</h1>
+<p>Creating a multi-volume split archive for torrent distribution
+involves dividing large payloads into smaller, uniform segments using
+archiving utilities like WinRAR, 7-Zip, or the command-line RAR tool.
+This guide covers selecting the right format, setting volume sizes,
+applying zero-compression storage modes, generating verification files,
+and packaging the final directory for seamless BitTorrent sharing.</p>
+<h3 id="step-1-choose-the-archive-format-and-tool">Step 1: Choose the
+Archive Format and Tool</h3>
+<p>While 7-Zip (<code>.7z</code> or <code>.zip</code>) is widely
+supported, the standard format for split archive releases across
+BitTorrent networks is RAR (<code>.rar</code>).</p>
+<ul>
+<li><strong>GUI Tools:</strong> WinRAR (Windows) or 7-Zip
+(Cross-platform).</li>
+<li><strong>Command Line:</strong> <code>rar</code>
+(Linux/macOS/Windows) for scripted or headless operations.</li>
+</ul>
+<h3 id="step-2-configure-volume-size">Step 2: Configure Volume Size</h3>
+<p>Choose a split size that divides your data logically. Common volume
+sizes for torrent distribution include:</p>
+<ul>
+<li><strong>Small files (under 1 GB):</strong> 15 MB to 50 MB per
+volume.</li>
+<li><strong>Medium files (1 GB – 10 GB):</strong> 50 MB to 100 MB per
+volume.</li>
+<li><strong>Large files (10 GB+):</strong> 100 MB to 500 MB per
+volume.</li>
+</ul>
+<p>Aligning volume sizes close to the torrent client's piece size
+prevents unnecessary disk thrashing, though modern BitTorrent clients
+handle non-aligned sizes without issue.</p>
+<h3 id="step-3-create-the-split-archive">Step 3: Create the Split
+Archive</h3>
+<h4 id="using-winrar-gui">Using WinRAR (GUI):</h4>
+<ol type="1">
+<li>Right-click the folder or file you want to distribute and select
+<strong>Add to archive...</strong></li>
+<li>Set the <strong>Archive format</strong> to
+<strong>RAR</strong>.</li>
+<li>Under <strong>Compression method</strong>, select
+<strong>Store</strong>. (Pre-compressed media such as video, audio, or
+game packages will not compress further; using "Store" eliminates CPU
+overhead).</li>
+<li>Under <strong>Split to volumes, size</strong>, enter your desired
+size (e.g., <code>100M</code> for 100 megabytes).</li>
+<li>Ensure the naming convention follows the standard format
+(<code>filename.part01.rar</code>, <code>filename.part02.rar</code>,
+etc.).</li>
+<li>Click <strong>OK</strong> to build the volumes.</li>
+</ol>
+<h4 id="using-the-linuxmacos-command-line">Using the Linux/macOS Command
+Line:</h4>
+<p>Run the following command in the terminal:</p>
+<div class="sourceCode" id="cb1"><pre
+class="sourceCode bash"><code class="sourceCode bash"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="ex">rar</span> a <span class="at">-m0</span> <span class="at">-v100m</span> output_archive.rar /path/to/source_folder/</span></code></pre></div>
+<ul>
+<li><code>a</code>: Adds files to the archive.</li>
+<li><code>-m0</code>: Sets compression level to 0 (Store mode /
+uncompressed).</li>
+<li><code>-v100m</code>: Sets the split volume size to 100
+Megabytes.</li>
+</ul>
+<h3 id="step-4-generate-checksums-and-recovery-data">Step 4: Generate
+Checksums and Recovery Data</h3>
+<p>Torrent distribution packages typically include integrity
+verification files alongside the archives:</p>
+<ul>
+<li><strong>SFV (.sfv):</strong> Generates CRC32 checksums for every
+split archive part so downloaders can quickly identify corrupted chunks.
+Use tools like QuickSFV, cksfv, or WinSFV to generate the
+<code>.sfv</code> file in the root folder alongside the RAR parts.</li>
+<li><strong>PAR2 (.par2):</strong> Optional parity files that allow
+downloaders to repair missing or corrupted split volumes without
+re-downloading entire segments. Use <code>par2create</code> or QuickPar
+to generate 5% to 10% redundancy parity blocks.</li>
+</ul>
+<h3 id="step-5-final-directory-packaging-for-the-torrent-client">Step 5:
+Final Directory Packaging for the Torrent Client</h3>
+<ol type="1">
+<li>Place all split volumes (<code>.part01.rar</code>,
+<code>.part02.rar</code>, etc.), the <code>.sfv</code> file, and any
+optional <code>.nfo</code> or <code>.par2</code> files inside a single
+parent folder.</li>
+<li>Open your torrent creation client (e.g., qBittorrent, mktorrent, or
+Transmission).</li>
+<li>Select the parent folder as the <strong>Source</strong>.</li>
+<li>Set the appropriate piece size (typically between 1 MiB and 16 MiB,
+depending on total directory size).</li>
+<li>Add your tracker URLs, generate the <code>.torrent</code> file, and
+begin seeding.</li>
+</ol></article>
+        <div id=comments-container></div>
+
+        <script>
+            const utterancesScript = document.createElement('script');
+            
+            utterancesScript.setAttribute('src', 'https://utteranc.es/client.js');
+            utterancesScript.setAttribute('repo', 'salivity/bittorrent'); 
+            utterancesScript.setAttribute('issue-term', 'pathname'); 
+            utterancesScript.setAttribute('theme', localStorage.getItem('theme') === 'dark' ? 'github-dark' : 'github-light'); 
+            utterancesScript.setAttribute('crossorigin', 'anonymous');
+            utterancesScript.async = true;
+
+            document.getElementById('comments-container').appendChild(utterancesScript);
+        </script>
+    
+    </main>
+    <footer>
+        <nav>
+            <ul class="footer-links">
+                <li><a href="/bittorrent/privacy-policy">Privacy Policy</a></li>
+                <li><a href="/bittorrent/terms-and-conditions">Terms and Conditions</a></li>
+            </ul>
+        </nav>
+        <div class="copyright">
+            Copyright &copy; <span id="current-year"></span>
+        </div>
+    </footer>
+</body>
+</html>

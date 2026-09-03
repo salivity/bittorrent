@@ -1,0 +1,168 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="light">
+<head>
+    <script async src="https://www.googletagmanager.com/gtag/js?id=G-R4Y4YXFHZS"></script>
+    <script>
+        window.dataLayer = window.dataLayer || [];
+
+        function gtag(){
+            dataLayer.push(arguments);
+        }
+
+        gtag('js', new Date());
+
+        gtag('config', 'G-R4Y4YXFHZS');
+    </script>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>What Is a Torrent Fast Resume File? - bittorrent</title>
+    <meta name="description" content="A fast resume file is a specialized data file used by BitTorrent clients to save the active state and verification progress of downloads, allowing tasks to resume immediately after a client restart without performing lengthy file re-checks. This article">
+    <link rel="canonical" href="https://salivity.github.io/bittorrent/article/what-is-a-torrent-fast-resume-file">
+    <link rel="icon" href="/bittorrent/favicon.ico">
+    <link rel="stylesheet" href="/bittorrent/css/style.css">
+    <link media="print" rel="stylesheet" href="/bittorrent/css/print.css">
+    <script src="/bittorrent/js/fuse.min.js"></script>
+    <script src="/bittorrent/js/script.js"></script>
+    <script id="MathJax-script" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/4.1.3/tex-chtml.min.js" defer></script>
+    <script src="/monetize/monetize.js"></script>
+    <meta property="og:type" content="website" />
+    <meta property="og:title" content="What Is a Torrent Fast Resume File? - bittorrent" />
+    <meta property="og:url" content="https://salivity.github.io/bittorrent/article/what-is-a-torrent-fast-resume-file" />
+    <meta property="og:image:url" content="https://salivity.github.io/bittorrent/images/open-graph/default.webp" />
+    <meta property="og:image:secure_url" content="https://salivity.github.io/bittorrent/images/open-graph/default.webp" />
+    <meta property="og:image:width" content="1120" />
+    <meta property="og:image:height" content="630" />
+    <meta property="og:description" content="A fast resume file is a specialized data file used by BitTorrent clients to save the active state and verification progress of downloads, allowing tasks to resume immediately after a client restart without performing lengthy file re-checks. This article" />
+    <link rel="manifest" href="/bittorrent/pwa/manifest.json" />
+</head>
+<body>
+    <header>
+        <a href="/bittorrent/" aria-label="Go To Home Page" title="Go To Home Page" id="logo">
+            <span>salivity.github.io/</span><span>bittorrent</span>
+        </a>
+        <nav>
+            <ul class="header-links">
+                <li><a href="https://github.com/salivity" title="Github" aria-label="Go To Github Profile Page"><svg class="svg-icon" focusable="false" aria-hidden="true" viewBox="0 0 24 24"><path d="M12 1.27a11 11 0 00-3.48 21.46c.55.09.73-.28.73-.55v-1.84c-3.03.64-3.67-1.46-3.67-1.46-.55-1.29-1.28-1.65-1.28-1.65-.92-.65.1-.65.1-.65 1.1 0 1.73 1.1 1.73 1.1.92 1.65 2.57 1.2 3.21.92a2 2 0 01.64-1.47c-2.47-.27-5.04-1.19-5.04-5.5 0-1.1.46-2.1 1.2-2.84a3.76 3.76 0 010-2.93s.91-.28 3.11 1.1c1.8-.49 3.7-.49 5.5 0 2.1-1.38 3.02-1.1 3.02-1.1a3.76 3.76 0 010 2.93c.83.74 1.2 1.74 1.2 2.94 0 4.21-2.57 5.13-5.04 5.4.45.37.82.92.82 2.02v3.03c0 .27.1.64.73.55A11 11 0 0012 1.27"></path></svg></a></li>
+                <li><a href="/bittorrent/search" title="Search" aria-label="Go To Search Page"><svg class="svg-icon" aria-hidden="true" focusable="false" viewBox="0 0 24 24"><path d="M15.5 14h-.79l-.28-.27C15.41 12.59 16 11.11 16 9.5 16 5.91 13.09 3 9.5 3S3 5.91 3 9.5 5.91 16 9.5 16c1.61 0 3.09-.59 4.23-1.57l.27.28v.79l5 4.99L20.49 19zm-6 0C7.01 14 5 11.99 5 9.5S7.01 5 9.5 5 14 7.01 14 9.5 11.99 14 9.5 14"></path></svg></a></li>
+                <li><a id="theme-toggle" title="Theme" href="javascript:void(0);" aria-label="Toggle Website Theme"></a></li>
+            </ul>
+        </nav>
+    </header>
+    <main>
+        <article><h1 id="what-is-a-torrent-fast-resume-file">What Is a Torrent Fast
+Resume File?</h1>
+<p>A fast resume file is a specialized data file used by BitTorrent
+clients to save the active state and verification progress of downloads,
+allowing tasks to resume immediately after a client restart without
+performing lengthy file re-checks. This article explains what fast
+resume files are, why they are essential for performance, the exact
+state information they store, and the step-by-step process clients use
+to reload torrents between reboots.</p>
+<hr />
+<h3 id="the-purpose-of-fast-resume-files">The Purpose of Fast Resume
+Files</h3>
+<p>When a BitTorrent client downloads content, files are split into
+hundreds or thousands of small pieces, each validated by cryptographic
+hashes (typically SHA-1 or SHA-256). If a BitTorrent client shuts down,
+it must know which pieces are already complete and verified on disk when
+it restarts.</p>
+<p>Without a fast resume mechanism, the client would be forced to read
+every byte of data from the storage drive and recalculate the hashes for
+every piece across all active torrents. For large libraries or
+multi-terabyte files, this full re-check causes severe disk I/O
+bottlenecks and can take hours. Fast resume files eliminate this
+overhead by caching the client's operational state to disk before
+exiting.</p>
+<hr />
+<h3 id="how-state-information-is-stored">How State Information Is
+Stored</h3>
+<p>Fast resume files are typically encoded using
+<strong>Bencode</strong>—the standard serialization format native to the
+BitTorrent protocol—or stored within a local database (such as SQLite).
+They capture critical data points across several categories:</p>
+<ol type="1">
+<li><p><strong>Piece Bitfields and Progress</strong></p>
+<ul>
+<li><strong>Bitfield:</strong> A compact binary sequence where each bit
+represents a specific piece of the torrent (e.g., <code>1</code> for
+completed/verified, <code>0</code> for missing).</li>
+<li><strong>Unfinished Block Data:</strong> Information regarding
+partially downloaded pieces, noting which specific sub-blocks are
+present in temporary storage or partfiles.</li>
+</ul></li>
+<li><p><strong>File Integrity and Timestamp Validation</strong></p>
+<ul>
+<li><strong>Modification Timestamps (<code>mtime</code>):</strong> The
+last modified date and time of each downloaded file on the local file
+system.</li>
+<li><strong>File Sizes:</strong> The exact byte sizes of the files on
+disk.</li>
+<li><strong>File Paths and Priorities:</strong> Custom target
+directories, renamed files, or file exclusion settings (e.g., files
+marked "Do Not Download").</li>
+</ul></li>
+<li><p><strong>Transfer Metrics and Client State</strong></p>
+<ul>
+<li><strong>Statistical Totals:</strong> Total bytes uploaded, total
+bytes downloaded, and elapsed active time.</li>
+<li><strong>Operational Status:</strong> Whether the torrent was paused,
+active, queued, or running under specific bandwidth allocation
+limits.</li>
+<li><strong>Peer and Tracker Cache:</strong> Active tracker URLs, local
+peer discovery lists, and DHT (Distributed Hash Table) states to quickly
+re-establish network connections.</li>
+</ul></li>
+</ol>
+<hr />
+<h3 id="how-the-resume-process-works-on-reboot">How the Resume Process
+Works on Reboot</h3>
+<p>When a BitTorrent client reboots, it executes a fast verification
+sequence using the fast resume data:</p>
+<ol type="1">
+<li><strong>Reading the Cache:</strong> The client loads the fast resume
+file corresponding to the torrent's unique info-hash.</li>
+<li><strong>Fast Validation (Timestamp &amp; Size Check):</strong>
+Instead of hashing the payload, the client queries the local filesystem
+to inspect the file size and <code>mtime</code> for all associated
+files.</li>
+<li><strong>State Confirmation:</strong> If the file sizes and
+modification timestamps match the records stored in the fast resume
+file, the client assumes the underlying data has not been modified or
+corrupted externally.</li>
+<li><strong>Immediate Activation:</strong> The client applies the saved
+bitfield directly into memory and transitions the torrent immediately to
+seeding or downloading without disk-intensive hashing.</li>
+<li><strong>Fallback to Full Check (If Invalidation Occurs):</strong> If
+a timestamp or file size does not match—or if the fast resume file is
+missing or corrupted—the client invalidates the cache and automatically
+initiates a full piece-by-piece hash check.</li>
+</ol></article>
+        <div id=comments-container></div>
+
+        <script>
+            const utterancesScript = document.createElement('script');
+            
+            utterancesScript.setAttribute('src', 'https://utteranc.es/client.js');
+            utterancesScript.setAttribute('repo', 'salivity/bittorrent'); 
+            utterancesScript.setAttribute('issue-term', 'pathname'); 
+            utterancesScript.setAttribute('theme', localStorage.getItem('theme') === 'dark' ? 'github-dark' : 'github-light'); 
+            utterancesScript.setAttribute('crossorigin', 'anonymous');
+            utterancesScript.async = true;
+
+            document.getElementById('comments-container').appendChild(utterancesScript);
+        </script>
+    
+    </main>
+    <footer>
+        <nav>
+            <ul class="footer-links">
+                <li><a href="/bittorrent/privacy-policy">Privacy Policy</a></li>
+                <li><a href="/bittorrent/terms-and-conditions">Terms and Conditions</a></li>
+            </ul>
+        </nav>
+        <div class="copyright">
+            Copyright &copy; <span id="current-year"></span>
+        </div>
+    </footer>
+</body>
+</html>

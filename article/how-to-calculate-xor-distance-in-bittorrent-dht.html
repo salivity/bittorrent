@@ -1,0 +1,212 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="light">
+<head>
+    <script async src="https://www.googletagmanager.com/gtag/js?id=G-R4Y4YXFHZS"></script>
+    <script>
+        window.dataLayer = window.dataLayer || [];
+
+        function gtag(){
+            dataLayer.push(arguments);
+        }
+
+        gtag('js', new Date());
+
+        gtag('config', 'G-R4Y4YXFHZS');
+    </script>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>How to Calculate XOR Distance in BitTorrent DHT - bittorrent</title>
+    <meta name="description" content="In the BitTorrent Distributed Hash Table (DHT) network, routing and peer discovery rely on the Kademlia algorithm's concept of distance. Instead of measuring physical network latency or geographic separation, a node determines proximity using a mathemati">
+    <link rel="canonical" href="https://salivity.github.io/bittorrent/article/how-to-calculate-xor-distance-in-bittorrent-dht">
+    <link rel="icon" href="/bittorrent/favicon.ico">
+    <link rel="stylesheet" href="/bittorrent/css/style.css">
+    <link media="print" rel="stylesheet" href="/bittorrent/css/print.css">
+    <script src="/bittorrent/js/fuse.min.js"></script>
+    <script src="/bittorrent/js/script.js"></script>
+    <script id="MathJax-script" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/4.1.3/tex-chtml.min.js" defer></script>
+    <script src="/monetize/monetize.js"></script>
+    <meta property="og:type" content="website" />
+    <meta property="og:title" content="How to Calculate XOR Distance in BitTorrent DHT - bittorrent" />
+    <meta property="og:url" content="https://salivity.github.io/bittorrent/article/how-to-calculate-xor-distance-in-bittorrent-dht" />
+    <meta property="og:image:url" content="https://salivity.github.io/bittorrent/images/open-graph/default.webp" />
+    <meta property="og:image:secure_url" content="https://salivity.github.io/bittorrent/images/open-graph/default.webp" />
+    <meta property="og:image:width" content="1120" />
+    <meta property="og:image:height" content="630" />
+    <meta property="og:description" content="In the BitTorrent Distributed Hash Table (DHT) network, routing and peer discovery rely on the Kademlia algorithm's concept of distance. Instead of measuring physical network latency or geographic separation, a node determines proximity using a mathemati" />
+    <link rel="manifest" href="/bittorrent/pwa/manifest.json" />
+</head>
+<body>
+    <header>
+        <a href="/bittorrent/" aria-label="Go To Home Page" title="Go To Home Page" id="logo">
+            <span>salivity.github.io/</span><span>bittorrent</span>
+        </a>
+        <nav>
+            <ul class="header-links">
+                <li><a href="https://github.com/salivity" title="Github" aria-label="Go To Github Profile Page"><svg class="svg-icon" focusable="false" aria-hidden="true" viewBox="0 0 24 24"><path d="M12 1.27a11 11 0 00-3.48 21.46c.55.09.73-.28.73-.55v-1.84c-3.03.64-3.67-1.46-3.67-1.46-.55-1.29-1.28-1.65-1.28-1.65-.92-.65.1-.65.1-.65 1.1 0 1.73 1.1 1.73 1.1.92 1.65 2.57 1.2 3.21.92a2 2 0 01.64-1.47c-2.47-.27-5.04-1.19-5.04-5.5 0-1.1.46-2.1 1.2-2.84a3.76 3.76 0 010-2.93s.91-.28 3.11 1.1c1.8-.49 3.7-.49 5.5 0 2.1-1.38 3.02-1.1 3.02-1.1a3.76 3.76 0 010 2.93c.83.74 1.2 1.74 1.2 2.94 0 4.21-2.57 5.13-5.04 5.4.45.37.82.92.82 2.02v3.03c0 .27.1.64.73.55A11 11 0 0012 1.27"></path></svg></a></li>
+                <li><a href="/bittorrent/search" title="Search" aria-label="Go To Search Page"><svg class="svg-icon" aria-hidden="true" focusable="false" viewBox="0 0 24 24"><path d="M15.5 14h-.79l-.28-.27C15.41 12.59 16 11.11 16 9.5 16 5.91 13.09 3 9.5 3S3 5.91 3 9.5 5.91 16 9.5 16c1.61 0 3.09-.59 4.23-1.57l.27.28v.79l5 4.99L20.49 19zm-6 0C7.01 14 5 11.99 5 9.5S7.01 5 9.5 5 14 7.01 14 9.5 11.99 14 9.5 14"></path></svg></a></li>
+                <li><a id="theme-toggle" title="Theme" href="javascript:void(0);" aria-label="Toggle Website Theme"></a></li>
+            </ul>
+        </nav>
+    </header>
+    <main>
+        <article><h1 id="how-to-calculate-xor-distance-in-bittorrent-dht">How to
+Calculate XOR Distance in BitTorrent DHT</h1>
+<p>In the BitTorrent Distributed Hash Table (DHT) network, routing and
+peer discovery rely on the Kademlia algorithm's concept of distance.
+Instead of measuring physical network latency or geographic separation,
+a node determines proximity using a mathematical operation called the
+XOR metric. This article provides a clear, step-by-step explanation of
+how a DHT node computes the XOR distance between its unique 160-bit Node
+ID and a target torrent's 160-bit info hash to locate peers and store
+data.</p>
+<h2 id="the-160-bit-identifier-space">The 160-Bit Identifier Space</h2>
+<p>Both a BitTorrent DHT Node ID and a torrent info hash are represented
+as 160-bit integers, typically derived using the SHA-1 cryptographic
+hash function. Because both identifiers exist within the exact same
+<span class="math inline">\(2^{160}\)</span> keyspace, they can be
+compared directly.</p>
+<ul>
+<li><strong>Node ID:</strong> A unique 20-byte (160-bit) identifier
+assigned to a specific client participating in the DHT.</li>
+<li><strong>Target Info Hash:</strong> The 20-byte (160-bit) SHA-1 hash
+of the torrent file's <code>info</code> dictionary, identifying the
+specific content.</li>
+</ul>
+<h2 id="the-xor-calculation-formula">The XOR Calculation Formula</h2>
+<p>The distance <span class="math inline">\(d(x, y)\)</span> between two
+160-bit identifiers, <span class="math inline">\(x\)</span> and <span
+class="math inline">\(y\)</span>, is defined as the bitwise exclusive OR
+(XOR) of the two values:</p>
+<p><span class="math display">\[d(x, y) = x \oplus y\]</span></p>
+<p>The result is treated as an unsigned integer value representing the
+distance.</p>
+<h3 id="the-bitwise-logic">The Bitwise Logic</h3>
+<p>The XOR operator evaluates each pair of corresponding bits according
+to the standard truth table:</p>
+<ul>
+<li><code>0</code> <span class="math inline">\(\oplus\)</span>
+<code>0</code> = <code>0</code></li>
+<li><code>0</code> <span class="math inline">\(\oplus\)</span>
+<code>1</code> = <code>1</code></li>
+<li><code>1</code> <span class="math inline">\(\oplus\)</span>
+<code>0</code> = <code>1</code></li>
+<li><code>1</code> <span class="math inline">\(\oplus\)</span>
+<code>1</code> = <code>0</code></li>
+</ul>
+<p>If the bits at a given position are identical, the result is
+<code>0</code>. If the bits are different, the result is
+<code>1</code>.</p>
+<h2 id="step-by-step-calculation-example">Step-by-Step Calculation
+Example</h2>
+<p>To calculate the distance between a Node ID and an Info Hash:</p>
+<ol type="1">
+<li><strong>Convert to Binary or Byte Arrays:</strong> Represent both
+the Node ID and the Target Info Hash as byte arrays of 20 bytes
+each.</li>
+<li><strong>Apply Bitwise XOR Byte-by-Byte:</strong> Loop from the most
+significant byte (index 0) to the least significant byte (index 19) and
+perform the XOR operation on each pair.</li>
+<li><strong>Interpret the Distance:</strong> The resulting 20-byte array
+represents the distance as a big-endian unsigned 160-bit integer.</li>
+</ol>
+<h3 id="simplified-8-bit-example">Simplified 8-Bit Example</h3>
+<p>Assume a simplified 8-bit keyspace:</p>
+<ul>
+<li><strong>Node ID (<span class="math inline">\(x\)</span>):</strong>
+<code>11010010</code> (Decimal: 210)</li>
+<li><strong>Target Info Hash (<span
+class="math inline">\(y\)</span>):</strong> <code>11011100</code>
+(Decimal: 220)</li>
+</ul>
+<p>Calculate <span class="math inline">\(x \oplus y\)</span>:</p>
+<pre class="text"><code>  1 1 0 1 0 0 1 0  (Node ID)
+⊕ 1 1 0 1 1 1 0 0  (Info Hash)
+-----------------
+  0 0 0 0 1 1 1 0  (XOR Distance = 14)</code></pre>
+<p>The resulting distance between the node and the target info hash is
+<code>14</code>.</p>
+<h2 id="shared-prefixes-and-closeness">Shared Prefixes and
+Closeness</h2>
+<p>The numeric value of the XOR output determines the closeness of a
+node to a target:</p>
+<ul>
+<li><strong>High-Order Bits (Prefixes):</strong> The most significant
+bits determine the vast majority of the numeric value. If two keys share
+a long common prefix (many leading matching bits), their XOR result will
+have many leading zeros, producing a smaller integer distance.</li>
+<li><strong>Smaller Distance Value:</strong> A lower numerical result
+indicates that the node is closer to the target info hash in the DHT
+routing topology.</li>
+<li><strong>Exact Match:</strong> If a node's ID is identical to the
+target info hash, every bit matches, resulting in <span
+class="math inline">\(x \oplus x = 0\)</span> (distance is zero).</li>
+</ul>
+<h2 id="mathematical-properties-of-the-xor-metric">Mathematical
+Properties of the XOR Metric</h2>
+<p>The XOR operation is used in Kademlia because it satisfies all formal
+mathematical requirements of a true metric:</p>
+<ol type="1">
+<li><strong>Identity of Indiscernibles:</strong> <span
+class="math inline">\(d(x, y) = 0\)</span> if and only if <span
+class="math inline">\(x = y\)</span>.</li>
+<li><strong>Non-negativity:</strong> <span class="math inline">\(d(x, y)
+\ge 0\)</span> for all <span class="math inline">\(x\)</span> and <span
+class="math inline">\(y\)</span>.</li>
+<li><strong>Symmetry:</strong> <span class="math inline">\(d(x, y) =
+d(y, x)\)</span> (the distance from <span
+class="math inline">\(x\)</span> to <span
+class="math inline">\(y\)</span> is identical to the distance from <span
+class="math inline">\(y\)</span> to <span
+class="math inline">\(x\)</span>).</li>
+<li><strong>Triangle Inequality:</strong> <span
+class="math inline">\(d(x, z) \le d(x, y) \oplus d(y, z)\)</span> (in
+fact, <span class="math inline">\(d(x, z) = d(x, y) \oplus d(y,
+z)\)</span>).</li>
+</ol>
+<h2 id="practical-use-in-bittorrent-dht-routing">Practical Use in
+BitTorrent DHT Routing</h2>
+<p>When a BitTorrent client wants to announce or find peers for a
+torrent:</p>
+<ol type="1">
+<li>The client calculates the XOR distance between the target info hash
+and all known contacts in its routing table (organized into
+K-buckets).</li>
+<li>The client selects the <span class="math inline">\(k\)</span> nodes
+(typically <span class="math inline">\(k = 8\)</span>) that yield the
+smallest numerical XOR distance.</li>
+<li>The client sends iterative <code>get_peers</code> or
+<code>find_node</code> queries to those closest nodes.</li>
+<li>The queried nodes respond with peers or other nodes in their own
+routing tables that have even smaller XOR distances to the target info
+hash, converging rapidly on the nodes responsible for storing the
+torrent's peer list.</li>
+</ol></article>
+        <div id=comments-container></div>
+
+        <script>
+            const utterancesScript = document.createElement('script');
+            
+            utterancesScript.setAttribute('src', 'https://utteranc.es/client.js');
+            utterancesScript.setAttribute('repo', 'salivity/bittorrent'); 
+            utterancesScript.setAttribute('issue-term', 'pathname'); 
+            utterancesScript.setAttribute('theme', localStorage.getItem('theme') === 'dark' ? 'github-dark' : 'github-light'); 
+            utterancesScript.setAttribute('crossorigin', 'anonymous');
+            utterancesScript.async = true;
+
+            document.getElementById('comments-container').appendChild(utterancesScript);
+        </script>
+    
+    </main>
+    <footer>
+        <nav>
+            <ul class="footer-links">
+                <li><a href="/bittorrent/privacy-policy">Privacy Policy</a></li>
+                <li><a href="/bittorrent/terms-and-conditions">Terms and Conditions</a></li>
+            </ul>
+        </nav>
+        <div class="copyright">
+            Copyright &copy; <span id="current-year"></span>
+        </div>
+    </footer>
+</body>
+</html>

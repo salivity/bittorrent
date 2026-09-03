@@ -1,0 +1,181 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="light">
+<head>
+    <script async src="https://www.googletagmanager.com/gtag/js?id=G-R4Y4YXFHZS"></script>
+    <script>
+        window.dataLayer = window.dataLayer || [];
+
+        function gtag(){
+            dataLayer.push(arguments);
+        }
+
+        gtag('js', new Date());
+
+        gtag('config', 'G-R4Y4YXFHZS');
+    </script>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>What is Tribler and How Does Onion Routing Work? - bittorrent</title>
+    <meta name="description" content="Tribler is an open-source, decentralized BitTorrent client designed to provide robust privacy, censorship resistance, and metadata discovery without relying on central infrastructure. This article explores the architecture of Tribler, examining its decen">
+    <link rel="canonical" href="https://salivity.github.io/bittorrent/article/what-is-tribler-and-how-does-onion-routing-work">
+    <link rel="icon" href="/bittorrent/favicon.ico">
+    <link rel="stylesheet" href="/bittorrent/css/style.css">
+    <link media="print" rel="stylesheet" href="/bittorrent/css/print.css">
+    <script src="/bittorrent/js/fuse.min.js"></script>
+    <script src="/bittorrent/js/script.js"></script>
+    <script id="MathJax-script" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/4.1.3/tex-chtml.min.js" defer></script>
+    <script src="/monetize/monetize.js"></script>
+    <meta property="og:type" content="website" />
+    <meta property="og:title" content="What is Tribler and How Does Onion Routing Work? - bittorrent" />
+    <meta property="og:url" content="https://salivity.github.io/bittorrent/article/what-is-tribler-and-how-does-onion-routing-work" />
+    <meta property="og:image:url" content="https://salivity.github.io/bittorrent/images/open-graph/default.webp" />
+    <meta property="og:image:secure_url" content="https://salivity.github.io/bittorrent/images/open-graph/default.webp" />
+    <meta property="og:image:width" content="1120" />
+    <meta property="og:image:height" content="630" />
+    <meta property="og:description" content="Tribler is an open-source, decentralized BitTorrent client designed to provide robust privacy, censorship resistance, and metadata discovery without relying on central infrastructure. This article explores the architecture of Tribler, examining its decen" />
+    <link rel="manifest" href="/bittorrent/pwa/manifest.json" />
+</head>
+<body>
+    <header>
+        <a href="/bittorrent/" aria-label="Go To Home Page" title="Go To Home Page" id="logo">
+            <span>salivity.github.io/</span><span>bittorrent</span>
+        </a>
+        <nav>
+            <ul class="header-links">
+                <li><a href="https://github.com/salivity" title="Github" aria-label="Go To Github Profile Page"><svg class="svg-icon" focusable="false" aria-hidden="true" viewBox="0 0 24 24"><path d="M12 1.27a11 11 0 00-3.48 21.46c.55.09.73-.28.73-.55v-1.84c-3.03.64-3.67-1.46-3.67-1.46-.55-1.29-1.28-1.65-1.28-1.65-.92-.65.1-.65.1-.65 1.1 0 1.73 1.1 1.73 1.1.92 1.65 2.57 1.2 3.21.92a2 2 0 01.64-1.47c-2.47-.27-5.04-1.19-5.04-5.5 0-1.1.46-2.1 1.2-2.84a3.76 3.76 0 010-2.93s.91-.28 3.11 1.1c1.8-.49 3.7-.49 5.5 0 2.1-1.38 3.02-1.1 3.02-1.1a3.76 3.76 0 010 2.93c.83.74 1.2 1.74 1.2 2.94 0 4.21-2.57 5.13-5.04 5.4.45.37.82.92.82 2.02v3.03c0 .27.1.64.73.55A11 11 0 0012 1.27"></path></svg></a></li>
+                <li><a href="/bittorrent/search" title="Search" aria-label="Go To Search Page"><svg class="svg-icon" aria-hidden="true" focusable="false" viewBox="0 0 24 24"><path d="M15.5 14h-.79l-.28-.27C15.41 12.59 16 11.11 16 9.5 16 5.91 13.09 3 9.5 3S3 5.91 3 9.5 5.91 16 9.5 16c1.61 0 3.09-.59 4.23-1.57l.27.28v.79l5 4.99L20.49 19zm-6 0C7.01 14 5 11.99 5 9.5S7.01 5 9.5 5 14 7.01 14 9.5 11.99 14 9.5 14"></path></svg></a></li>
+                <li><a id="theme-toggle" title="Theme" href="javascript:void(0);" aria-label="Toggle Website Theme"></a></li>
+            </ul>
+        </nav>
+    </header>
+    <main>
+        <article><h1 id="what-is-tribler-and-how-does-onion-routing-work">What is Tribler
+and How Does Onion Routing Work?</h1>
+<p>Tribler is an open-source, decentralized BitTorrent client designed
+to provide robust privacy, censorship resistance, and metadata discovery
+without relying on central infrastructure. This article explores the
+architecture of Tribler, examining its decentralized peer-to-peer search
+capabilities and detailing how it implements an integrated, custom
+onion-routing protocol to enable anonymous file sharing and
+torrenting.</p>
+<h2 id="what-is-tribler">What is Tribler?</h2>
+<p>Tribler is a research-driven BitTorrent client developed by
+researchers at Delft University of Technology. Unlike standard
+BitTorrent clients that depend on external indexers, websites, and
+centralized trackers, Tribler is engineered to be fully autonomous.</p>
+<p>Key architectural components include:</p>
+<ul>
+<li><strong>Decentralized Search:</strong> Users search for content
+directly through a gossip-based distributed database among connected
+peers, eliminating reliance on centralized torrent indexing
+websites.</li>
+<li><strong>Trackerless Operation:</strong> Tribler utilizes a
+combination of Mainline Distributed Hash Tables (DHT) and direct
+peer-to-peer channels to facilitate peer discovery.</li>
+<li><strong>Reputation System:</strong> To combat spam and malicious
+files, Tribler incorporates a decentralized trust system where peers
+evaluate and rate content reliability.</li>
+</ul>
+<h2 id="the-privacy-problem-in-standard-bittorrent">The Privacy Problem
+in Standard BitTorrent</h2>
+<p>In the standard BitTorrent protocol, all participants in a swarm
+(uploaders and downloaders) share their public IP addresses with one
+another to establish direct data connections. This public visibility
+makes standard torrenting vulnerable to surveillance, IP logging, and
+traffic monitoring by internet service providers, copyright trolls, and
+third-party observers.</p>
+<h2 id="how-tribler-implements-onion-routing">How Tribler Implements
+Onion Routing</h2>
+<p>To solve the IP leakage problem, Tribler integrates its own Tor-like
+onion-routing network directly into the application layer. Standard Tor
+forbids high-bandwidth peer-to-peer traffic, which led the Tribler team
+to build a dedicated overlay network optimized specifically for
+BitTorrent data transfer.</p>
+<p>The onion-routing mechanism operates through the following steps:</p>
+<h3 id="1-multi-hop-circuit-construction">1. Multi-Hop Circuit
+Construction</h3>
+<p>When a user begins downloading or seeding, Tribler builds an
+encrypted virtual circuit consisting of several intermediate peer nodes
+(hops). The user can configure the path length, typically between one
+and three hops:</p>
+<ul>
+<li><strong>One Hop:</strong> Provides basic proxying, masking the
+user's IP from the swarm.</li>
+<li><strong>Three Hops:</strong> Provides robust anonymity, separating
+the user from the exit point across multiple intermediary relays.</li>
+</ul>
+<h3 id="2-layered-encryption">2. Layered Encryption</h3>
+<p>Tribler wraps the data packets in multiple layers of encryption using
+public-key cryptography, corresponding to each node in the circuit:</p>
+<ol type="1">
+<li>The originating client encrypts the payload with the public key of
+the exit node.</li>
+<li>The payload is encrypted again with the public key of the middle
+node.</li>
+<li>The payload is encrypted a final time with the key of the entry node
+(guard).</li>
+</ol>
+<p>As the packet traverses the circuit, each relay decrypts only its
+designated layer to reveal the routing instructions for the next hop. No
+single node in the circuit knows both the original source IP address and
+the final destination swarm.</p>
+<h3 id="3-swarm-interaction-via-exit-nodes">3. Swarm Interaction via
+Exit Nodes</h3>
+<p>The final node in the circuit—the exit node—acts as a proxy to the
+BitTorrent swarm. The exit node communicates directly with other
+BitTorrent peers, requesting data blocks and transferring them back
+through the encrypted tunnel to the originating client. From the
+perspective of the BitTorrent swarm, all traffic originates from the
+exit node's IP address rather than the actual downloader.</p>
+<h3 id="4-decentralized-bandwidth-incentives">4. Decentralized Bandwidth
+Incentives</h3>
+<p>Onion routing requires significant volunteer bandwidth. To encourage
+peers to act as relay and exit nodes, Tribler implements a token economy
+called <em>TrustChain</em>. TrustChain is a lightweight,
+tamper-resistant ledger that records the bandwidth a user contributes as
+a relay. Users who provide relay bandwidth earn credit, granting them
+higher download speeds and priority routing through the network.</p>
+<h2 id="performance-and-anonymity-trade-offs">Performance and Anonymity
+Trade-Offs</h2>
+<p>While Tribler’s onion routing conceals user IP addresses from swarms,
+it introduces distinct trade-offs:</p>
+<ul>
+<li><strong>Bandwidth and Latency:</strong> Multi-hop encryption and
+relaying introduce computational overhead and latency, resulting in
+slower download speeds compared to unencrypted BitTorrent
+connections.</li>
+<li><strong>Exit Node Responsibility:</strong> Operating as an exit node
+exposes a user's IP address to the BitTorrent swarm, meaning that relay
+operators may visibly appear as the source of third-party traffic.
+Tribler allows users to disable exit-node functionality while still
+using the network as a client.</li>
+</ul></article>
+        <div id=comments-container></div>
+
+        <script>
+            const utterancesScript = document.createElement('script');
+            
+            utterancesScript.setAttribute('src', 'https://utteranc.es/client.js');
+            utterancesScript.setAttribute('repo', 'salivity/bittorrent'); 
+            utterancesScript.setAttribute('issue-term', 'pathname'); 
+            utterancesScript.setAttribute('theme', localStorage.getItem('theme') === 'dark' ? 'github-dark' : 'github-light'); 
+            utterancesScript.setAttribute('crossorigin', 'anonymous');
+            utterancesScript.async = true;
+
+            document.getElementById('comments-container').appendChild(utterancesScript);
+        </script>
+    
+    </main>
+    <footer>
+        <nav>
+            <ul class="footer-links">
+                <li><a href="/bittorrent/privacy-policy">Privacy Policy</a></li>
+                <li><a href="/bittorrent/terms-and-conditions">Terms and Conditions</a></li>
+            </ul>
+        </nav>
+        <div class="copyright">
+            Copyright &copy; <span id="current-year"></span>
+        </div>
+    </footer>
+</body>
+</html>

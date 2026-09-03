@@ -1,0 +1,183 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="light">
+<head>
+    <script async src="https://www.googletagmanager.com/gtag/js?id=G-R4Y4YXFHZS"></script>
+    <script>
+        window.dataLayer = window.dataLayer || [];
+
+        function gtag(){
+            dataLayer.push(arguments);
+        }
+
+        gtag('js', new Date());
+
+        gtag('config', 'G-R4Y4YXFHZS');
+    </script>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>How to Verify Torrent Download Integrity - bittorrent</title>
+    <meta name="description" content="Verifying the integrity of a completed torrent download is essential for ensuring that your files have not been corrupted, injected with malware, or altered by a malicious third party. While the BitTorrent protocol includes native mechanisms to prevent t">
+    <link rel="canonical" href="https://salivity.github.io/bittorrent/article/how-to-verify-torrent-download-integrity">
+    <link rel="icon" href="/bittorrent/favicon.ico">
+    <link rel="stylesheet" href="/bittorrent/css/style.css">
+    <link media="print" rel="stylesheet" href="/bittorrent/css/print.css">
+    <script src="/bittorrent/js/fuse.min.js"></script>
+    <script src="/bittorrent/js/script.js"></script>
+    <script id="MathJax-script" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/4.1.3/tex-chtml.min.js" defer></script>
+    <script src="/monetize/monetize.js"></script>
+    <meta property="og:type" content="website" />
+    <meta property="og:title" content="How to Verify Torrent Download Integrity - bittorrent" />
+    <meta property="og:url" content="https://salivity.github.io/bittorrent/article/how-to-verify-torrent-download-integrity" />
+    <meta property="og:image:url" content="https://salivity.github.io/bittorrent/images/open-graph/default.webp" />
+    <meta property="og:image:secure_url" content="https://salivity.github.io/bittorrent/images/open-graph/default.webp" />
+    <meta property="og:image:width" content="1120" />
+    <meta property="og:image:height" content="630" />
+    <meta property="og:description" content="Verifying the integrity of a completed torrent download is essential for ensuring that your files have not been corrupted, injected with malware, or altered by a malicious third party. While the BitTorrent protocol includes native mechanisms to prevent t" />
+    <link rel="manifest" href="/bittorrent/pwa/manifest.json" />
+</head>
+<body>
+    <header>
+        <a href="/bittorrent/" aria-label="Go To Home Page" title="Go To Home Page" id="logo">
+            <span>salivity.github.io/</span><span>bittorrent</span>
+        </a>
+        <nav>
+            <ul class="header-links">
+                <li><a href="https://github.com/salivity" title="Github" aria-label="Go To Github Profile Page"><svg class="svg-icon" focusable="false" aria-hidden="true" viewBox="0 0 24 24"><path d="M12 1.27a11 11 0 00-3.48 21.46c.55.09.73-.28.73-.55v-1.84c-3.03.64-3.67-1.46-3.67-1.46-.55-1.29-1.28-1.65-1.28-1.65-.92-.65.1-.65.1-.65 1.1 0 1.73 1.1 1.73 1.1.92 1.65 2.57 1.2 3.21.92a2 2 0 01.64-1.47c-2.47-.27-5.04-1.19-5.04-5.5 0-1.1.46-2.1 1.2-2.84a3.76 3.76 0 010-2.93s.91-.28 3.11 1.1c1.8-.49 3.7-.49 5.5 0 2.1-1.38 3.02-1.1 3.02-1.1a3.76 3.76 0 010 2.93c.83.74 1.2 1.74 1.2 2.94 0 4.21-2.57 5.13-5.04 5.4.45.37.82.92.82 2.02v3.03c0 .27.1.64.73.55A11 11 0 0012 1.27"></path></svg></a></li>
+                <li><a href="/bittorrent/search" title="Search" aria-label="Go To Search Page"><svg class="svg-icon" aria-hidden="true" focusable="false" viewBox="0 0 24 24"><path d="M15.5 14h-.79l-.28-.27C15.41 12.59 16 11.11 16 9.5 16 5.91 13.09 3 9.5 3S3 5.91 3 9.5 5.91 16 9.5 16c1.61 0 3.09-.59 4.23-1.57l.27.28v.79l5 4.99L20.49 19zm-6 0C7.01 14 5 11.99 5 9.5S7.01 5 9.5 5 14 7.01 14 9.5 11.99 14 9.5 14"></path></svg></a></li>
+                <li><a id="theme-toggle" title="Theme" href="javascript:void(0);" aria-label="Toggle Website Theme"></a></li>
+            </ul>
+        </nav>
+    </header>
+    <main>
+        <article><h1 id="how-to-verify-torrent-download-integrity">How to Verify Torrent
+Download Integrity</h1>
+<p>Verifying the integrity of a completed torrent download is essential
+for ensuring that your files have not been corrupted, injected with
+malware, or altered by a malicious third party. While the BitTorrent
+protocol includes native mechanisms to prevent transmission errors,
+protecting against deliberate tampering requires additional validation
+steps. This guide details how to use built-in client checks, independent
+cryptographic checksums, digital signatures, and security scanners to
+ensure your downloaded files are authentic and safe.</p>
+<h2 id="1-run-a-force-re-check-in-your-torrent-client">1. Run a "Force
+Re-check" in Your Torrent Client</h2>
+<p>The BitTorrent protocol automatically divides files into smaller
+pieces and validates each piece against a cryptographic hash
+(historically SHA-1, or SHA-256 in BitTorrent v2) defined in the
+<code>.torrent</code> metadata or magnet link.</p>
+<p>If you suspect file corruption or want to ensure the download matches
+the original torrent manifest:</p>
+<ol type="1">
+<li>Open your torrent client (such as qBittorrent, Transmission, or
+Deluge).</li>
+<li>Right-click the completed torrent.</li>
+<li>Select <strong>Force Recheck</strong> (or <strong>Verify Local
+Data</strong>).</li>
+</ol>
+<p>The client will read the files on your disk, recalculate the piece
+hashes, and automatically re-download any blocks that fail
+validation.</p>
+<p><em>Note: This only confirms that your files match the
+<code>.torrent</code> creator's upload. If the <code>.torrent</code>
+file itself was created by a malicious actor, this check alone will not
+protect you.</em></p>
+<h2 id="2-compare-independent-cryptographic-hashes">2. Compare
+Independent Cryptographic Hashes</h2>
+<p>To confirm that the content has not been tampered with compared to
+the original developer's or publisher's release, compare the downloaded
+file's hash against the official hash (usually SHA-256) published on the
+official project website.</p>
+<h3 id="windows-powershell-or-command-prompt">Windows (PowerShell or
+Command Prompt)</h3>
+<p>Run the following command in PowerShell:</p>
+<div class="sourceCode" id="cb1"><pre
+class="sourceCode powershell"><code class="sourceCode powershell"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a>Get-FileHash <span class="op">-</span>Path <span class="st">&quot;C:\path\to\downloaded_file.iso&quot;</span> <span class="op">-</span>Algorithm SHA256</span></code></pre></div>
+<p>Or via Command Prompt:</p>
+<div class="sourceCode" id="cb2"><pre
+class="sourceCode cmd"><code class="sourceCode dosbat"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a>certutil <span class="at">-hashfile</span> <span class="st">&quot;C:\path\to\downloaded_file.iso&quot;</span> SHA256</span></code></pre></div>
+<h3 id="macos-and-linux-terminal">macOS and Linux (Terminal)</h3>
+<p>Run the standard checksum utility:</p>
+<div class="sourceCode" id="cb3"><pre
+class="sourceCode bash"><code class="sourceCode bash"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a><span class="fu">sha256sum</span> /path/to/downloaded_file.iso</span></code></pre></div>
+<p><em>(On macOS, you can also use
+<code>shasum -a 256 /path/to/downloaded_file.iso</code>)</em></p>
+<p>Compare the generated alphanumeric string with the hash provided by
+the trusted publisher. If even a single character differs, the file has
+been modified or corrupted.</p>
+<h2 id="3-verify-pgp--gpg-digital-signatures">3. Verify PGP / GPG
+Digital Signatures</h2>
+<p>Many open-source projects and Linux distributions provide a detached
+PGP signature file (often ending in <code>.sig</code> or
+<code>.asc</code>) alongside their torrents. A digital signature
+guarantees both file integrity and author authenticity.</p>
+<ol type="1">
+<li>Download the publisher's public key from their official website or a
+trusted key server.</li>
+<li>Import the public key:
+<div class="sourceCode" id="cb4"><pre
+class="sourceCode bash"><code class="sourceCode bash"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a><span class="ex">gpg</span> <span class="at">--import</span> publisher_key.asc</span></code></pre></div></li>
+<li>Verify the downloaded file against the signature:
+<div class="sourceCode" id="cb5"><pre
+class="sourceCode bash"><code class="sourceCode bash"><span id="cb5-1"><a href="#cb5-1" aria-hidden="true" tabindex="-1"></a><span class="ex">gpg</span> <span class="at">--verify</span> signature_file.sig downloaded_file.iso</span></code></pre></div></li>
+</ol>
+<p>A "Good signature" message confirms that the file was created by the
+keyholder and has not been altered since it was signed.</p>
+<h2 id="4-check-os-level-code-signatures">4. Check OS-Level Code
+Signatures</h2>
+<p>For executable files (<code>.exe</code>, <code>.msi</code>,
+<code>.dmg</code>, <code>.pkg</code>), check the embedded digital
+certificate:</p>
+<ul>
+<li><strong>Windows:</strong> Right-click the executable, select
+<strong>Properties</strong>, and look for the <strong>Digital
+Signatures</strong> tab. Verify that the signature is valid and belongs
+to the legitimate software vendor.</li>
+<li><strong>macOS:</strong> Check the code signature in Terminal using:
+<div class="sourceCode" id="cb6"><pre
+class="sourceCode bash"><code class="sourceCode bash"><span id="cb6-1"><a href="#cb6-1" aria-hidden="true" tabindex="-1"></a><span class="ex">codesign</span> <span class="at">-dv</span> <span class="at">--verbose</span><span class="op">=</span>4 /path/to/application.app</span></code></pre></div></li>
+</ul>
+<p>If the signature is missing, invalid, or belongs to an unknown
+entity, do not execute the file.</p>
+<h2 id="5-perform-multi-engine-antivirus-analysis">5. Perform
+Multi-Engine Antivirus Analysis</h2>
+<p>Before opening or executing any files downloaded via torrent
+networks:</p>
+<ul>
+<li>Upload the file or its hash to an online analysis platform like
+VirusTotal to cross-reference it against dozens of antivirus
+engines.</li>
+<li>Scan the file locally using up-to-date endpoint protection
+software.</li>
+<li>If executing untrusted software is necessary, run it inside an
+isolated virtual machine or sandbox environment to observe its behavior
+safely.</li>
+</ul></article>
+        <div id=comments-container></div>
+
+        <script>
+            const utterancesScript = document.createElement('script');
+            
+            utterancesScript.setAttribute('src', 'https://utteranc.es/client.js');
+            utterancesScript.setAttribute('repo', 'salivity/bittorrent'); 
+            utterancesScript.setAttribute('issue-term', 'pathname'); 
+            utterancesScript.setAttribute('theme', localStorage.getItem('theme') === 'dark' ? 'github-dark' : 'github-light'); 
+            utterancesScript.setAttribute('crossorigin', 'anonymous');
+            utterancesScript.async = true;
+
+            document.getElementById('comments-container').appendChild(utterancesScript);
+        </script>
+    
+    </main>
+    <footer>
+        <nav>
+            <ul class="footer-links">
+                <li><a href="/bittorrent/privacy-policy">Privacy Policy</a></li>
+                <li><a href="/bittorrent/terms-and-conditions">Terms and Conditions</a></li>
+            </ul>
+        </nav>
+        <div class="copyright">
+            Copyright &copy; <span id="current-year"></span>
+        </div>
+    </footer>
+</body>
+</html>

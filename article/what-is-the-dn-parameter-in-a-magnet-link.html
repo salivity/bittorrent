@@ -1,0 +1,131 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="light">
+<head>
+    <script async src="https://www.googletagmanager.com/gtag/js?id=G-R4Y4YXFHZS"></script>
+    <script>
+        window.dataLayer = window.dataLayer || [];
+
+        function gtag(){
+            dataLayer.push(arguments);
+        }
+
+        gtag('js', new Date());
+
+        gtag('config', 'G-R4Y4YXFHZS');
+    </script>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>What Is the dn Parameter in a Magnet Link? - bittorrent</title>
+    <meta name="description" content="This article explains the purpose and functionality of the dn parameter within a BitTorrent magnet link. You will learn what the parameter stands for, how it provides a human-readable display name for torrent downloads, how URL encoding affects its forma">
+    <link rel="canonical" href="https://salivity.github.io/bittorrent/article/what-is-the-dn-parameter-in-a-magnet-link">
+    <link rel="icon" href="/bittorrent/favicon.ico">
+    <link rel="stylesheet" href="/bittorrent/css/style.css">
+    <link media="print" rel="stylesheet" href="/bittorrent/css/print.css">
+    <script src="/bittorrent/js/fuse.min.js"></script>
+    <script src="/bittorrent/js/script.js"></script>
+    <script id="MathJax-script" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/4.1.3/tex-chtml.min.js" defer></script>
+    <script src="/monetize/monetize.js"></script>
+    <meta property="og:type" content="website" />
+    <meta property="og:title" content="What Is the dn Parameter in a Magnet Link? - bittorrent" />
+    <meta property="og:url" content="https://salivity.github.io/bittorrent/article/what-is-the-dn-parameter-in-a-magnet-link" />
+    <meta property="og:image:url" content="https://salivity.github.io/bittorrent/images/open-graph/default.webp" />
+    <meta property="og:image:secure_url" content="https://salivity.github.io/bittorrent/images/open-graph/default.webp" />
+    <meta property="og:image:width" content="1120" />
+    <meta property="og:image:height" content="630" />
+    <meta property="og:description" content="This article explains the purpose and functionality of the dn parameter within a BitTorrent magnet link. You will learn what the parameter stands for, how it provides a human-readable display name for torrent downloads, how URL encoding affects its forma" />
+    <link rel="manifest" href="/bittorrent/pwa/manifest.json" />
+</head>
+<body>
+    <header>
+        <a href="/bittorrent/" aria-label="Go To Home Page" title="Go To Home Page" id="logo">
+            <span>salivity.github.io/</span><span>bittorrent</span>
+        </a>
+        <nav>
+            <ul class="header-links">
+                <li><a href="https://github.com/salivity" title="Github" aria-label="Go To Github Profile Page"><svg class="svg-icon" focusable="false" aria-hidden="true" viewBox="0 0 24 24"><path d="M12 1.27a11 11 0 00-3.48 21.46c.55.09.73-.28.73-.55v-1.84c-3.03.64-3.67-1.46-3.67-1.46-.55-1.29-1.28-1.65-1.28-1.65-.92-.65.1-.65.1-.65 1.1 0 1.73 1.1 1.73 1.1.92 1.65 2.57 1.2 3.21.92a2 2 0 01.64-1.47c-2.47-.27-5.04-1.19-5.04-5.5 0-1.1.46-2.1 1.2-2.84a3.76 3.76 0 010-2.93s.91-.28 3.11 1.1c1.8-.49 3.7-.49 5.5 0 2.1-1.38 3.02-1.1 3.02-1.1a3.76 3.76 0 010 2.93c.83.74 1.2 1.74 1.2 2.94 0 4.21-2.57 5.13-5.04 5.4.45.37.82.92.82 2.02v3.03c0 .27.1.64.73.55A11 11 0 0012 1.27"></path></svg></a></li>
+                <li><a href="/bittorrent/search" title="Search" aria-label="Go To Search Page"><svg class="svg-icon" aria-hidden="true" focusable="false" viewBox="0 0 24 24"><path d="M15.5 14h-.79l-.28-.27C15.41 12.59 16 11.11 16 9.5 16 5.91 13.09 3 9.5 3S3 5.91 3 9.5 5.91 16 9.5 16c1.61 0 3.09-.59 4.23-1.57l.27.28v.79l5 4.99L20.49 19zm-6 0C7.01 14 5 11.99 5 9.5S7.01 5 9.5 5 14 7.01 14 9.5 11.99 14 9.5 14"></path></svg></a></li>
+                <li><a id="theme-toggle" title="Theme" href="javascript:void(0);" aria-label="Toggle Website Theme"></a></li>
+            </ul>
+        </nav>
+    </header>
+    <main>
+        <article><h1 id="what-is-the-dn-parameter-in-a-magnet-link">What Is the dn
+Parameter in a Magnet Link?</h1>
+<p>This article explains the purpose and functionality of the
+<code>dn</code> parameter within a BitTorrent magnet link. You will
+learn what the parameter stands for, how it provides a human-readable
+display name for torrent downloads, how URL encoding affects its format,
+and why it serves as a provisional name until full torrent metadata is
+retrieved from peers.</p>
+<h3 id="understanding-the-dn-parameter">Understanding the dn
+Parameter</h3>
+<p>In a standard Magnet URI scheme, the <code>dn</code> parameter stands
+for <strong>Display Name</strong>. Its primary role is to specify a
+human-readable title for the file or collection of files being shared,
+allowing BitTorrent clients to label the transfer clearly in the user
+interface.</p>
+<p>A basic magnet link structure containing the parameter looks like
+this:</p>
+<p><code>magnet:?xt=urn:btih:EXAMPLEHASH123456789&amp;dn=Ubuntu+22.04+Desktop+ISO</code></p>
+<p>In this example, the <code>dn=</code> portion instructs the torrent
+client to display "Ubuntu 22.04 Desktop ISO" as the name of the
+download.</p>
+<h3 id="how-the-suggested-display-name-works">How the Suggested Display
+Name Works</h3>
+<ol type="1">
+<li><p><strong>Immediate Identification:</strong> A magnet link
+fundamentally relies on the exact cryptographic hash of the content,
+defined by the <code>xt</code> (Exact Topic) parameter. Because hashes
+are long strings of alphanumeric characters (such as
+<code>urn:btih:</code> followed by a 40-character hex string), they do
+not convey what is actually being downloaded. The <code>dn</code>
+parameter bridges this gap by offering an instant name before any
+network data is transferred.</p></li>
+<li><p><strong>URL Encoding Requirement:</strong> Because magnet links
+are standard Uniform Resource Identifiers (URIs), the text inside the
+<code>dn</code> parameter must follow standard percent-encoding rules.
+Spaces are typically replaced with <code>+</code> or <code>%20</code>,
+and special symbols are converted into their respective hexadecimal
+ASCII codes (e.g., <code>&amp;</code> becomes <code>%26</code>). Torrent
+clients automatically parse these encoded characters back into standard
+text.</p></li>
+<li><p><strong>Fallback and Metadata Overwrite:</strong> The display
+name provided by the <code>dn</code> parameter is purely a suggestion.
+When you first add a magnet link, your client does not yet have the full
+<code>.torrent</code> metadata file containing the exact file list and
+internal directory structure. The client displays the <code>dn</code>
+string as a placeholder. Once connected to peers in the swarm, the
+client downloads the actual metadata payload. Depending on the client's
+settings, the provisional display name may be replaced with the
+authoritative file or folder name embedded directly inside the retrieved
+metadata.</p></li>
+</ol></article>
+        <div id=comments-container></div>
+
+        <script>
+            const utterancesScript = document.createElement('script');
+            
+            utterancesScript.setAttribute('src', 'https://utteranc.es/client.js');
+            utterancesScript.setAttribute('repo', 'salivity/bittorrent'); 
+            utterancesScript.setAttribute('issue-term', 'pathname'); 
+            utterancesScript.setAttribute('theme', localStorage.getItem('theme') === 'dark' ? 'github-dark' : 'github-light'); 
+            utterancesScript.setAttribute('crossorigin', 'anonymous');
+            utterancesScript.async = true;
+
+            document.getElementById('comments-container').appendChild(utterancesScript);
+        </script>
+    
+    </main>
+    <footer>
+        <nav>
+            <ul class="footer-links">
+                <li><a href="/bittorrent/privacy-policy">Privacy Policy</a></li>
+                <li><a href="/bittorrent/terms-and-conditions">Terms and Conditions</a></li>
+            </ul>
+        </nav>
+        <div class="copyright">
+            Copyright &copy; <span id="current-year"></span>
+        </div>
+    </footer>
+</body>
+</html>

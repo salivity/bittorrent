@@ -1,0 +1,144 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="light">
+<head>
+    <script async src="https://www.googletagmanager.com/gtag/js?id=G-R4Y4YXFHZS"></script>
+    <script>
+        window.dataLayer = window.dataLayer || [];
+
+        function gtag(){
+            dataLayer.push(arguments);
+        }
+
+        gtag('js', new Date());
+
+        gtag('config', 'G-R4Y4YXFHZS');
+    </script>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>How Torrent Clients Announce Transition to Seeder - bittorrent</title>
+    <meta name="description" content="When a BitTorrent client finishes downloading the final piece of a file, it transitions from a leech to a seeder through a combination of peer-wire protocol messages, connection management, and tracker updates. To notify currently connected peers of its">
+    <link rel="canonical" href="https://salivity.github.io/bittorrent/article/how-torrent-clients-announce-transition-to-seeder">
+    <link rel="icon" href="/bittorrent/favicon.ico">
+    <link rel="stylesheet" href="/bittorrent/css/style.css">
+    <link media="print" rel="stylesheet" href="/bittorrent/css/print.css">
+    <script src="/bittorrent/js/fuse.min.js"></script>
+    <script src="/bittorrent/js/script.js"></script>
+    <script id="MathJax-script" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/4.1.3/tex-chtml.min.js" defer></script>
+    <script src="/monetize/monetize.js"></script>
+    <meta property="og:type" content="website" />
+    <meta property="og:title" content="How Torrent Clients Announce Transition to Seeder - bittorrent" />
+    <meta property="og:url" content="https://salivity.github.io/bittorrent/article/how-torrent-clients-announce-transition-to-seeder" />
+    <meta property="og:image:url" content="https://salivity.github.io/bittorrent/images/open-graph/default.webp" />
+    <meta property="og:image:secure_url" content="https://salivity.github.io/bittorrent/images/open-graph/default.webp" />
+    <meta property="og:image:width" content="1120" />
+    <meta property="og:image:height" content="630" />
+    <meta property="og:description" content="When a BitTorrent client finishes downloading the final piece of a file, it transitions from a leech to a seeder through a combination of peer-wire protocol messages, connection management, and tracker updates. To notify currently connected peers of its" />
+    <link rel="manifest" href="/bittorrent/pwa/manifest.json" />
+</head>
+<body>
+    <header>
+        <a href="/bittorrent/" aria-label="Go To Home Page" title="Go To Home Page" id="logo">
+            <span>salivity.github.io/</span><span>bittorrent</span>
+        </a>
+        <nav>
+            <ul class="header-links">
+                <li><a href="https://github.com/salivity" title="Github" aria-label="Go To Github Profile Page"><svg class="svg-icon" focusable="false" aria-hidden="true" viewBox="0 0 24 24"><path d="M12 1.27a11 11 0 00-3.48 21.46c.55.09.73-.28.73-.55v-1.84c-3.03.64-3.67-1.46-3.67-1.46-.55-1.29-1.28-1.65-1.28-1.65-.92-.65.1-.65.1-.65 1.1 0 1.73 1.1 1.73 1.1.92 1.65 2.57 1.2 3.21.92a2 2 0 01.64-1.47c-2.47-.27-5.04-1.19-5.04-5.5 0-1.1.46-2.1 1.2-2.84a3.76 3.76 0 010-2.93s.91-.28 3.11 1.1c1.8-.49 3.7-.49 5.5 0 2.1-1.38 3.02-1.1 3.02-1.1a3.76 3.76 0 010 2.93c.83.74 1.2 1.74 1.2 2.94 0 4.21-2.57 5.13-5.04 5.4.45.37.82.92.82 2.02v3.03c0 .27.1.64.73.55A11 11 0 0012 1.27"></path></svg></a></li>
+                <li><a href="/bittorrent/search" title="Search" aria-label="Go To Search Page"><svg class="svg-icon" aria-hidden="true" focusable="false" viewBox="0 0 24 24"><path d="M15.5 14h-.79l-.28-.27C15.41 12.59 16 11.11 16 9.5 16 5.91 13.09 3 9.5 3S3 5.91 3 9.5 5.91 16 9.5 16c1.61 0 3.09-.59 4.23-1.57l.27.28v.79l5 4.99L20.49 19zm-6 0C7.01 14 5 11.99 5 9.5S7.01 5 9.5 5 14 7.01 14 9.5 11.99 14 9.5 14"></path></svg></a></li>
+                <li><a id="theme-toggle" title="Theme" href="javascript:void(0);" aria-label="Toggle Website Theme"></a></li>
+            </ul>
+        </nav>
+    </header>
+    <main>
+        <article><h1 id="how-torrent-clients-announce-transition-to-seeder">How Torrent
+Clients Announce Transition to Seeder</h1>
+<p>When a BitTorrent client finishes downloading the final piece of a
+file, it transitions from a leech to a seeder through a combination of
+peer-wire protocol messages, connection management, and tracker updates.
+To notify currently connected peers of its new status, the client
+broadcasts a final piece confirmation (<code>HAVE</code> message),
+updates its internal state, terminates unnecessary connections with
+other seeders, and reports the completion event to the tracker.</p>
+<h3 id="broadcasting-the-final-piece-have-message">Broadcasting the
+Final Piece (<code>HAVE</code> Message)</h3>
+<p>Under the standard BitTorrent protocol, clients do not send a single
+explicit "I am now a seeder" message over an existing peer connection.
+Instead, the transition occurs incrementally through piece
+management:</p>
+<ul>
+<li><strong>Piece Verification:</strong> Once the client downloads and
+verifies the cryptographic hash of the final missing piece, it
+constructs a standard <code>HAVE</code> message (Message ID
+<code>4</code>).</li>
+<li><strong>Broadcast to Peers:</strong> The client transmits this
+<code>HAVE</code> message, containing the index of the last piece, to
+all currently connected peers.</li>
+<li><strong>Peer Bitfield Update:</strong> Connected peers receive the
+message and update their internal representation of the client's
+bitfield. Because the peer now sees that the client possesses every
+piece of the torrent, the peer recognizes that the client has become a
+full seeder.</li>
+</ul>
+<h3 id="terminating-redundant-seeder-to-seeder-connections">Terminating
+Redundant Seeder-to-Seeder Connections</h3>
+<p>Because seeders only upload data and do not download, two seeders
+have nothing to share with each other. Once the transition to a seeder
+is complete:</p>
+<ul>
+<li>The newly converted seeder identifies any connected peers that also
+possess 100% of the file.</li>
+<li>The client systematically closes these TCP connections. Terminating
+connections with other seeders frees up network sockets, bandwidth, and
+upload slots exclusively for leechers who still require pieces.</li>
+</ul>
+<h3 id="tracker-announcement-eventcompleted">Tracker Announcement
+(<code>event=completed</code>)</h3>
+<p>In addition to communicating directly with connected peers over the
+peer-wire protocol, the client notifies the central tracker (or DHT
+network):</p>
+<ul>
+<li><strong>The Announce Request:</strong> The client sends an immediate
+announce request containing the parameter
+<code>event=completed</code>.</li>
+<li><strong>Swarm Metrics Update:</strong> The tracker adjusts the swarm
+statistics by decrementing the leecher count and incrementing the seeder
+count.</li>
+<li><strong>New Peer Lists:</strong> The tracker stops providing other
+seeders' IP addresses to this client and begins distributing this
+client's IP to new leechers entering the swarm.</li>
+</ul>
+<h3 id="extension-protocols">Extension Protocols</h3>
+<p>If the client and its peers support the BitTorrent Fast Extension
+(BEP 6), seeders connecting to the swarm anew can use the
+<code>HAVE ALL</code> message during the initial handshake. However, for
+active connections transitioning mid-transfer, the standard
+<code>HAVE</code> message for the final piece remains the primary
+trigger that signals completion to the swarm.</p></article>
+        <div id=comments-container></div>
+
+        <script>
+            const utterancesScript = document.createElement('script');
+            
+            utterancesScript.setAttribute('src', 'https://utteranc.es/client.js');
+            utterancesScript.setAttribute('repo', 'salivity/bittorrent'); 
+            utterancesScript.setAttribute('issue-term', 'pathname'); 
+            utterancesScript.setAttribute('theme', localStorage.getItem('theme') === 'dark' ? 'github-dark' : 'github-light'); 
+            utterancesScript.setAttribute('crossorigin', 'anonymous');
+            utterancesScript.async = true;
+
+            document.getElementById('comments-container').appendChild(utterancesScript);
+        </script>
+    
+    </main>
+    <footer>
+        <nav>
+            <ul class="footer-links">
+                <li><a href="/bittorrent/privacy-policy">Privacy Policy</a></li>
+                <li><a href="/bittorrent/terms-and-conditions">Terms and Conditions</a></li>
+            </ul>
+        </nav>
+        <div class="copyright">
+            Copyright &copy; <span id="current-year"></span>
+        </div>
+    </footer>
+</body>
+</html>

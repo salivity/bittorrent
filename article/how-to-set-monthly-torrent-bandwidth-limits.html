@@ -1,0 +1,166 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="light">
+<head>
+    <script async src="https://www.googletagmanager.com/gtag/js?id=G-R4Y4YXFHZS"></script>
+    <script>
+        window.dataLayer = window.dataLayer || [];
+
+        function gtag(){
+            dataLayer.push(arguments);
+        }
+
+        gtag('js', new Date());
+
+        gtag('config', 'G-R4Y4YXFHZS');
+    </script>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>How to Set Monthly Torrent Bandwidth Limits - bittorrent</title>
+    <meta name="description" content="Many Internet Service Providers (ISPs) enforce strict monthly data caps, making unmonitored torrenting a common cause of unexpected overage fees or throttled connections. This guide explains how to configure built-in transfer caps in supported torrent cl">
+    <link rel="canonical" href="https://salivity.github.io/bittorrent/article/how-to-set-monthly-torrent-bandwidth-limits">
+    <link rel="icon" href="/bittorrent/favicon.ico">
+    <link rel="stylesheet" href="/bittorrent/css/style.css">
+    <link media="print" rel="stylesheet" href="/bittorrent/css/print.css">
+    <script src="/bittorrent/js/fuse.min.js"></script>
+    <script src="/bittorrent/js/script.js"></script>
+    <script id="MathJax-script" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/4.1.3/tex-chtml.min.js" defer></script>
+    <script src="/monetize/monetize.js"></script>
+    <meta property="og:type" content="website" />
+    <meta property="og:title" content="How to Set Monthly Torrent Bandwidth Limits - bittorrent" />
+    <meta property="og:url" content="https://salivity.github.io/bittorrent/article/how-to-set-monthly-torrent-bandwidth-limits" />
+    <meta property="og:image:url" content="https://salivity.github.io/bittorrent/images/open-graph/default.webp" />
+    <meta property="og:image:secure_url" content="https://salivity.github.io/bittorrent/images/open-graph/default.webp" />
+    <meta property="og:image:width" content="1120" />
+    <meta property="og:image:height" content="630" />
+    <meta property="og:description" content="Many Internet Service Providers (ISPs) enforce strict monthly data caps, making unmonitored torrenting a common cause of unexpected overage fees or throttled connections. This guide explains how to configure built-in transfer caps in supported torrent cl" />
+    <link rel="manifest" href="/bittorrent/pwa/manifest.json" />
+</head>
+<body>
+    <header>
+        <a href="/bittorrent/" aria-label="Go To Home Page" title="Go To Home Page" id="logo">
+            <span>salivity.github.io/</span><span>bittorrent</span>
+        </a>
+        <nav>
+            <ul class="header-links">
+                <li><a href="https://github.com/salivity" title="Github" aria-label="Go To Github Profile Page"><svg class="svg-icon" focusable="false" aria-hidden="true" viewBox="0 0 24 24"><path d="M12 1.27a11 11 0 00-3.48 21.46c.55.09.73-.28.73-.55v-1.84c-3.03.64-3.67-1.46-3.67-1.46-.55-1.29-1.28-1.65-1.28-1.65-.92-.65.1-.65.1-.65 1.1 0 1.73 1.1 1.73 1.1.92 1.65 2.57 1.2 3.21.92a2 2 0 01.64-1.47c-2.47-.27-5.04-1.19-5.04-5.5 0-1.1.46-2.1 1.2-2.84a3.76 3.76 0 010-2.93s.91-.28 3.11 1.1c1.8-.49 3.7-.49 5.5 0 2.1-1.38 3.02-1.1 3.02-1.1a3.76 3.76 0 010 2.93c.83.74 1.2 1.74 1.2 2.94 0 4.21-2.57 5.13-5.04 5.4.45.37.82.92.82 2.02v3.03c0 .27.1.64.73.55A11 11 0 0012 1.27"></path></svg></a></li>
+                <li><a href="/bittorrent/search" title="Search" aria-label="Go To Search Page"><svg class="svg-icon" aria-hidden="true" focusable="false" viewBox="0 0 24 24"><path d="M15.5 14h-.79l-.28-.27C15.41 12.59 16 11.11 16 9.5 16 5.91 13.09 3 9.5 3S3 5.91 3 9.5 5.91 16 9.5 16c1.61 0 3.09-.59 4.23-1.57l.27.28v.79l5 4.99L20.49 19zm-6 0C7.01 14 5 11.99 5 9.5S7.01 5 9.5 5 14 7.01 14 9.5 11.99 14 9.5 14"></path></svg></a></li>
+                <li><a id="theme-toggle" title="Theme" href="javascript:void(0);" aria-label="Toggle Website Theme"></a></li>
+            </ul>
+        </nav>
+    </header>
+    <main>
+        <article><h1 id="how-to-set-monthly-torrent-bandwidth-limits">How to Set Monthly
+Torrent Bandwidth Limits</h1>
+<p>Many Internet Service Providers (ISPs) enforce strict monthly data
+caps, making unmonitored torrenting a common cause of unexpected overage
+fees or throttled connections. This guide explains how to configure
+built-in transfer caps in supported torrent clients like uTorrent and
+BitTorrent, how to manage usage in clients without native caps like
+qBittorrent, and how to use operating system tools to automatically stop
+all transfer activity once your monthly bandwidth limit is reached.</p>
+<hr />
+<h2
+id="configuring-built-in-transfer-caps-in-utorrent-and-bittorrent">Configuring
+Built-in Transfer Caps in uTorrent and BitTorrent</h2>
+<p>Both uTorrent and the official BitTorrent client include a native
+"Transfer Cap" feature designed specifically to halt or restrict
+activity after a set data limit.</p>
+<ol type="1">
+<li>Open your torrent client.</li>
+<li>Go to <strong>Options</strong> &gt; <strong>Preferences</strong> (or
+press <code>Ctrl + P</code>).</li>
+<li>Select <strong>Transfer Cap</strong> from the left-hand menu.</li>
+<li>Check the box labeled <strong>Enable Transfer Cap</strong>.</li>
+<li>Configure the cap settings:
+<ul>
+<li><strong>Cap Type:</strong> Select <strong>Uploads +
+Downloads</strong> (or choose individual limits if preferred).</li>
+<li><strong>Bandwidth Cap:</strong> Enter your maximum data allowance in
+megabytes (MB) or gigabytes (GB).</li>
+<li><strong>Time Period:</strong> Set the reset cycle to <strong>30
+days</strong> or choose a specific reset day that aligns with your ISP
+billing cycle.</li>
+</ul></li>
+<li>Click <strong>Apply</strong> and then <strong>OK</strong>.</li>
+</ol>
+<p>Once the threshold is reached within the selected period, the client
+automatically stops all active downloading and seeding until the next
+cycle begins or the counter is manually reset.</p>
+<hr />
+<h2 id="managing-limits-in-qbittorrent">Managing Limits in
+qBittorrent</h2>
+<p>qBittorrent does not feature a dedicated monthly data-cap shutdown
+trigger, but you can prevent excess usage using alternative methods:</p>
+<h3 id="method-1-share-ratio-limiting">Method 1: Share Ratio
+Limiting</h3>
+<p>To stop uploads from consuming data after downloads finish:</p>
+<ol type="1">
+<li>Go to <strong>Tools</strong> &gt; <strong>Options</strong> &gt;
+<strong>BitTorrent</strong>.</li>
+<li>Under <strong>Seeding Limits</strong>, check <strong>When ratio
+reaches</strong> and set a low value (e.g., <code>1.00</code>).</li>
+<li>Set the action to <strong>Pause torrent</strong> or <strong>Remove
+torrent</strong>.</li>
+</ol>
+<h3 id="method-2-scheduled-alternative-rate-limits">Method 2: Scheduled
+Alternative Rate Limits</h3>
+<ol type="1">
+<li>Go to <strong>Tools</strong> &gt; <strong>Options</strong> &gt;
+<strong>Speed</strong>.</li>
+<li>Enable <strong>Alternative Rate Limits</strong> and set
+download/upload speeds to <code>0 KiB/s</code> (or a minimal rate).</li>
+<li>Use the <strong>Schedule</strong> section below to restrict activity
+during high-traffic hours.</li>
+</ol>
+<hr />
+<h2 id="system-level-monthly-limits-windows-1011">System-Level Monthly
+Limits (Windows 10/11)</h2>
+<p>If your torrent client lacks a built-in cutoff mechanism, you can
+configure Windows to monitor and restrict background data usage:</p>
+<ol type="1">
+<li>Open Windows <strong>Settings</strong> (<code>Win + I</code>).</li>
+<li>Navigate to <strong>Network &amp; internet</strong> &gt;
+<strong>Advanced network settings</strong> &gt; <strong>Data
+usage</strong>.</li>
+<li>Select your active network connection from the dropdown menu at the
+top.</li>
+<li>Click <strong>Enter limit</strong>.</li>
+<li>Set the <strong>Limit type</strong> to <strong>Monthly</strong>,
+select your monthly reset date, and input your data limit in megabytes
+or gigabytes.</li>
+<li>Click <strong>Save</strong>.</li>
+</ol>
+<p>While Windows provides warnings when limits are approached, pairing
+this with third-party tools like <strong>NetLimiter</strong> or
+<strong>GlassWire</strong> allows you to create strict firewall rules
+that instantly block internet access for specific applications (like
+<code>qbittorrent.exe</code>) the moment a monthly quota is reached.</p></article>
+        <div id=comments-container></div>
+
+        <script>
+            const utterancesScript = document.createElement('script');
+            
+            utterancesScript.setAttribute('src', 'https://utteranc.es/client.js');
+            utterancesScript.setAttribute('repo', 'salivity/bittorrent'); 
+            utterancesScript.setAttribute('issue-term', 'pathname'); 
+            utterancesScript.setAttribute('theme', localStorage.getItem('theme') === 'dark' ? 'github-dark' : 'github-light'); 
+            utterancesScript.setAttribute('crossorigin', 'anonymous');
+            utterancesScript.async = true;
+
+            document.getElementById('comments-container').appendChild(utterancesScript);
+        </script>
+    
+    </main>
+    <footer>
+        <nav>
+            <ul class="footer-links">
+                <li><a href="/bittorrent/privacy-policy">Privacy Policy</a></li>
+                <li><a href="/bittorrent/terms-and-conditions">Terms and Conditions</a></li>
+            </ul>
+        </nav>
+        <div class="copyright">
+            Copyright &copy; <span id="current-year"></span>
+        </div>
+    </footer>
+</body>
+</html>

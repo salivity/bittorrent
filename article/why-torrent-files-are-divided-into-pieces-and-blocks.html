@@ -1,0 +1,149 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="light">
+<head>
+    <script async src="https://www.googletagmanager.com/gtag/js?id=G-R4Y4YXFHZS"></script>
+    <script>
+        window.dataLayer = window.dataLayer || [];
+
+        function gtag(){
+            dataLayer.push(arguments);
+        }
+
+        gtag('js', new Date());
+
+        gtag('config', 'G-R4Y4YXFHZS');
+    </script>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Why Torrent Files Are Divided into Pieces and Blocks - bittorrent</title>
+    <meta name="description" content="The BitTorrent protocol breaks large files into smaller units—specifically pieces and sub-divided blocks—to enable high-speed decentralized transfers, efficient data integrity verification, and robust fault tolerance. Dividing data into pieces allows">
+    <link rel="canonical" href="https://salivity.github.io/bittorrent/article/why-torrent-files-are-divided-into-pieces-and-blocks">
+    <link rel="icon" href="/bittorrent/favicon.ico">
+    <link rel="stylesheet" href="/bittorrent/css/style.css">
+    <link media="print" rel="stylesheet" href="/bittorrent/css/print.css">
+    <script src="/bittorrent/js/fuse.min.js"></script>
+    <script src="/bittorrent/js/script.js"></script>
+    <script id="MathJax-script" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/4.1.3/tex-chtml.min.js" defer></script>
+    <script src="/monetize/monetize.js"></script>
+    <meta property="og:type" content="website" />
+    <meta property="og:title" content="Why Torrent Files Are Divided into Pieces and Blocks - bittorrent" />
+    <meta property="og:url" content="https://salivity.github.io/bittorrent/article/why-torrent-files-are-divided-into-pieces-and-blocks" />
+    <meta property="og:image:url" content="https://salivity.github.io/bittorrent/images/open-graph/default.webp" />
+    <meta property="og:image:secure_url" content="https://salivity.github.io/bittorrent/images/open-graph/default.webp" />
+    <meta property="og:image:width" content="1120" />
+    <meta property="og:image:height" content="630" />
+    <meta property="og:description" content="The BitTorrent protocol breaks large files into smaller units—specifically pieces and sub-divided blocks—to enable high-speed decentralized transfers, efficient data integrity verification, and robust fault tolerance. Dividing data into pieces allows" />
+    <link rel="manifest" href="/bittorrent/pwa/manifest.json" />
+</head>
+<body>
+    <header>
+        <a href="/bittorrent/" aria-label="Go To Home Page" title="Go To Home Page" id="logo">
+            <span>salivity.github.io/</span><span>bittorrent</span>
+        </a>
+        <nav>
+            <ul class="header-links">
+                <li><a href="https://github.com/salivity" title="Github" aria-label="Go To Github Profile Page"><svg class="svg-icon" focusable="false" aria-hidden="true" viewBox="0 0 24 24"><path d="M12 1.27a11 11 0 00-3.48 21.46c.55.09.73-.28.73-.55v-1.84c-3.03.64-3.67-1.46-3.67-1.46-.55-1.29-1.28-1.65-1.28-1.65-.92-.65.1-.65.1-.65 1.1 0 1.73 1.1 1.73 1.1.92 1.65 2.57 1.2 3.21.92a2 2 0 01.64-1.47c-2.47-.27-5.04-1.19-5.04-5.5 0-1.1.46-2.1 1.2-2.84a3.76 3.76 0 010-2.93s.91-.28 3.11 1.1c1.8-.49 3.7-.49 5.5 0 2.1-1.38 3.02-1.1 3.02-1.1a3.76 3.76 0 010 2.93c.83.74 1.2 1.74 1.2 2.94 0 4.21-2.57 5.13-5.04 5.4.45.37.82.92.82 2.02v3.03c0 .27.1.64.73.55A11 11 0 0012 1.27"></path></svg></a></li>
+                <li><a href="/bittorrent/search" title="Search" aria-label="Go To Search Page"><svg class="svg-icon" aria-hidden="true" focusable="false" viewBox="0 0 24 24"><path d="M15.5 14h-.79l-.28-.27C15.41 12.59 16 11.11 16 9.5 16 5.91 13.09 3 9.5 3S3 5.91 3 9.5 5.91 16 9.5 16c1.61 0 3.09-.59 4.23-1.57l.27.28v.79l5 4.99L20.49 19zm-6 0C7.01 14 5 11.99 5 9.5S7.01 5 9.5 5 14 7.01 14 9.5 11.99 14 9.5 14"></path></svg></a></li>
+                <li><a id="theme-toggle" title="Theme" href="javascript:void(0);" aria-label="Toggle Website Theme"></a></li>
+            </ul>
+        </nav>
+    </header>
+    <main>
+        <article><h1 id="why-torrent-files-are-divided-into-pieces-and-blocks">Why
+Torrent Files Are Divided into Pieces and Blocks</h1>
+<p>The BitTorrent protocol breaks large files into smaller
+units—specifically pieces and sub-divided blocks—to enable high-speed
+decentralized transfers, efficient data integrity verification, and
+robust fault tolerance. Dividing data into pieces allows clients to
+download different segments of a file simultaneously from multiple
+peers, while subdividing those pieces into 16 KiB blocks optimizes
+network transmission and prevents connection bottlenecks.</p>
+<h3 id="why-files-are-divided-into-pieces">Why Files Are Divided into
+Pieces</h3>
+<p>A "piece" is the fundamental unit of data transfer and integrity
+verification in the BitTorrent protocol. Pieces typically range in size
+from 256 KiB to 32 MiB, depending on the total size of the torrent.</p>
+<ul>
+<li><strong>Multi-Source Downloading (Swarming):</strong> By splitting a
+file into distinct pieces, a client does not need to download the file
+sequentially from a single source. Instead, it can download Piece 1 from
+Peer A, Piece 2 from Peer B, and Piece 3 from Peer C at the exact same
+time. This swarming behavior maximizes bandwidth utilization across the
+entire network.</li>
+<li><strong>Cryptographic Verification:</strong> The
+<code>.torrent</code> metadata file contains a list of cryptographic
+hashes (historically SHA-1, or SHA-256 in BitTorrent v2), with one hash
+corresponding to each piece. Once a client finishes downloading a piece,
+it checks the piece against its hash. If data is corrupted or
+maliciously altered, only that specific piece is discarded, rather than
+the entire multi-gigabyte file.</li>
+<li><strong>Decentralized Sharing:</strong> As soon as a client finishes
+verifying a single piece, it can immediately begin uploading that piece
+to other peers in the swarm, even if the rest of the file has not yet
+been downloaded.</li>
+</ul>
+<h3 id="why-pieces-are-subdivided-into-blocks">Why Pieces Are Subdivided
+into Blocks</h3>
+<p>While pieces manage file logic and cryptographic validation, they are
+too large to be transmitted efficiently over standard network sockets in
+a single request. Consequently, clients subdivide pieces into smaller
+units called "blocks" (also referred to as chunks), which are almost
+universally fixed at 16 KiB (16,384 bytes).</p>
+<ul>
+<li><strong>Pipelining and Latency Reduction:</strong> If a client had
+to request an entire 4 MiB piece in one go, a single packet drop or slow
+connection would stall the transfer. Subdividing the piece into 16 KiB
+blocks allows the client to send a continuous stream of requests
+(pipelining) over TCP without waiting for each individual block to
+arrive before requesting the next.</li>
+<li><strong>Multi-Peer Piece Assembly:</strong> A single piece does not
+have to come from one peer. A client can request different 16 KiB blocks
+of the <em>same</em> piece from multiple peers simultaneously, speeding
+up the completion of that piece.</li>
+<li><strong>Metadata Overhead Management:</strong> Hash verification at
+the 16 KiB block level would make <code>.torrent</code> metadata files
+excessively large (often hundreds of megabytes). By keeping
+cryptographic hashes limited to pieces, BitTorrent maintains tiny
+metadata files while still using small block sizes for smooth network
+transport.</li>
+</ul>
+<h3 id="the-unified-process">The Unified Process</h3>
+<ol type="1">
+<li>The client looks at the list of needed <strong>pieces</strong> and
+identifies which peers have them.</li>
+<li>The client requests a series of 16 KiB <strong>blocks</strong> to
+reconstruct a targeted piece.</li>
+<li>Once all blocks for that piece arrive in memory, the client runs a
+hash check on the entire <strong>piece</strong>.</li>
+<li>If the hash matches, the piece is written to disk and advertised as
+available to the rest of the swarm.</li>
+</ol></article>
+        <div id=comments-container></div>
+
+        <script>
+            const utterancesScript = document.createElement('script');
+            
+            utterancesScript.setAttribute('src', 'https://utteranc.es/client.js');
+            utterancesScript.setAttribute('repo', 'salivity/bittorrent'); 
+            utterancesScript.setAttribute('issue-term', 'pathname'); 
+            utterancesScript.setAttribute('theme', localStorage.getItem('theme') === 'dark' ? 'github-dark' : 'github-light'); 
+            utterancesScript.setAttribute('crossorigin', 'anonymous');
+            utterancesScript.async = true;
+
+            document.getElementById('comments-container').appendChild(utterancesScript);
+        </script>
+    
+    </main>
+    <footer>
+        <nav>
+            <ul class="footer-links">
+                <li><a href="/bittorrent/privacy-policy">Privacy Policy</a></li>
+                <li><a href="/bittorrent/terms-and-conditions">Terms and Conditions</a></li>
+            </ul>
+        </nav>
+        <div class="copyright">
+            Copyright &copy; <span id="current-year"></span>
+        </div>
+    </footer>
+</body>
+</html>

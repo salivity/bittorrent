@@ -1,0 +1,163 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="light">
+<head>
+    <script async src="https://www.googletagmanager.com/gtag/js?id=G-R4Y4YXFHZS"></script>
+    <script>
+        window.dataLayer = window.dataLayer || [];
+
+        function gtag(){
+            dataLayer.push(arguments);
+        }
+
+        gtag('js', new Date());
+
+        gtag('config', 'G-R4Y4YXFHZS');
+    </script>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dual-Stack IPv4 and IPv6 DHT in Torrent Clients - bittorrent</title>
+    <meta name="description" content="Modern BitTorrent clients locate decentralized peers by operating dual-stack Distributed Hash Tables (DHT), running isolated IPv4 and IPv6 Kademlia overlay networks side by side. Instead of attempting to bridge the two incompatible IP protocols directly">
+    <link rel="canonical" href="https://salivity.github.io/bittorrent/article/dual-stack-ipv4-and-ipv6-dht-in-torrent-clients">
+    <link rel="icon" href="/bittorrent/favicon.ico">
+    <link rel="stylesheet" href="/bittorrent/css/style.css">
+    <link media="print" rel="stylesheet" href="/bittorrent/css/print.css">
+    <script src="/bittorrent/js/fuse.min.js"></script>
+    <script src="/bittorrent/js/script.js"></script>
+    <script id="MathJax-script" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/4.1.3/tex-chtml.min.js" defer></script>
+    <script src="/monetize/monetize.js"></script>
+    <meta property="og:type" content="website" />
+    <meta property="og:title" content="Dual-Stack IPv4 and IPv6 DHT in Torrent Clients - bittorrent" />
+    <meta property="og:url" content="https://salivity.github.io/bittorrent/article/dual-stack-ipv4-and-ipv6-dht-in-torrent-clients" />
+    <meta property="og:image:url" content="https://salivity.github.io/bittorrent/images/open-graph/default.webp" />
+    <meta property="og:image:secure_url" content="https://salivity.github.io/bittorrent/images/open-graph/default.webp" />
+    <meta property="og:image:width" content="1120" />
+    <meta property="og:image:height" content="630" />
+    <meta property="og:description" content="Modern BitTorrent clients locate decentralized peers by operating dual-stack Distributed Hash Tables (DHT), running isolated IPv4 and IPv6 Kademlia overlay networks side by side. Instead of attempting to bridge the two incompatible IP protocols directly" />
+    <link rel="manifest" href="/bittorrent/pwa/manifest.json" />
+</head>
+<body>
+    <header>
+        <a href="/bittorrent/" aria-label="Go To Home Page" title="Go To Home Page" id="logo">
+            <span>salivity.github.io/</span><span>bittorrent</span>
+        </a>
+        <nav>
+            <ul class="header-links">
+                <li><a href="https://github.com/salivity" title="Github" aria-label="Go To Github Profile Page"><svg class="svg-icon" focusable="false" aria-hidden="true" viewBox="0 0 24 24"><path d="M12 1.27a11 11 0 00-3.48 21.46c.55.09.73-.28.73-.55v-1.84c-3.03.64-3.67-1.46-3.67-1.46-.55-1.29-1.28-1.65-1.28-1.65-.92-.65.1-.65.1-.65 1.1 0 1.73 1.1 1.73 1.1.92 1.65 2.57 1.2 3.21.92a2 2 0 01.64-1.47c-2.47-.27-5.04-1.19-5.04-5.5 0-1.1.46-2.1 1.2-2.84a3.76 3.76 0 010-2.93s.91-.28 3.11 1.1c1.8-.49 3.7-.49 5.5 0 2.1-1.38 3.02-1.1 3.02-1.1a3.76 3.76 0 010 2.93c.83.74 1.2 1.74 1.2 2.94 0 4.21-2.57 5.13-5.04 5.4.45.37.82.92.82 2.02v3.03c0 .27.1.64.73.55A11 11 0 0012 1.27"></path></svg></a></li>
+                <li><a href="/bittorrent/search" title="Search" aria-label="Go To Search Page"><svg class="svg-icon" aria-hidden="true" focusable="false" viewBox="0 0 24 24"><path d="M15.5 14h-.79l-.28-.27C15.41 12.59 16 11.11 16 9.5 16 5.91 13.09 3 9.5 3S3 5.91 3 9.5 5.91 16 9.5 16c1.61 0 3.09-.59 4.23-1.57l.27.28v.79l5 4.99L20.49 19zm-6 0C7.01 14 5 11.99 5 9.5S7.01 5 9.5 5 14 7.01 14 9.5 11.99 14 9.5 14"></path></svg></a></li>
+                <li><a id="theme-toggle" title="Theme" href="javascript:void(0);" aria-label="Toggle Website Theme"></a></li>
+            </ul>
+        </nav>
+    </header>
+    <main>
+        <article><h1 id="dual-stack-ipv4-and-ipv6-dht-in-torrent-clients">Dual-Stack IPv4
+and IPv6 DHT in Torrent Clients</h1>
+<p>Modern BitTorrent clients locate decentralized peers by operating
+dual-stack Distributed Hash Tables (DHT), running isolated IPv4 and IPv6
+Kademlia overlay networks side by side. Instead of attempting to bridge
+the two incompatible IP protocols directly within a single DHT routing
+table, clients maintain two independent routing states, execute
+simultaneous lookups across both networks, and merge the resulting peer
+pools into a single downloading swarm.</p>
+<h3 id="independent-routing-tables">Independent Routing Tables</h3>
+<p>Modern torrent implementations (such as libtorrent) isolate network
+routing by maintaining two distinct DHT routing tables: one for IPv4 and
+one for IPv6. A DHT node ID represents a cryptographic location in the
+Kademlia key space, but physical communication relies on IP packets.
+Because an IPv4-only node cannot route messages to or accept messages
+from an IPv6 address, mixing both into a single 160-bit routing table
+would corrupt distance metrics and lead to unreachable routing hops.</p>
+<p>To prevent routing failures, the client generates separate node
+identities (or uses one identity mapped across both protocols) and
+tracks neighbor nodes in two distinct buckets:</p>
+<ul>
+<li><strong>IPv4 Routing Table:</strong> Stores 4-byte IP addresses and
+2-byte port numbers.</li>
+<li><strong>IPv6 Routing Table:</strong> Stores 16-byte IP addresses and
+2-byte port numbers.</li>
+</ul>
+<h3 id="protocol-extensions-bep-32-and-bep-42">Protocol Extensions: BEP
+32 and BEP 42</h3>
+<p>The BitTorrent DHT protocol (originally defined in BEP 5) was
+designed strictly for IPv4 using 6-byte compact node info structures.
+Parallel operation is enabled through specific BitTorrent Enhancement
+Proposals:</p>
+<ul>
+<li><strong>BEP 32 (IPv6 DHT Extension):</strong> Introduces the
+<code>nodes6</code> parameter to DHT remote procedure calls
+(<code>ping</code>, <code>find_node</code>, <code>get_peers</code>,
+<code>announce_peer</code>). This allows dual-stack nodes to communicate
+IPv6 address information alongside or instead of the legacy
+<code>nodes</code> parameter.</li>
+<li><strong>BEP 42 (DHT Security Extension):</strong> Secures node IDs
+by requiring them to be cryptographically derived from the node's
+external IP address. In dual-stack setups, clients derive separate,
+verified node IDs for their IPv4 and IPv6 endpoints to prevent Sybil and
+routing table poisoning attacks.</li>
+</ul>
+<h3 id="bootstrapping-dual-networks">Bootstrapping Dual Networks</h3>
+<p>When a torrent client launches, it initiates two separate bootstrap
+processes:</p>
+<ol type="1">
+<li>It queries known public IPv4 bootstrap nodes (such as
+<code>router.bittorrent.com</code> over IPv4) to populate the IPv4
+routing table.</li>
+<li>It queries IPv6 bootstrap endpoints (or resolves dual-stack
+hostnames to their <code>AAAA</code> records) to populate the IPv6
+routing table.</li>
+</ol>
+<p>If a dual-stack neighbor responds to an IPv4 query, it can advertise
+its IPv6 presence using the <code>want</code> key in queries, allowing
+the client to seed its IPv6 routing table directly from IPv4
+interactions.</p>
+<h3 id="concurrent-lookups-and-swarm-aggregation">Concurrent Lookups and
+Swarm Aggregation</h3>
+<p>When a torrent search starts, the client uses the same target 160-bit
+infohash to query both DHT networks concurrently:</p>
+<ol type="1">
+<li><strong>Parallel Queries:</strong> The client sends
+<code>get_peers</code> requests into both the IPv4 DHT and the IPv6
+DHT.</li>
+<li><strong>Independent Iterative Traversal:</strong> Each network
+traverses its respective nodes according to XOR distance metrics without
+relying on the other network's path.</li>
+<li><strong>Merging Peer Results:</strong> Nodes return peer contact
+information via <code>values</code> (IPv4 peers) and
+<code>values6</code> (IPv6 peers). The client's peer manager combines
+these results into a unified peer list.</li>
+<li><strong>Announcing Presence:</strong> The client sends
+<code>announce_peer</code> messages to the closest nodes on both
+networks, ensuring that IPv4-only, IPv6-only, and dual-stack peers can
+all discover the client.</li>
+</ol>
+<p>Through this parallel architecture, the client maximizes peer
+discovery across disparate networks while maintaining robust, error-free
+DHT routing topologies.</p></article>
+        <div id=comments-container></div>
+
+        <script>
+            const utterancesScript = document.createElement('script');
+            
+            utterancesScript.setAttribute('src', 'https://utteranc.es/client.js');
+            utterancesScript.setAttribute('repo', 'salivity/bittorrent'); 
+            utterancesScript.setAttribute('issue-term', 'pathname'); 
+            utterancesScript.setAttribute('theme', localStorage.getItem('theme') === 'dark' ? 'github-dark' : 'github-light'); 
+            utterancesScript.setAttribute('crossorigin', 'anonymous');
+            utterancesScript.async = true;
+
+            document.getElementById('comments-container').appendChild(utterancesScript);
+        </script>
+    
+    </main>
+    <footer>
+        <nav>
+            <ul class="footer-links">
+                <li><a href="/bittorrent/privacy-policy">Privacy Policy</a></li>
+                <li><a href="/bittorrent/terms-and-conditions">Terms and Conditions</a></li>
+            </ul>
+        </nav>
+        <div class="copyright">
+            Copyright &copy; <span id="current-year"></span>
+        </div>
+    </footer>
+</body>
+</html>

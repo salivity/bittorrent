@@ -1,0 +1,205 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="light">
+<head>
+    <script async src="https://www.googletagmanager.com/gtag/js?id=G-R4Y4YXFHZS"></script>
+    <script>
+        window.dataLayer = window.dataLayer || [];
+
+        function gtag(){
+            dataLayer.push(arguments);
+        }
+
+        gtag('js', new Date());
+
+        gtag('config', 'G-R4Y4YXFHZS');
+    </script>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SOCKS5 Proxy Setup for Torrenting Explained - bittorrent</title>
+    <meta name="description" content="The SOCKS5 protocol is an advanced proxy technology that routes internet traffic through a remote proxy server, replacing your real IP address with the proxy's IP. For torrent users, SOCKS5 provides an effective way to hide their personal IP address on p">
+    <link rel="canonical" href="https://salivity.github.io/bittorrent/article/socks5-proxy-setup-for-torrenting-explained">
+    <link rel="icon" href="/bittorrent/favicon.ico">
+    <link rel="stylesheet" href="/bittorrent/css/style.css">
+    <link media="print" rel="stylesheet" href="/bittorrent/css/print.css">
+    <script src="/bittorrent/js/fuse.min.js"></script>
+    <script src="/bittorrent/js/script.js"></script>
+    <script id="MathJax-script" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/4.1.3/tex-chtml.min.js" defer></script>
+    <script src="/monetize/monetize.js"></script>
+    <meta property="og:type" content="website" />
+    <meta property="og:title" content="SOCKS5 Proxy Setup for Torrenting Explained - bittorrent" />
+    <meta property="og:url" content="https://salivity.github.io/bittorrent/article/socks5-proxy-setup-for-torrenting-explained" />
+    <meta property="og:image:url" content="https://salivity.github.io/bittorrent/images/open-graph/default.webp" />
+    <meta property="og:image:secure_url" content="https://salivity.github.io/bittorrent/images/open-graph/default.webp" />
+    <meta property="og:image:width" content="1120" />
+    <meta property="og:image:height" content="630" />
+    <meta property="og:description" content="The SOCKS5 protocol is an advanced proxy technology that routes internet traffic through a remote proxy server, replacing your real IP address with the proxy's IP. For torrent users, SOCKS5 provides an effective way to hide their personal IP address on p" />
+    <link rel="manifest" href="/bittorrent/pwa/manifest.json" />
+</head>
+<body>
+    <header>
+        <a href="/bittorrent/" aria-label="Go To Home Page" title="Go To Home Page" id="logo">
+            <span>salivity.github.io/</span><span>bittorrent</span>
+        </a>
+        <nav>
+            <ul class="header-links">
+                <li><a href="https://github.com/salivity" title="Github" aria-label="Go To Github Profile Page"><svg class="svg-icon" focusable="false" aria-hidden="true" viewBox="0 0 24 24"><path d="M12 1.27a11 11 0 00-3.48 21.46c.55.09.73-.28.73-.55v-1.84c-3.03.64-3.67-1.46-3.67-1.46-.55-1.29-1.28-1.65-1.28-1.65-.92-.65.1-.65.1-.65 1.1 0 1.73 1.1 1.73 1.1.92 1.65 2.57 1.2 3.21.92a2 2 0 01.64-1.47c-2.47-.27-5.04-1.19-5.04-5.5 0-1.1.46-2.1 1.2-2.84a3.76 3.76 0 010-2.93s.91-.28 3.11 1.1c1.8-.49 3.7-.49 5.5 0 2.1-1.38 3.02-1.1 3.02-1.1a3.76 3.76 0 010 2.93c.83.74 1.2 1.74 1.2 2.94 0 4.21-2.57 5.13-5.04 5.4.45.37.82.92.82 2.02v3.03c0 .27.1.64.73.55A11 11 0 0012 1.27"></path></svg></a></li>
+                <li><a href="/bittorrent/search" title="Search" aria-label="Go To Search Page"><svg class="svg-icon" aria-hidden="true" focusable="false" viewBox="0 0 24 24"><path d="M15.5 14h-.79l-.28-.27C15.41 12.59 16 11.11 16 9.5 16 5.91 13.09 3 9.5 3S3 5.91 3 9.5 5.91 16 9.5 16c1.61 0 3.09-.59 4.23-1.57l.27.28v.79l5 4.99L20.49 19zm-6 0C7.01 14 5 11.99 5 9.5S7.01 5 9.5 5 14 7.01 14 9.5 11.99 14 9.5 14"></path></svg></a></li>
+                <li><a id="theme-toggle" title="Theme" href="javascript:void(0);" aria-label="Toggle Website Theme"></a></li>
+            </ul>
+        </nav>
+    </header>
+    <main>
+        <article><h1 id="socks5-proxy-setup-for-torrenting-explained">SOCKS5 Proxy Setup
+for Torrenting Explained</h1>
+<p>The SOCKS5 protocol is an advanced proxy technology that routes
+internet traffic through a remote proxy server, replacing your real IP
+address with the proxy's IP. For torrent users, SOCKS5 provides an
+effective way to hide their personal IP address on peer-to-peer (P2P)
+swarms while maintaining fast download speeds. This guide breaks down
+what the SOCKS5 protocol is, how it functions in peer-to-peer
+networking, and how to configure it directly within your torrent
+client.</p>
+<h3 id="what-is-the-socks5-proxy-protocol">What is the SOCKS5 Proxy
+Protocol?</h3>
+<p>SOCKS stands for "Socket Secure." Version 5 (SOCKS5) is the latest
+iteration of this protocol. Unlike standard HTTP proxies that only
+interpret web traffic, SOCKS5 operates at Layer 5 (the session layer) of
+the OSI model. This means it is application-agnostic and can handle
+virtually any program or protocol, including TCP and UDP traffic, making
+it ideal for torrent clients.</p>
+<p>Key features of SOCKS5 include:</p>
+<ul>
+<li><strong>IP Masking:</strong> BitTorrent peers only see the IP
+address of the SOCKS5 proxy server instead of your home IP.</li>
+<li><strong>Authentication Support:</strong> It supports user
+authentication (username and password), preventing unauthorized use of
+the proxy server.</li>
+<li><strong>High Performance:</strong> SOCKS5 does not apply heavy
+encryption algorithms to traffic, resulting in lower CPU overhead and
+faster transfer speeds compared to traditional VPNs.</li>
+<li><strong>UDP Support:</strong> Torrenting relies heavily on UDP for
+DHT (Distributed Hash Table) and peer discovery, which SOCKS5 natively
+supports.</li>
+</ul>
+<hr />
+<h3 id="socks5-proxy-vs-vpn-for-torrenting">SOCKS5 Proxy vs. VPN for
+Torrenting</h3>
+<p>While both hide your IP address, they function differently:</p>
+<ul>
+<li><strong>SOCKS5 Proxy:</strong> Configured at the application level
+(e.g., inside qBittorrent). It routes only the torrent client's traffic
+through the proxy without affecting your web browser or other apps. It
+does <strong>not</strong> encrypt your traffic by default, meaning your
+ISP can see that data transfer is occurring, but third parties in the
+torrent swarm cannot see your real IP.</li>
+<li><strong>VPN:</strong> Configured at the system level. It routes and
+encrypts all device traffic through a secure tunnel, hiding your
+activity from your ISP and masking your IP across the entire
+system.</li>
+</ul>
+<hr />
+<h3
+id="step-by-step-how-to-configure-socks5-in-a-torrent-client">Step-by-Step:
+How to Configure SOCKS5 in a Torrent Client</h3>
+<p>To configure a SOCKS5 proxy, you need credentials provided by your
+proxy or VPN provider:</p>
+<ul>
+<li><strong>Proxy Server Address (Host / URL / IP)</strong></li>
+<li><strong>Port Number</strong> (Commonly 1080, but varies by
+provider)</li>
+<li><strong>Username and Password</strong></li>
+</ul>
+<p>Here is how to set it up in popular clients:</p>
+<h4 id="1-qbittorrent">1. qBittorrent</h4>
+<ol type="1">
+<li>Open qBittorrent and navigate to <strong>Tools &gt; Options</strong>
+(or press <code>Alt + O</code>).</li>
+<li>Select the <strong>Connection</strong> tab on the left.</li>
+<li>Under the <strong>Proxy Server</strong> section, set the following:
+<ul>
+<li><strong>Type:</strong> Select <code>SOCKS5</code>.</li>
+<li><strong>Host:</strong> Enter your provider’s proxy server
+address.</li>
+<li><strong>Port:</strong> Enter the port number.</li>
+</ul></li>
+<li>Check the box for <strong>Authentication</strong> and enter your
+<code>Username</code> and <code>Password</code>.</li>
+<li>Enable the following checkboxes for maximum privacy:
+<ul>
+<li><strong>Use proxy for peer connections:</strong> Yes (Ensures
+torrent traffic goes through the proxy).</li>
+<li><strong>Disable connections not supported by proxies:</strong> Yes
+(Prevents data leaks).</li>
+<li><strong>Use proxy for hostname lookup:</strong> Yes (Prevents DNS
+leaks).</li>
+</ul></li>
+<li>Click <strong>Apply</strong> and <strong>OK</strong>, then restart
+qBittorrent.</li>
+</ol>
+<h4 id="2-deluge">2. Deluge</h4>
+<ol type="1">
+<li>Open Deluge and go to <strong>Preferences &gt; Proxy</strong>.</li>
+<li>Under each section (<strong>Peer</strong>, <strong>Web
+Seed</strong>, <strong>Tracker</strong>, and <strong>DHT</strong>):
+<ul>
+<li>Set <strong>Type</strong> to <code>Socks5 with Auth</code> (or
+<code>Socks5</code>).</li>
+<li>Enter the <strong>Username</strong>, <strong>Password</strong>,
+<strong>Host</strong>, and <strong>Port</strong>.</li>
+</ul></li>
+<li>Click <strong>Apply</strong> and <strong>OK</strong>.</li>
+</ol>
+<h4 id="3-transmission--biglybt--utorrent">3. Transmission / BiglyBT /
+uTorrent</h4>
+<ol type="1">
+<li>Open the client's <strong>Preferences / Network / Connection
+Settings</strong>.</li>
+<li>Locate the <strong>Proxy</strong> section.</li>
+<li>Change the protocol type to <strong>SOCKS5</strong>.</li>
+<li>Input the server hostname, port, and your authentication
+details.</li>
+<li>Save settings and restart the application.</li>
+</ol>
+<hr />
+<h3 id="verifying-the-socks5-configuration">Verifying the SOCKS5
+Configuration</h3>
+<p>After setting up the proxy, verify that your IP address is properly
+masked:</p>
+<ol type="1">
+<li>Visit a torrent IP-checking service (such as CheckMyTorrentIP or
+TorGuard’s IP checker).</li>
+<li>Download their tracking magnet link or <code>.torrent</code> file
+into your torrent client.</li>
+<li>Check the status or IP displayed on the tracker page. It should
+display the proxy server's IP address, not your real residential
+IP.</li>
+</ol></article>
+        <div id=comments-container></div>
+
+        <script>
+            const utterancesScript = document.createElement('script');
+            
+            utterancesScript.setAttribute('src', 'https://utteranc.es/client.js');
+            utterancesScript.setAttribute('repo', 'salivity/bittorrent'); 
+            utterancesScript.setAttribute('issue-term', 'pathname'); 
+            utterancesScript.setAttribute('theme', localStorage.getItem('theme') === 'dark' ? 'github-dark' : 'github-light'); 
+            utterancesScript.setAttribute('crossorigin', 'anonymous');
+            utterancesScript.async = true;
+
+            document.getElementById('comments-container').appendChild(utterancesScript);
+        </script>
+    
+    </main>
+    <footer>
+        <nav>
+            <ul class="footer-links">
+                <li><a href="/bittorrent/privacy-policy">Privacy Policy</a></li>
+                <li><a href="/bittorrent/terms-and-conditions">Terms and Conditions</a></li>
+            </ul>
+        </nav>
+        <div class="copyright">
+            Copyright &copy; <span id="current-year"></span>
+        </div>
+    </footer>
+</body>
+</html>

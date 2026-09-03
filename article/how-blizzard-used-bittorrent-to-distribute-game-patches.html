@@ -1,0 +1,135 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="light">
+<head>
+    <script async src="https://www.googletagmanager.com/gtag/js?id=G-R4Y4YXFHZS"></script>
+    <script>
+        window.dataLayer = window.dataLayer || [];
+
+        function gtag(){
+            dataLayer.push(arguments);
+        }
+
+        gtag('js', new Date());
+
+        gtag('config', 'G-R4Y4YXFHZS');
+    </script>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>How Blizzard Used BitTorrent to Distribute Game Patches - bittorrent</title>
+    <meta name="description" content="During the mid-2000s, Blizzard Entertainment addressed the massive bandwidth demands of updating games like World of Warcraft, StarCraft II, and Diablo III by deploying a custom peer-to-peer (P2P) distribution system based on the BitTorrent protocol. Dub">
+    <link rel="canonical" href="https://salivity.github.io/bittorrent/article/how-blizzard-used-bittorrent-to-distribute-game-patches">
+    <link rel="icon" href="/bittorrent/favicon.ico">
+    <link rel="stylesheet" href="/bittorrent/css/style.css">
+    <link media="print" rel="stylesheet" href="/bittorrent/css/print.css">
+    <script src="/bittorrent/js/fuse.min.js"></script>
+    <script src="/bittorrent/js/script.js"></script>
+    <script id="MathJax-script" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/4.1.3/tex-chtml.min.js" defer></script>
+    <script src="/monetize/monetize.js"></script>
+    <meta property="og:type" content="website" />
+    <meta property="og:title" content="How Blizzard Used BitTorrent to Distribute Game Patches - bittorrent" />
+    <meta property="og:url" content="https://salivity.github.io/bittorrent/article/how-blizzard-used-bittorrent-to-distribute-game-patches" />
+    <meta property="og:image:url" content="https://salivity.github.io/bittorrent/images/open-graph/default.webp" />
+    <meta property="og:image:secure_url" content="https://salivity.github.io/bittorrent/images/open-graph/default.webp" />
+    <meta property="og:image:width" content="1120" />
+    <meta property="og:image:height" content="630" />
+    <meta property="og:description" content="During the mid-2000s, Blizzard Entertainment addressed the massive bandwidth demands of updating games like World of Warcraft, StarCraft II, and Diablo III by deploying a custom peer-to-peer (P2P) distribution system based on the BitTorrent protocol. Dub" />
+    <link rel="manifest" href="/bittorrent/pwa/manifest.json" />
+</head>
+<body>
+    <header>
+        <a href="/bittorrent/" aria-label="Go To Home Page" title="Go To Home Page" id="logo">
+            <span>salivity.github.io/</span><span>bittorrent</span>
+        </a>
+        <nav>
+            <ul class="header-links">
+                <li><a href="https://github.com/salivity" title="Github" aria-label="Go To Github Profile Page"><svg class="svg-icon" focusable="false" aria-hidden="true" viewBox="0 0 24 24"><path d="M12 1.27a11 11 0 00-3.48 21.46c.55.09.73-.28.73-.55v-1.84c-3.03.64-3.67-1.46-3.67-1.46-.55-1.29-1.28-1.65-1.28-1.65-.92-.65.1-.65.1-.65 1.1 0 1.73 1.1 1.73 1.1.92 1.65 2.57 1.2 3.21.92a2 2 0 01.64-1.47c-2.47-.27-5.04-1.19-5.04-5.5 0-1.1.46-2.1 1.2-2.84a3.76 3.76 0 010-2.93s.91-.28 3.11 1.1c1.8-.49 3.7-.49 5.5 0 2.1-1.38 3.02-1.1 3.02-1.1a3.76 3.76 0 010 2.93c.83.74 1.2 1.74 1.2 2.94 0 4.21-2.57 5.13-5.04 5.4.45.37.82.92.82 2.02v3.03c0 .27.1.64.73.55A11 11 0 0012 1.27"></path></svg></a></li>
+                <li><a href="/bittorrent/search" title="Search" aria-label="Go To Search Page"><svg class="svg-icon" aria-hidden="true" focusable="false" viewBox="0 0 24 24"><path d="M15.5 14h-.79l-.28-.27C15.41 12.59 16 11.11 16 9.5 16 5.91 13.09 3 9.5 3S3 5.91 3 9.5 5.91 16 9.5 16c1.61 0 3.09-.59 4.23-1.57l.27.28v.79l5 4.99L20.49 19zm-6 0C7.01 14 5 11.99 5 9.5S7.01 5 9.5 5 14 7.01 14 9.5 11.99 14 9.5 14"></path></svg></a></li>
+                <li><a id="theme-toggle" title="Theme" href="javascript:void(0);" aria-label="Toggle Website Theme"></a></li>
+            </ul>
+        </nav>
+    </header>
+    <main>
+        <article><h1 id="how-blizzard-used-bittorrent-to-distribute-game-patches">How
+Blizzard Used BitTorrent to Distribute Game Patches</h1>
+<p>During the mid-2000s, Blizzard Entertainment addressed the massive
+bandwidth demands of updating games like <em>World of Warcraft</em>,
+<em>StarCraft II</em>, and <em>Diablo III</em> by deploying a custom
+peer-to-peer (P2P) distribution system based on the BitTorrent protocol.
+Dubbed the Blizzard Downloader, this tool allowed millions of players to
+share patch data directly with one another, dramatically reducing server
+strain and download bottlenecks during major game launches.</p>
+<p>When <em>World of Warcraft</em> debuted in 2004, traditional
+client-server distribution models struggled under the weight of millions
+of concurrent players downloading multi-gigabyte patches on release
+days. Standard Content Delivery Networks (CDNs) were prohibitively
+expensive and prone to bandwidth saturation. To solve this, Blizzard
+integrated a modified BitTorrent client directly into its standalone
+patcher and background downloader utilities.</p>
+<p>The architecture operated as a hybrid peer-to-peer system. When
+Blizzard released a new patch or expansion pre-load, the launcher
+retrieved metadata files structured similarly to standard
+<code>.torrent</code> files. Blizzard maintained its own tracking
+infrastructure and high-capacity HTTP seed servers to guarantee a
+baseline download speed. As players downloaded data blocks, their
+clients automatically uploaded those verified chunks to other active
+downloaders in the swarm.</p>
+<p>This approach offered several distinct advantages for large-scale
+deployments:</p>
+<ul>
+<li><strong>Bandwidth Offloading:</strong> During peak update windows,
+the vast majority of outbound traffic was generated peer-to-peer between
+users, significantly cutting Blizzard's CDN bandwidth consumption.</li>
+<li><strong>Background Pre-loading:</strong> For major expansions such
+as <em>The Burning Crusade</em> and <em>Wrath of the Lich King</em>, the
+Blizzard Background Downloader quietly seeded and downloaded encrypted
+assets weeks before launch, preventing launch-day network crashes.</li>
+<li><strong>Data Integrity:</strong> BitTorrent's built-in cryptographic
+hashing ensured that corrupted data packets were detected and
+re-downloaded automatically before applying the patch.</li>
+</ul>
+<p>Despite its technical efficiency, the system faced practical
+challenges. During the late 2000s, many Internet Service Providers
+(ISPs) aggressively throttled BitTorrent protocol traffic on standard
+P2P ports, causing severe slowdowns for legitimate game downloads.
+Additionally, players with restricted upload bandwidth or strict router
+NAT configurations frequently experienced connection issues. Blizzard
+mitigated these friction points by allowing users to disable P2P sharing
+entirely in favor of direct HTTP downloads and by tuning default upload
+caps.</p>
+<p>By the early 2010s, the landscape of digital distribution shifted.
+CDN costs decreased significantly, average consumer internet speeds
+rose, and Blizzard re-engineered its data storage with the CASC (Content
+Addressable Storage Container) format. With the introduction of the
+modern Battle.net desktop application and the Next Generation Delivery
+Pipeline (NGDP), Blizzard gradually phased out the custom BitTorrent
+client around 2015 in favor of direct HTTP/HTTPS streaming
+downloads.</p></article>
+        <div id=comments-container></div>
+
+        <script>
+            const utterancesScript = document.createElement('script');
+            
+            utterancesScript.setAttribute('src', 'https://utteranc.es/client.js');
+            utterancesScript.setAttribute('repo', 'salivity/bittorrent'); 
+            utterancesScript.setAttribute('issue-term', 'pathname'); 
+            utterancesScript.setAttribute('theme', localStorage.getItem('theme') === 'dark' ? 'github-dark' : 'github-light'); 
+            utterancesScript.setAttribute('crossorigin', 'anonymous');
+            utterancesScript.async = true;
+
+            document.getElementById('comments-container').appendChild(utterancesScript);
+        </script>
+    
+    </main>
+    <footer>
+        <nav>
+            <ul class="footer-links">
+                <li><a href="/bittorrent/privacy-policy">Privacy Policy</a></li>
+                <li><a href="/bittorrent/terms-and-conditions">Terms and Conditions</a></li>
+            </ul>
+        </nav>
+        <div class="copyright">
+            Copyright &copy; <span id="current-year"></span>
+        </div>
+    </footer>
+</body>
+</html>

@@ -1,0 +1,161 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="light">
+<head>
+    <script async src="https://www.googletagmanager.com/gtag/js?id=G-R4Y4YXFHZS"></script>
+    <script>
+        window.dataLayer = window.dataLayer || [];
+
+        function gtag(){
+            dataLayer.push(arguments);
+        }
+
+        gtag('js', new Date());
+
+        gtag('config', 'G-R4Y4YXFHZS');
+    </script>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Why Hard Links Cannot Cross Disks or Partitions - bittorrent</title>
+    <meta name="description" content="Hard links are a popular tool in torrent management because they allow users to organize and seed media without consuming duplicate storage space. However, hard links cannot span across different physical disks or filesystem partitions. This limitation s">
+    <link rel="canonical" href="https://salivity.github.io/bittorrent/article/why-hard-links-cannot-cross-disks-or-partitions">
+    <link rel="icon" href="/bittorrent/favicon.ico">
+    <link rel="stylesheet" href="/bittorrent/css/style.css">
+    <link media="print" rel="stylesheet" href="/bittorrent/css/print.css">
+    <script src="/bittorrent/js/fuse.min.js"></script>
+    <script src="/bittorrent/js/script.js"></script>
+    <script id="MathJax-script" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/4.1.3/tex-chtml.min.js" defer></script>
+    <script src="/monetize/monetize.js"></script>
+    <meta property="og:type" content="website" />
+    <meta property="og:title" content="Why Hard Links Cannot Cross Disks or Partitions - bittorrent" />
+    <meta property="og:url" content="https://salivity.github.io/bittorrent/article/why-hard-links-cannot-cross-disks-or-partitions" />
+    <meta property="og:image:url" content="https://salivity.github.io/bittorrent/images/open-graph/default.webp" />
+    <meta property="og:image:secure_url" content="https://salivity.github.io/bittorrent/images/open-graph/default.webp" />
+    <meta property="og:image:width" content="1120" />
+    <meta property="og:image:height" content="630" />
+    <meta property="og:description" content="Hard links are a popular tool in torrent management because they allow users to organize and seed media without consuming duplicate storage space. However, hard links cannot span across different physical disks or filesystem partitions. This limitation s" />
+    <link rel="manifest" href="/bittorrent/pwa/manifest.json" />
+</head>
+<body>
+    <header>
+        <a href="/bittorrent/" aria-label="Go To Home Page" title="Go To Home Page" id="logo">
+            <span>salivity.github.io/</span><span>bittorrent</span>
+        </a>
+        <nav>
+            <ul class="header-links">
+                <li><a href="https://github.com/salivity" title="Github" aria-label="Go To Github Profile Page"><svg class="svg-icon" focusable="false" aria-hidden="true" viewBox="0 0 24 24"><path d="M12 1.27a11 11 0 00-3.48 21.46c.55.09.73-.28.73-.55v-1.84c-3.03.64-3.67-1.46-3.67-1.46-.55-1.29-1.28-1.65-1.28-1.65-.92-.65.1-.65.1-.65 1.1 0 1.73 1.1 1.73 1.1.92 1.65 2.57 1.2 3.21.92a2 2 0 01.64-1.47c-2.47-.27-5.04-1.19-5.04-5.5 0-1.1.46-2.1 1.2-2.84a3.76 3.76 0 010-2.93s.91-.28 3.11 1.1c1.8-.49 3.7-.49 5.5 0 2.1-1.38 3.02-1.1 3.02-1.1a3.76 3.76 0 010 2.93c.83.74 1.2 1.74 1.2 2.94 0 4.21-2.57 5.13-5.04 5.4.45.37.82.92.82 2.02v3.03c0 .27.1.64.73.55A11 11 0 0012 1.27"></path></svg></a></li>
+                <li><a href="/bittorrent/search" title="Search" aria-label="Go To Search Page"><svg class="svg-icon" aria-hidden="true" focusable="false" viewBox="0 0 24 24"><path d="M15.5 14h-.79l-.28-.27C15.41 12.59 16 11.11 16 9.5 16 5.91 13.09 3 9.5 3S3 5.91 3 9.5 5.91 16 9.5 16c1.61 0 3.09-.59 4.23-1.57l.27.28v.79l5 4.99L20.49 19zm-6 0C7.01 14 5 11.99 5 9.5S7.01 5 9.5 5 14 7.01 14 9.5 11.99 14 9.5 14"></path></svg></a></li>
+                <li><a id="theme-toggle" title="Theme" href="javascript:void(0);" aria-label="Toggle Website Theme"></a></li>
+            </ul>
+        </nav>
+    </header>
+    <main>
+        <article><h1 id="why-hard-links-cannot-cross-disks-or-partitions">Why Hard Links
+Cannot Cross Disks or Partitions</h1>
+<p>Hard links are a popular tool in torrent management because they
+allow users to organize and seed media without consuming duplicate
+storage space. However, hard links cannot span across different physical
+disks or filesystem partitions. This limitation stems from how
+filesystems store and reference data structures, specifically inode
+tables, which are confined entirely to their individual partitions.</p>
+<h2 id="understanding-inodes-and-file-pointers">Understanding Inodes and
+File Pointers</h2>
+<p>To understand why hard links cannot cross drive boundaries, it is
+necessary to look at how a filesystem organizes data:</p>
+<ul>
+<li><strong>Inodes:</strong> An inode (index node) is a data structure
+on a filesystem that stores metadata about a file, including its
+permissions, size, and the physical disk blocks where the actual data
+resides. Inodes do not store the file's name.</li>
+<li><strong>Directory Entries:</strong> A directory is simply a table
+that maps human-readable filenames to their corresponding inode
+numbers.</li>
+<li><strong>Hard Links:</strong> When you create a hard link, you create
+a new directory entry (filename) that points directly to an existing
+inode number on that same filesystem. Both names reference the exact
+same data blocks on disk.</li>
+</ul>
+<h2 id="the-partition-boundary-problem">The Partition Boundary
+Problem</h2>
+<p>Every filesystem partition maintains its own independent inode table.
+Inode numbers are unique only within that specific filesystem, not
+across the entire operating system.</p>
+<p>If a hard link were allowed to point to an inode number on a separate
+physical disk or partition, significant issues would occur:</p>
+<ul>
+<li><strong>Ambiguity and Conflicts:</strong> Inode #500 on Drive A
+might represent a video file, while Inode #500 on Drive B represents a
+system configuration file or unallocated space. The operating system
+cannot distinguish which physical device the pointer refers to purely
+from an inode reference.</li>
+<li><strong>Lack of Cross-Drive Tracking:</strong> If Drive B is
+unmounted or removed, any reference on Drive A pointing to Drive B's
+inode would break, violating the fundamental filesystem guarantee that a
+hard link is a permanent, direct reference to the data.</li>
+</ul>
+<p>Because the underlying operating system kernel requires hard links to
+resolve directly to an inode within the same local table, the operation
+is explicitly blocked with an error (such as <code>EXDEV</code> or
+"Invalid cross-device link").</p>
+<h2 id="implications-for-torrent-management">Implications for Torrent
+Management</h2>
+<p>In media automation and torrent workflows (such as using tools like
+Sonarr, Radarr, or qBittorrent), hard links enable a downloaded file to
+remain in the client's download folder for seeding while simultaneously
+appearing in a media server library with a restructured name.</p>
+<p>When your storage expands across multiple physical drives or
+partitions:</p>
+<ul>
+<li><strong>Storage Duplication:</strong> Moving completed downloads to
+a different disk requires a full copy instead of an instant hard link,
+using twice the storage space if you wish to keep seeding.</li>
+<li><strong>Broken Workflows:</strong> Automated scripts that rely on
+hard linking will fail if the download directory and the destination
+library are on different mount points.</li>
+</ul>
+<h2 id="alternatives-for-multi-disk-setups">Alternatives for Multi-Disk
+Setups</h2>
+<p>If torrent data must be distributed across multiple disks,
+alternative strategies are required:</p>
+<ul>
+<li><strong>Symbolic Links (Symlinks):</strong> Unlike hard links,
+symlinks point to a file path rather than an inode number. Symlinks can
+cross drives and partitions freely, though some media servers and
+torrent clients handle them differently than direct file
+references.</li>
+<li><strong>Filesystem Pooling (e.g., MergerFS):</strong> Pooling
+software allows multiple physical drives to appear as a single unified
+mount point, enabling hard links within the same underlying branch.</li>
+<li><strong>Btrfs or ZFS Pools:</strong> Using storage pools or volume
+managers allows you to expand a single filesystem across multiple
+physical drives, preserving hard link functionality across the entire
+storage array.</li>
+</ul></article>
+        <div id=comments-container></div>
+
+        <script>
+            const utterancesScript = document.createElement('script');
+            
+            utterancesScript.setAttribute('src', 'https://utteranc.es/client.js');
+            utterancesScript.setAttribute('repo', 'salivity/bittorrent'); 
+            utterancesScript.setAttribute('issue-term', 'pathname'); 
+            utterancesScript.setAttribute('theme', localStorage.getItem('theme') === 'dark' ? 'github-dark' : 'github-light'); 
+            utterancesScript.setAttribute('crossorigin', 'anonymous');
+            utterancesScript.async = true;
+
+            document.getElementById('comments-container').appendChild(utterancesScript);
+        </script>
+    
+    </main>
+    <footer>
+        <nav>
+            <ul class="footer-links">
+                <li><a href="/bittorrent/privacy-policy">Privacy Policy</a></li>
+                <li><a href="/bittorrent/terms-and-conditions">Terms and Conditions</a></li>
+            </ul>
+        </nav>
+        <div class="copyright">
+            Copyright &copy; <span id="current-year"></span>
+        </div>
+    </footer>
+</body>
+</html>

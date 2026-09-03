@@ -1,0 +1,140 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="light">
+<head>
+    <script async src="https://www.googletagmanager.com/gtag/js?id=G-R4Y4YXFHZS"></script>
+    <script>
+        window.dataLayer = window.dataLayer || [];
+
+        function gtag(){
+            dataLayer.push(arguments);
+        }
+
+        gtag('js', new Date());
+
+        gtag('config', 'G-R4Y4YXFHZS');
+    </script>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Why Torrents Get Stuck on the Final Piece - bittorrent</title>
+    <meta name="description" content="When downloading a torrent, getting stalled on the final piece due to a slow peer can turn a fast download into a frustrating bottleneck. This article explains what happens when a single low-speed uploader delays the completion of an otherwise finished f">
+    <link rel="canonical" href="https://salivity.github.io/bittorrent/article/why-torrents-get-stuck-on-the-final-piece">
+    <link rel="icon" href="/bittorrent/favicon.ico">
+    <link rel="stylesheet" href="/bittorrent/css/style.css">
+    <link media="print" rel="stylesheet" href="/bittorrent/css/print.css">
+    <script src="/bittorrent/js/fuse.min.js"></script>
+    <script src="/bittorrent/js/script.js"></script>
+    <script id="MathJax-script" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/4.1.3/tex-chtml.min.js" defer></script>
+    <script src="/monetize/monetize.js"></script>
+    <meta property="og:type" content="website" />
+    <meta property="og:title" content="Why Torrents Get Stuck on the Final Piece - bittorrent" />
+    <meta property="og:url" content="https://salivity.github.io/bittorrent/article/why-torrents-get-stuck-on-the-final-piece" />
+    <meta property="og:image:url" content="https://salivity.github.io/bittorrent/images/open-graph/default.webp" />
+    <meta property="og:image:secure_url" content="https://salivity.github.io/bittorrent/images/open-graph/default.webp" />
+    <meta property="og:image:width" content="1120" />
+    <meta property="og:image:height" content="630" />
+    <meta property="og:description" content="When downloading a torrent, getting stalled on the final piece due to a slow peer can turn a fast download into a frustrating bottleneck. This article explains what happens when a single low-speed uploader delays the completion of an otherwise finished f" />
+    <link rel="manifest" href="/bittorrent/pwa/manifest.json" />
+</head>
+<body>
+    <header>
+        <a href="/bittorrent/" aria-label="Go To Home Page" title="Go To Home Page" id="logo">
+            <span>salivity.github.io/</span><span>bittorrent</span>
+        </a>
+        <nav>
+            <ul class="header-links">
+                <li><a href="https://github.com/salivity" title="Github" aria-label="Go To Github Profile Page"><svg class="svg-icon" focusable="false" aria-hidden="true" viewBox="0 0 24 24"><path d="M12 1.27a11 11 0 00-3.48 21.46c.55.09.73-.28.73-.55v-1.84c-3.03.64-3.67-1.46-3.67-1.46-.55-1.29-1.28-1.65-1.28-1.65-.92-.65.1-.65.1-.65 1.1 0 1.73 1.1 1.73 1.1.92 1.65 2.57 1.2 3.21.92a2 2 0 01.64-1.47c-2.47-.27-5.04-1.19-5.04-5.5 0-1.1.46-2.1 1.2-2.84a3.76 3.76 0 010-2.93s.91-.28 3.11 1.1c1.8-.49 3.7-.49 5.5 0 2.1-1.38 3.02-1.1 3.02-1.1a3.76 3.76 0 010 2.93c.83.74 1.2 1.74 1.2 2.94 0 4.21-2.57 5.13-5.04 5.4.45.37.82.92.82 2.02v3.03c0 .27.1.64.73.55A11 11 0 0012 1.27"></path></svg></a></li>
+                <li><a href="/bittorrent/search" title="Search" aria-label="Go To Search Page"><svg class="svg-icon" aria-hidden="true" focusable="false" viewBox="0 0 24 24"><path d="M15.5 14h-.79l-.28-.27C15.41 12.59 16 11.11 16 9.5 16 5.91 13.09 3 9.5 3S3 5.91 3 9.5 5.91 16 9.5 16c1.61 0 3.09-.59 4.23-1.57l.27.28v.79l5 4.99L20.49 19zm-6 0C7.01 14 5 11.99 5 9.5S7.01 5 9.5 5 14 7.01 14 9.5 11.99 14 9.5 14"></path></svg></a></li>
+                <li><a id="theme-toggle" title="Theme" href="javascript:void(0);" aria-label="Toggle Website Theme"></a></li>
+            </ul>
+        </nav>
+    </header>
+    <main>
+        <article><h1 id="why-torrents-get-stuck-on-the-final-piece">Why Torrents Get
+Stuck on the Final Piece</h1>
+<p>When downloading a torrent, getting stalled on the final piece due to
+a slow peer can turn a fast download into a frustrating bottleneck. This
+article explains what happens when a single low-speed uploader delays
+the completion of an otherwise finished file, how this impacts system
+performance and swarm health, and the mechanisms torrent clients use to
+resolve the issue.</p>
+<h3 id="the-mechanism-of-the-last-piece-bottleneck">The Mechanism of the
+Last-Piece Bottleneck</h3>
+<p>BitTorrent protocol splits files into hundreds or thousands of
+smaller pieces, usually ranging from 256 KB to several megabytes in
+size. During the download process, clients prioritize downloading rare
+pieces first to ensure optimal distribution across the swarm.</p>
+<p>When a download reaches 99%, only a few blocks remain unretrieved. If
+your client requests these final blocks from a peer with low upload
+bandwidth, high latency, or an unstable connection, the download rate
+plummets to match that single peer's upload speed, regardless of your
+available downstream bandwidth.</p>
+<h3 id="the-direct-impacts-of-a-slow-final-peer">The Direct Impacts of a
+Slow Final Peer</h3>
+<ul>
+<li><strong>Wasted Downlink Bandwidth:</strong> Your connection sits
+mostly idle. Even with gigabit capability, the overall transfer rate
+drops to the rate of the single slow peer (often a few kilobytes per
+second).</li>
+<li><strong>Inaccessibility of the Downloaded Data:</strong> Most
+formats (such as compressed archives, disk images, or executable
+installers) cannot be used safely or unpacked until the entire file is
+verified. Even media files may have playback issues if the missing piece
+contains index or header data.</li>
+<li><strong>Delayed Seeding Transition:</strong> A client cannot become
+a "seed" until 100% of the payload passes hash checking. This delays the
+user from contributing back to the swarm as a full distributor, which
+can also hurt user share ratios on private trackers.</li>
+<li><strong>Prolonged Exposure to Data Corruption:</strong> If a slow
+peer transmits corrupted data, the entire piece will fail the
+cryptographic hash check (SHA-1/SHA-256) upon completion. The client
+must discard the corrupted piece and request it again, restarting the
+waiting cycle from scratch.</li>
+</ul>
+<h3 id="how-bittorrent-clients-mitigate-the-issue-end-game-mode">How
+BitTorrent Clients Mitigate the Issue: "End-Game Mode"</h3>
+<p>To prevent a single slow peer from holding the download hostage,
+modern BitTorrent clients implement <strong>End-Game Mode</strong> (or
+Endgame).</p>
+<p>Once all pending blocks of a torrent have been requested and only a
+few remain unreceived, the client shifts behavior:</p>
+<ol type="1">
+<li>It sends requests for the remaining missing blocks to <strong>all
+connected peers</strong>, not just the single slow peer.</li>
+<li>The fastest peer to respond delivers the required data first.</li>
+<li>As soon as a block arrives and passes verification, the client
+immediately sends <code>Cancel</code> messages to all other peers for
+that specific block to prevent redundant bandwidth usage.</li>
+</ol>
+<p>If a client does not support End-Game Mode, or if the swarm has very
+few seeds and peers holding the last piece, the user must either wait
+out the slow transfer, manually drop the slow peer connection, or
+re-announce to the tracker to discover faster peers.</p></article>
+        <div id=comments-container></div>
+
+        <script>
+            const utterancesScript = document.createElement('script');
+            
+            utterancesScript.setAttribute('src', 'https://utteranc.es/client.js');
+            utterancesScript.setAttribute('repo', 'salivity/bittorrent'); 
+            utterancesScript.setAttribute('issue-term', 'pathname'); 
+            utterancesScript.setAttribute('theme', localStorage.getItem('theme') === 'dark' ? 'github-dark' : 'github-light'); 
+            utterancesScript.setAttribute('crossorigin', 'anonymous');
+            utterancesScript.async = true;
+
+            document.getElementById('comments-container').appendChild(utterancesScript);
+        </script>
+    
+    </main>
+    <footer>
+        <nav>
+            <ul class="footer-links">
+                <li><a href="/bittorrent/privacy-policy">Privacy Policy</a></li>
+                <li><a href="/bittorrent/terms-and-conditions">Terms and Conditions</a></li>
+            </ul>
+        </nav>
+        <div class="copyright">
+            Copyright &copy; <span id="current-year"></span>
+        </div>
+    </footer>
+</body>
+</html>

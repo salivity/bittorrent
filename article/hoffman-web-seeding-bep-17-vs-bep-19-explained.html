@@ -1,0 +1,161 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="light">
+<head>
+    <script async src="https://www.googletagmanager.com/gtag/js?id=G-R4Y4YXFHZS"></script>
+    <script>
+        window.dataLayer = window.dataLayer || [];
+
+        function gtag(){
+            dataLayer.push(arguments);
+        }
+
+        gtag('js', new Date());
+
+        gtag('config', 'G-R4Y4YXFHZS');
+    </script>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Hoffman Web Seeding BEP 17 vs BEP 19 Explained - bittorrent</title>
+    <meta name="description" content="This article explores the mechanics of the BitTorrent Hoffman-style web seeding specification (BEP 17) and compares it with the GetRight-style web seeding specification (BEP 19). Web seeding allows BitTorrent clients to download piece data from tradition">
+    <link rel="canonical" href="https://salivity.github.io/bittorrent/article/hoffman-web-seeding-bep-17-vs-bep-19-explained">
+    <link rel="icon" href="/bittorrent/favicon.ico">
+    <link rel="stylesheet" href="/bittorrent/css/style.css">
+    <link media="print" rel="stylesheet" href="/bittorrent/css/print.css">
+    <script src="/bittorrent/js/fuse.min.js"></script>
+    <script src="/bittorrent/js/script.js"></script>
+    <script id="MathJax-script" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/4.1.3/tex-chtml.min.js" defer></script>
+    <script src="/monetize/monetize.js"></script>
+    <meta property="og:type" content="website" />
+    <meta property="og:title" content="Hoffman Web Seeding BEP 17 vs BEP 19 Explained - bittorrent" />
+    <meta property="og:url" content="https://salivity.github.io/bittorrent/article/hoffman-web-seeding-bep-17-vs-bep-19-explained" />
+    <meta property="og:image:url" content="https://salivity.github.io/bittorrent/images/open-graph/default.webp" />
+    <meta property="og:image:secure_url" content="https://salivity.github.io/bittorrent/images/open-graph/default.webp" />
+    <meta property="og:image:width" content="1120" />
+    <meta property="og:image:height" content="630" />
+    <meta property="og:description" content="This article explores the mechanics of the BitTorrent Hoffman-style web seeding specification (BEP 17) and compares it with the GetRight-style web seeding specification (BEP 19). Web seeding allows BitTorrent clients to download piece data from tradition" />
+    <link rel="manifest" href="/bittorrent/pwa/manifest.json" />
+</head>
+<body>
+    <header>
+        <a href="/bittorrent/" aria-label="Go To Home Page" title="Go To Home Page" id="logo">
+            <span>salivity.github.io/</span><span>bittorrent</span>
+        </a>
+        <nav>
+            <ul class="header-links">
+                <li><a href="https://github.com/salivity" title="Github" aria-label="Go To Github Profile Page"><svg class="svg-icon" focusable="false" aria-hidden="true" viewBox="0 0 24 24"><path d="M12 1.27a11 11 0 00-3.48 21.46c.55.09.73-.28.73-.55v-1.84c-3.03.64-3.67-1.46-3.67-1.46-.55-1.29-1.28-1.65-1.28-1.65-.92-.65.1-.65.1-.65 1.1 0 1.73 1.1 1.73 1.1.92 1.65 2.57 1.2 3.21.92a2 2 0 01.64-1.47c-2.47-.27-5.04-1.19-5.04-5.5 0-1.1.46-2.1 1.2-2.84a3.76 3.76 0 010-2.93s.91-.28 3.11 1.1c1.8-.49 3.7-.49 5.5 0 2.1-1.38 3.02-1.1 3.02-1.1a3.76 3.76 0 010 2.93c.83.74 1.2 1.74 1.2 2.94 0 4.21-2.57 5.13-5.04 5.4.45.37.82.92.82 2.02v3.03c0 .27.1.64.73.55A11 11 0 0012 1.27"></path></svg></a></li>
+                <li><a href="/bittorrent/search" title="Search" aria-label="Go To Search Page"><svg class="svg-icon" aria-hidden="true" focusable="false" viewBox="0 0 24 24"><path d="M15.5 14h-.79l-.28-.27C15.41 12.59 16 11.11 16 9.5 16 5.91 13.09 3 9.5 3S3 5.91 3 9.5 5.91 16 9.5 16c1.61 0 3.09-.59 4.23-1.57l.27.28v.79l5 4.99L20.49 19zm-6 0C7.01 14 5 11.99 5 9.5S7.01 5 9.5 5 14 7.01 14 9.5 11.99 14 9.5 14"></path></svg></a></li>
+                <li><a id="theme-toggle" title="Theme" href="javascript:void(0);" aria-label="Toggle Website Theme"></a></li>
+            </ul>
+        </nav>
+    </header>
+    <main>
+        <article><h1 id="hoffman-web-seeding-bep-17-vs-bep-19-explained">Hoffman Web
+Seeding BEP 17 vs BEP 19 Explained</h1>
+<p>This article explores the mechanics of the BitTorrent Hoffman-style
+web seeding specification (BEP 17) and compares it with the
+GetRight-style web seeding specification (BEP 19). Web seeding allows
+BitTorrent clients to download piece data from traditional HTTP or FTP
+servers alongside regular peer-to-peer swarms. While both BEP 17 and BEP
+19 fulfill the goal of integrating web servers as fallback seeders, they
+diverge significantly in how requests are structured, server-side
+requirements, and multi-file handling.</p>
+<h2 id="understanding-bep-17-hoffman-style">Understanding BEP 17
+(Hoffman Style)</h2>
+<p>BEP 17, created by John Hoffman for BitTornado, defines a web seeding
+protocol where the client interacts with specialized scripts on an HTTP
+server rather than requesting static files directly.</p>
+<p>In BEP 17, the <code>.torrent</code> metadata includes an
+<code>httpseeds</code> key containing a list of URLs pointing to backend
+scripts or redirectors. When a BitTorrent client requires specific
+pieces of a torrent, it sends standard HTTP <code>GET</code> requests
+appended with query parameters detailing the swarm's info-hash, the
+requested piece index, and the byte ranges within that piece.</p>
+<p>A typical BEP 17 request looks like:</p>
+<pre class="text"><code>http://example.com/seed.php?info_hash=HASH&amp;piece=INDEX&amp;ranges=START-END</code></pre>
+<p>Because the server receives specific piece parameters, it must
+execute server-side logic (e.g., via PHP, Python, or a custom daemon) to
+parse the request, extract the appropriate byte offset from the target
+file or archive, and return the raw binary payload to the client.</p>
+<h2 id="understanding-bep-19-getright-style">Understanding BEP 19
+(GetRight Style)</h2>
+<p>BEP 19, formulated by Michael Burford of GetRight, is the more widely
+implemented alternative to BEP 17. Instead of relying on server-side
+processing scripts, BEP 19 allows BitTorrent clients to download from
+standard, unmodified HTTP 1.1 servers.</p>
+<p>In BEP 19, the <code>.torrent</code> file contains an
+<code>url-list</code> key with URLs pointing directly to static file
+locations. The client calculates the exact byte offsets corresponding to
+the pieces it needs and issues standard HTTP <code>GET</code> requests
+using the standard <code>Range:</code> header (e.g.,
+<code>Range: bytes=0-16383</code>). The web server merely serves the
+byte ranges as it would for any standard resumable download.</p>
+<h2 id="key-differences-between-bep-17-and-bep-19">Key Differences
+Between BEP 17 and BEP 19</h2>
+<h3 id="1-server-configuration-and-requirements">1. Server Configuration
+and Requirements</h3>
+<ul>
+<li><strong>BEP 17:</strong> Requires active server-side execution. The
+hosting provider must run custom scripts capable of reading torrent
+metadata and slicing data on demand.</li>
+<li><strong>BEP 19:</strong> Requires only a standard HTTP 1.1 server
+(such as Apache, Nginx, or AWS S3) that supports standard byte-range
+requests. No custom scripting is required.</li>
+</ul>
+<h3 id="2-multi-file-torrents">2. Multi-File Torrents</h3>
+<ul>
+<li><strong>BEP 17:</strong> The server-side script abstracts the
+internal file hierarchy of the torrent. The client simply requests piece
+numbers, and the script handles mapping those pieces across multiple
+files.</li>
+<li><strong>BEP 19:</strong> The client must map torrent pieces to
+specific file paths. In multi-file torrents, the root URL provided in
+the <code>url-list</code> must mirror the folder structure defined in
+the torrent metadata, and pieces spanning boundaries between two files
+require multiple HTTP requests to different endpoints.</li>
+</ul>
+<h3 id="3-url-structure-and-request-protocol">3. URL Structure and
+Request Protocol</h3>
+<ul>
+<li><strong>BEP 17:</strong> Uses URL query string parameters
+(<code>info_hash</code>, <code>piece</code>, <code>ranges</code>) to
+convey BitTorrent-specific concepts to the server.</li>
+<li><strong>BEP 19:</strong> Uses standard HTTP paths pointing to raw
+files, combined with standard HTTP <code>Range</code> request
+headers.</li>
+</ul>
+<h3 id="4-adoption-and-compatibility">4. Adoption and Compatibility</h3>
+<p>Due to the simplicity of serving static assets without executing
+backend code, BEP 19 gained broad support across almost all modern
+BitTorrent clients (such as libtorrent-based clients, qBittorrent, and
+Transmission) and content delivery networks. BEP 17 remains a legacy
+specification, primarily used in custom or specialized environments
+where on-the-fly piece generation is necessary.</p></article>
+        <div id=comments-container></div>
+
+        <script>
+            const utterancesScript = document.createElement('script');
+            
+            utterancesScript.setAttribute('src', 'https://utteranc.es/client.js');
+            utterancesScript.setAttribute('repo', 'salivity/bittorrent'); 
+            utterancesScript.setAttribute('issue-term', 'pathname'); 
+            utterancesScript.setAttribute('theme', localStorage.getItem('theme') === 'dark' ? 'github-dark' : 'github-light'); 
+            utterancesScript.setAttribute('crossorigin', 'anonymous');
+            utterancesScript.async = true;
+
+            document.getElementById('comments-container').appendChild(utterancesScript);
+        </script>
+    
+    </main>
+    <footer>
+        <nav>
+            <ul class="footer-links">
+                <li><a href="/bittorrent/privacy-policy">Privacy Policy</a></li>
+                <li><a href="/bittorrent/terms-and-conditions">Terms and Conditions</a></li>
+            </ul>
+        </nav>
+        <div class="copyright">
+            Copyright &copy; <span id="current-year"></span>
+        </div>
+    </footer>
+</body>
+</html>

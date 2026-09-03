@@ -1,0 +1,143 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="light">
+<head>
+    <script async src="https://www.googletagmanager.com/gtag/js?id=G-R4Y4YXFHZS"></script>
+    <script>
+        window.dataLayer = window.dataLayer || [];
+
+        function gtag(){
+            dataLayer.push(arguments);
+        }
+
+        gtag('js', new Date());
+
+        gtag('config', 'G-R4Y4YXFHZS');
+    </script>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>How BitTorrent Connects When Only One Peer Has Open Port - bittorrent</title>
+    <meta name="description" content="In the BitTorrent protocol, establishing a direct connection between two peers requires only one peer to have an open, accessible port. This article explains how asymmetric connection initiation, stateful Network Address Translation (NAT), and the full-d">
+    <link rel="canonical" href="https://salivity.github.io/bittorrent/article/how-bittorrent-connects-when-only-one-peer-has-open-port">
+    <link rel="icon" href="/bittorrent/favicon.ico">
+    <link rel="stylesheet" href="/bittorrent/css/style.css">
+    <link media="print" rel="stylesheet" href="/bittorrent/css/print.css">
+    <script src="/bittorrent/js/fuse.min.js"></script>
+    <script src="/bittorrent/js/script.js"></script>
+    <script id="MathJax-script" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/4.1.3/tex-chtml.min.js" defer></script>
+    <script src="/monetize/monetize.js"></script>
+    <meta property="og:type" content="website" />
+    <meta property="og:title" content="How BitTorrent Connects When Only One Peer Has Open Port - bittorrent" />
+    <meta property="og:url" content="https://salivity.github.io/bittorrent/article/how-bittorrent-connects-when-only-one-peer-has-open-port" />
+    <meta property="og:image:url" content="https://salivity.github.io/bittorrent/images/open-graph/default.webp" />
+    <meta property="og:image:secure_url" content="https://salivity.github.io/bittorrent/images/open-graph/default.webp" />
+    <meta property="og:image:width" content="1120" />
+    <meta property="og:image:height" content="630" />
+    <meta property="og:description" content="In the BitTorrent protocol, establishing a direct connection between two peers requires only one peer to have an open, accessible port. This article explains how asymmetric connection initiation, stateful Network Address Translation (NAT), and the full-d" />
+    <link rel="manifest" href="/bittorrent/pwa/manifest.json" />
+</head>
+<body>
+    <header>
+        <a href="/bittorrent/" aria-label="Go To Home Page" title="Go To Home Page" id="logo">
+            <span>salivity.github.io/</span><span>bittorrent</span>
+        </a>
+        <nav>
+            <ul class="header-links">
+                <li><a href="https://github.com/salivity" title="Github" aria-label="Go To Github Profile Page"><svg class="svg-icon" focusable="false" aria-hidden="true" viewBox="0 0 24 24"><path d="M12 1.27a11 11 0 00-3.48 21.46c.55.09.73-.28.73-.55v-1.84c-3.03.64-3.67-1.46-3.67-1.46-.55-1.29-1.28-1.65-1.28-1.65-.92-.65.1-.65.1-.65 1.1 0 1.73 1.1 1.73 1.1.92 1.65 2.57 1.2 3.21.92a2 2 0 01.64-1.47c-2.47-.27-5.04-1.19-5.04-5.5 0-1.1.46-2.1 1.2-2.84a3.76 3.76 0 010-2.93s.91-.28 3.11 1.1c1.8-.49 3.7-.49 5.5 0 2.1-1.38 3.02-1.1 3.02-1.1a3.76 3.76 0 010 2.93c.83.74 1.2 1.74 1.2 2.94 0 4.21-2.57 5.13-5.04 5.4.45.37.82.92.82 2.02v3.03c0 .27.1.64.73.55A11 11 0 0012 1.27"></path></svg></a></li>
+                <li><a href="/bittorrent/search" title="Search" aria-label="Go To Search Page"><svg class="svg-icon" aria-hidden="true" focusable="false" viewBox="0 0 24 24"><path d="M15.5 14h-.79l-.28-.27C15.41 12.59 16 11.11 16 9.5 16 5.91 13.09 3 9.5 3S3 5.91 3 9.5 5.91 16 9.5 16c1.61 0 3.09-.59 4.23-1.57l.27.28v.79l5 4.99L20.49 19zm-6 0C7.01 14 5 11.99 5 9.5S7.01 5 9.5 5 14 7.01 14 9.5 11.99 14 9.5 14"></path></svg></a></li>
+                <li><a id="theme-toggle" title="Theme" href="javascript:void(0);" aria-label="Toggle Website Theme"></a></li>
+            </ul>
+        </nav>
+    </header>
+    <main>
+        <article><h1 id="how-bittorrent-connects-when-only-one-peer-has-open-port">How
+BitTorrent Connects When Only One Peer Has Open Port</h1>
+<p>In the BitTorrent protocol, establishing a direct connection between
+two peers requires only one peer to have an open, accessible port. This
+article explains how asymmetric connection initiation, stateful Network
+Address Translation (NAT), and the full-duplex nature of transport
+protocols allow a peer behind a strict firewall to successfully upload
+to and download from an unfirewalled peer.</p>
+<h3 id="peer-discovery">Peer Discovery</h3>
+<p>To initiate a transfer, peers must first learn about each other's
+network addresses. This discovery happens through three primary
+mechanisms:</p>
+<ul>
+<li><strong>Trackers:</strong> Centralized servers that maintain lists
+of active peers (IP addresses and listening ports) in a swarm.</li>
+<li><strong>Distributed Hash Table (DHT):</strong> A decentralized
+routing system (such as Kademlia) where nodes store and retrieve peer
+contact information.</li>
+<li><strong>Peer Exchange (PEX):</strong> A protocol extension allowing
+connected peers to directly share lists of other peers they are
+currently connected to.</li>
+</ul>
+<p>Through these systems, a firewalled peer (Peer A) discovers the
+public IP address and listening port of a reachable peer (Peer B).</p>
+<h3 id="outbound-connection-initiation">Outbound Connection
+Initiation</h3>
+<p>Standard residential routers and firewalls block unsolicited inbound
+connection requests, meaning Peer B cannot initiate a connection to Peer
+A. However, most network firewalls permit outbound traffic initiated by
+internal devices.</p>
+<p>Because Peer B has a forwarded or public port, Peer A initiates an
+outbound TCP (or uTP via UDP) connection to Peer B’s IP address and open
+port. Because the connection is outbound from Peer A's perspective, Peer
+A's firewall allows the request to leave the local network.</p>
+<h3 id="stateful-nat-tracking">Stateful NAT Tracking</h3>
+<p>When Peer A sends the initial packet (such as a TCP SYN) outward:</p>
+<ol type="1">
+<li>Peer A's local router assigns an ephemeral source port and logs the
+connection in its state table.</li>
+<li>The router tracks the destination (Peer B's IP and port).</li>
+<li>When Peer B responds (e.g., TCP SYN-ACK), the router recognizes the
+incoming packets as a direct reply to the session initiated by Peer
+A.</li>
+<li>The router forwards these return packets through to Peer A.</li>
+</ol>
+<h3 id="bidirectional-bittorrent-communication">Bidirectional BitTorrent
+Communication</h3>
+<p>Once the transport layer handshake is complete, a full-duplex virtual
+circuit is established. Even though Peer A initiated the connection
+outward, the single established socket allows simultaneous two-way
+communication:</p>
+<ul>
+<li><strong>BitTorrent Handshake:</strong> Both peers exchange the
+standard BitTorrent protocol handshake to verify the info-hash of the
+torrent and their respective peer IDs.</li>
+<li><strong>Piece Exchange:</strong> Both peers exchange
+<code>have</code> messages, <code>request</code> blocks of data, and
+send <code>piece</code> payloads.</li>
+</ul>
+<p>Peer A can download data from Peer B, and Peer B can download data
+from Peer A across this single connection. As long as one peer has a
+reachable port to accept the initial connection request, a complete
+bidirectional data transfer takes place.</p></article>
+        <div id=comments-container></div>
+
+        <script>
+            const utterancesScript = document.createElement('script');
+            
+            utterancesScript.setAttribute('src', 'https://utteranc.es/client.js');
+            utterancesScript.setAttribute('repo', 'salivity/bittorrent'); 
+            utterancesScript.setAttribute('issue-term', 'pathname'); 
+            utterancesScript.setAttribute('theme', localStorage.getItem('theme') === 'dark' ? 'github-dark' : 'github-light'); 
+            utterancesScript.setAttribute('crossorigin', 'anonymous');
+            utterancesScript.async = true;
+
+            document.getElementById('comments-container').appendChild(utterancesScript);
+        </script>
+    
+    </main>
+    <footer>
+        <nav>
+            <ul class="footer-links">
+                <li><a href="/bittorrent/privacy-policy">Privacy Policy</a></li>
+                <li><a href="/bittorrent/terms-and-conditions">Terms and Conditions</a></li>
+            </ul>
+        </nav>
+        <div class="copyright">
+            Copyright &copy; <span id="current-year"></span>
+        </div>
+    </footer>
+</body>
+</html>

@@ -1,0 +1,186 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="light">
+<head>
+    <script async src="https://www.googletagmanager.com/gtag/js?id=G-R4Y4YXFHZS"></script>
+    <script>
+        window.dataLayer = window.dataLayer || [];
+
+        function gtag(){
+            dataLayer.push(arguments);
+        }
+
+        gtag('js', new Date());
+
+        gtag('config', 'G-R4Y4YXFHZS');
+    </script>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>What Is a Hybrid Info Hash in BitTorrent? - bittorrent</title>
+    <meta name="description" content="A hybrid info hash is a dual-identifier mechanism used in BitTorrent to maintain backward compatibility between the legacy BitTorrent v1 protocol and the modern BitTorrent v2 specification. This article explains what a hybrid info hash is, why it is nece">
+    <link rel="canonical" href="https://salivity.github.io/bittorrent/article/what-is-a-hybrid-info-hash-in-bittorrent">
+    <link rel="icon" href="/bittorrent/favicon.ico">
+    <link rel="stylesheet" href="/bittorrent/css/style.css">
+    <link media="print" rel="stylesheet" href="/bittorrent/css/print.css">
+    <script src="/bittorrent/js/fuse.min.js"></script>
+    <script src="/bittorrent/js/script.js"></script>
+    <script id="MathJax-script" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/4.1.3/tex-chtml.min.js" defer></script>
+    <script src="/monetize/monetize.js"></script>
+    <meta property="og:type" content="website" />
+    <meta property="og:title" content="What Is a Hybrid Info Hash in BitTorrent? - bittorrent" />
+    <meta property="og:url" content="https://salivity.github.io/bittorrent/article/what-is-a-hybrid-info-hash-in-bittorrent" />
+    <meta property="og:image:url" content="https://salivity.github.io/bittorrent/images/open-graph/default.webp" />
+    <meta property="og:image:secure_url" content="https://salivity.github.io/bittorrent/images/open-graph/default.webp" />
+    <meta property="og:image:width" content="1120" />
+    <meta property="og:image:height" content="630" />
+    <meta property="og:description" content="A hybrid info hash is a dual-identifier mechanism used in BitTorrent to maintain backward compatibility between the legacy BitTorrent v1 protocol and the modern BitTorrent v2 specification. This article explains what a hybrid info hash is, why it is nece" />
+    <link rel="manifest" href="/bittorrent/pwa/manifest.json" />
+</head>
+<body>
+    <header>
+        <a href="/bittorrent/" aria-label="Go To Home Page" title="Go To Home Page" id="logo">
+            <span>salivity.github.io/</span><span>bittorrent</span>
+        </a>
+        <nav>
+            <ul class="header-links">
+                <li><a href="https://github.com/salivity" title="Github" aria-label="Go To Github Profile Page"><svg class="svg-icon" focusable="false" aria-hidden="true" viewBox="0 0 24 24"><path d="M12 1.27a11 11 0 00-3.48 21.46c.55.09.73-.28.73-.55v-1.84c-3.03.64-3.67-1.46-3.67-1.46-.55-1.29-1.28-1.65-1.28-1.65-.92-.65.1-.65.1-.65 1.1 0 1.73 1.1 1.73 1.1.92 1.65 2.57 1.2 3.21.92a2 2 0 01.64-1.47c-2.47-.27-5.04-1.19-5.04-5.5 0-1.1.46-2.1 1.2-2.84a3.76 3.76 0 010-2.93s.91-.28 3.11 1.1c1.8-.49 3.7-.49 5.5 0 2.1-1.38 3.02-1.1 3.02-1.1a3.76 3.76 0 010 2.93c.83.74 1.2 1.74 1.2 2.94 0 4.21-2.57 5.13-5.04 5.4.45.37.82.92.82 2.02v3.03c0 .27.1.64.73.55A11 11 0 0012 1.27"></path></svg></a></li>
+                <li><a href="/bittorrent/search" title="Search" aria-label="Go To Search Page"><svg class="svg-icon" aria-hidden="true" focusable="false" viewBox="0 0 24 24"><path d="M15.5 14h-.79l-.28-.27C15.41 12.59 16 11.11 16 9.5 16 5.91 13.09 3 9.5 3S3 5.91 3 9.5 5.91 16 9.5 16c1.61 0 3.09-.59 4.23-1.57l.27.28v.79l5 4.99L20.49 19zm-6 0C7.01 14 5 11.99 5 9.5S7.01 5 9.5 5 14 7.01 14 9.5 11.99 14 9.5 14"></path></svg></a></li>
+                <li><a id="theme-toggle" title="Theme" href="javascript:void(0);" aria-label="Toggle Website Theme"></a></li>
+            </ul>
+        </nav>
+    </header>
+    <main>
+        <article><h1 id="what-is-a-hybrid-info-hash-in-bittorrent">What Is a Hybrid Info
+Hash in BitTorrent?</h1>
+<p>A hybrid info hash is a dual-identifier mechanism used in BitTorrent
+to maintain backward compatibility between the legacy BitTorrent v1
+protocol and the modern BitTorrent v2 specification. This article
+explains what a hybrid info hash is, why it is necessary, how the
+underlying metadata structure is formatted, and the exact process used
+to compute both v1 and v2 info hashes for a single torrent.</p>
+<h3 id="understanding-bittorrent-v1-vs-v2">Understanding BitTorrent v1
+vs. v2</h3>
+<p>BitTorrent v1 relies on a single cryptographic hash function: SHA-1.
+In v1, the entire payload is treated as a continuous byte stream,
+divided into fixed-size pieces. The torrent metadata file contains a
+concatenated list of 20-byte SHA-1 hashes for each piece, and the entire
+<code>info</code> dictionary is hashed with SHA-1 to generate a 20-byte
+<strong>v1 info hash</strong>.</p>
+<p>BitTorrent v2 (defined in BEP 52) addresses security vulnerabilities
+in SHA-1 and improves data deduplication by using SHA-256. Instead of
+treating files as one continuous stream, v2 organizes each file into its
+own Merkle hash tree. The roots of these trees are stored in a new
+<code>file tree</code> structure, and the <code>info</code> dictionary
+is hashed using SHA-256 to create a 32-byte <strong>v2 info
+hash</strong>.</p>
+<h3 id="what-is-a-hybrid-torrent">What Is a Hybrid Torrent?</h3>
+<p>A hybrid torrent is a specially formatted <code>.torrent</code> file
+that includes the necessary metadata for both v1 and v2 clients to
+participate in the same distribution network. It bridges the gap between
+older clients that only understand SHA-1 piece arrays and newer clients
+capable of utilizing SHA-256 Merkle trees.</p>
+<p>Clients interacting with a hybrid torrent can discover peers in both
+v1 and v2 swarms, allowing users on different protocol versions to share
+the same underlying file data.</p>
+<h3 id="structural-requirements-for-hybrid-torrents">Structural
+Requirements for Hybrid Torrents</h3>
+<p>To allow compatibility between both specifications, the
+<code>info</code> dictionary of a hybrid torrent must satisfy specific
+structural rules:</p>
+<ol type="1">
+<li><strong>Dual Metadata Fields</strong>: The <code>info</code>
+dictionary must contain both the legacy v1 <code>pieces</code> key (a
+byte string of 20-byte SHA-1 hashes) and the v2 <code>file tree</code>
+key (a hierarchical dictionary containing SHA-256 root hashes for each
+file).</li>
+<li><strong>File Alignment and Padding</strong>: In BitTorrent v2, every
+file is aligned to piece boundaries, meaning the start of a file always
+coincides with the start of a piece. To ensure v1 piece hashes match the
+file boundaries used in v2, hybrid torrents insert empty padding files
+into the v1 file list to pad the tail end of any file that does not
+evenly match the piece length.</li>
+<li><strong>Consistent Piece Size</strong>: The piece size chosen for
+the v1 <code>pieces</code> string must match the piece size declared in
+the v2 metadata.</li>
+</ol>
+<h3 id="how-the-hybrid-info-hash-is-generated">How the Hybrid Info Hash
+Is Generated</h3>
+<p>Because the info dictionary contains all fields required by both
+protocols, two distinct info hashes are generated from the same bencoded
+<code>info</code> dictionary:</p>
+<pre><code>                  +--------------------------------+
+                  |    Hybrid &#39;info&#39; Dictionary    |
+                  |  - Contains v1 &#39;pieces&#39;        |
+                  |  - Contains v2 &#39;file tree&#39;     |
+                  +---------------+----------------+
+                                  |
+                +-----------------+-----------------+
+                |                                   |
+       Apply SHA-1 Hashing                Apply SHA-256 Hashing
+                |                                   |
+                v                                   v
+    +-----------------------+           +-----------------------+
+    |     v1 Info Hash      |           |     v2 Info Hash      |
+    |   (20 Bytes / SHA-1)  |           |  (32 Bytes / SHA-256) |
+    +-----------------------+           +-----------------------+</code></pre>
+<ol type="1">
+<li><strong>Canonical Bencoding</strong>: The complete <code>info</code>
+dictionary—including name, piece length, v1 <code>pieces</code>, v1
+<code>files</code> (with padding), and the v2 <code>file tree</code>—is
+serialized using standard canonical Bencoding.</li>
+<li><strong>Generating the v1 Info Hash</strong>: The SHA-1 algorithm is
+run over the raw bytes of the bencoded <code>info</code> dictionary.
+This produces the standard 20-byte (160-bit) hash used by BitTorrent v1
+clients and trackers. <span class="math display">\[\text{v1 Info Hash} =
+\text{SHA-1}(\text{bencode}(\text{info}))\]</span></li>
+<li><strong>Generating the v2 Info Hash</strong>: The SHA-256 algorithm
+is run over the exact same raw bytes of the bencoded <code>info</code>
+dictionary. This produces the 32-byte (256-bit) hash used by BitTorrent
+v2 swarms. <span class="math display">\[\text{v2 Info Hash} =
+\text{SHA-256}(\text{bencode}(\text{info}))\]</span></li>
+</ol>
+<h3 id="representation-in-magnet-links">Representation in Magnet
+Links</h3>
+<p>In magnet links, a hybrid torrent includes both hashes to ensure
+maximum client interoperability.</p>
+<ul>
+<li>The v1 hash is represented via the <code>urn:btih:</code>
+(BitTorrent Info Hash) parameter, using a 40-character hex string or a
+32-character Base32 string.</li>
+<li>The v2 hash is represented via the <code>urn:btmh:</code>
+(BitTorrent Multihash) parameter, prefixed with the multihash identifier
+for SHA-256 (usually <code>1220</code> followed by the 64-character hex
+digest).</li>
+</ul>
+<p>When a client receives a hybrid magnet link, a v1 client parses the
+<code>urn:btih</code> parameter and joins the legacy swarm, while a
+v2-capable client can utilize both parameters to communicate across both
+swarms simultaneously.</p></article>
+        <div id=comments-container></div>
+
+        <script>
+            const utterancesScript = document.createElement('script');
+            
+            utterancesScript.setAttribute('src', 'https://utteranc.es/client.js');
+            utterancesScript.setAttribute('repo', 'salivity/bittorrent'); 
+            utterancesScript.setAttribute('issue-term', 'pathname'); 
+            utterancesScript.setAttribute('theme', localStorage.getItem('theme') === 'dark' ? 'github-dark' : 'github-light'); 
+            utterancesScript.setAttribute('crossorigin', 'anonymous');
+            utterancesScript.async = true;
+
+            document.getElementById('comments-container').appendChild(utterancesScript);
+        </script>
+    
+    </main>
+    <footer>
+        <nav>
+            <ul class="footer-links">
+                <li><a href="/bittorrent/privacy-policy">Privacy Policy</a></li>
+                <li><a href="/bittorrent/terms-and-conditions">Terms and Conditions</a></li>
+            </ul>
+        </nav>
+        <div class="copyright">
+            Copyright &copy; <span id="current-year"></span>
+        </div>
+    </footer>
+</body>
+</html>

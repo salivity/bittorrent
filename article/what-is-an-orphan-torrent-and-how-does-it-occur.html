@@ -1,0 +1,156 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="light">
+<head>
+    <script async src="https://www.googletagmanager.com/gtag/js?id=G-R4Y4YXFHZS"></script>
+    <script>
+        window.dataLayer = window.dataLayer || [];
+
+        function gtag(){
+            dataLayer.push(arguments);
+        }
+
+        gtag('js', new Date());
+
+        gtag('config', 'G-R4Y4YXFHZS');
+    </script>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>What Is an Orphan Torrent and How Does It Occur? - bittorrent</title>
+    <meta name="description" content="An orphan torrent occurs when a BitTorrent client or .torrent metadata file loses its link to the actual downloaded payload files on a storage drive. This guide explains what orphan torrents are, the technical mechanisms behind how .torrent files lose co">
+    <link rel="canonical" href="https://salivity.github.io/bittorrent/article/what-is-an-orphan-torrent-and-how-does-it-occur">
+    <link rel="icon" href="/bittorrent/favicon.ico">
+    <link rel="stylesheet" href="/bittorrent/css/style.css">
+    <link media="print" rel="stylesheet" href="/bittorrent/css/print.css">
+    <script src="/bittorrent/js/fuse.min.js"></script>
+    <script src="/bittorrent/js/script.js"></script>
+    <script id="MathJax-script" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/4.1.3/tex-chtml.min.js" defer></script>
+    <script src="/monetize/monetize.js"></script>
+    <meta property="og:type" content="website" />
+    <meta property="og:title" content="What Is an Orphan Torrent and How Does It Occur? - bittorrent" />
+    <meta property="og:url" content="https://salivity.github.io/bittorrent/article/what-is-an-orphan-torrent-and-how-does-it-occur" />
+    <meta property="og:image:url" content="https://salivity.github.io/bittorrent/images/open-graph/default.webp" />
+    <meta property="og:image:secure_url" content="https://salivity.github.io/bittorrent/images/open-graph/default.webp" />
+    <meta property="og:image:width" content="1120" />
+    <meta property="og:image:height" content="630" />
+    <meta property="og:description" content="An orphan torrent occurs when a BitTorrent client or .torrent metadata file loses its link to the actual downloaded payload files on a storage drive. This guide explains what orphan torrents are, the technical mechanisms behind how .torrent files lose co" />
+    <link rel="manifest" href="/bittorrent/pwa/manifest.json" />
+</head>
+<body>
+    <header>
+        <a href="/bittorrent/" aria-label="Go To Home Page" title="Go To Home Page" id="logo">
+            <span>salivity.github.io/</span><span>bittorrent</span>
+        </a>
+        <nav>
+            <ul class="header-links">
+                <li><a href="https://github.com/salivity" title="Github" aria-label="Go To Github Profile Page"><svg class="svg-icon" focusable="false" aria-hidden="true" viewBox="0 0 24 24"><path d="M12 1.27a11 11 0 00-3.48 21.46c.55.09.73-.28.73-.55v-1.84c-3.03.64-3.67-1.46-3.67-1.46-.55-1.29-1.28-1.65-1.28-1.65-.92-.65.1-.65.1-.65 1.1 0 1.73 1.1 1.73 1.1.92 1.65 2.57 1.2 3.21.92a2 2 0 01.64-1.47c-2.47-.27-5.04-1.19-5.04-5.5 0-1.1.46-2.1 1.2-2.84a3.76 3.76 0 010-2.93s.91-.28 3.11 1.1c1.8-.49 3.7-.49 5.5 0 2.1-1.38 3.02-1.1 3.02-1.1a3.76 3.76 0 010 2.93c.83.74 1.2 1.74 1.2 2.94 0 4.21-2.57 5.13-5.04 5.4.45.37.82.92.82 2.02v3.03c0 .27.1.64.73.55A11 11 0 0012 1.27"></path></svg></a></li>
+                <li><a href="/bittorrent/search" title="Search" aria-label="Go To Search Page"><svg class="svg-icon" aria-hidden="true" focusable="false" viewBox="0 0 24 24"><path d="M15.5 14h-.79l-.28-.27C15.41 12.59 16 11.11 16 9.5 16 5.91 13.09 3 9.5 3S3 5.91 3 9.5 5.91 16 9.5 16c1.61 0 3.09-.59 4.23-1.57l.27.28v.79l5 4.99L20.49 19zm-6 0C7.01 14 5 11.99 5 9.5S7.01 5 9.5 5 14 7.01 14 9.5 11.99 14 9.5 14"></path></svg></a></li>
+                <li><a id="theme-toggle" title="Theme" href="javascript:void(0);" aria-label="Toggle Website Theme"></a></li>
+            </ul>
+        </nav>
+    </header>
+    <main>
+        <article><h1 id="what-is-an-orphan-torrent-and-how-does-it-occur">What Is an
+Orphan Torrent and How Does It Occur?</h1>
+<p>An orphan torrent occurs when a BitTorrent client or
+<code>.torrent</code> metadata file loses its link to the actual
+downloaded payload files on a storage drive. This guide explains what
+orphan torrents are, the technical mechanisms behind how
+<code>.torrent</code> files lose connection to their target data, the
+common user and system actions that cause this issue, and how to
+reconnect them.</p>
+<h3 id="understanding-torrent-metadata-and-payloads">Understanding
+Torrent Metadata and Payloads</h3>
+<p>To understand an orphan torrent, it is essential to distinguish
+between the two core components of a torrent download:</p>
+<ol type="1">
+<li><strong>The Metadata (<code>.torrent</code> file or magnet
+link):</strong> This file contains no actual content. Instead, it
+contains cryptographic hashes of the file pieces, file names, folder
+structures, and tracker URLs.</li>
+<li><strong>The Payload:</strong> The actual data (videos, software,
+documents, etc.) being downloaded or seeded on your local drive.</li>
+</ol>
+<p>Under normal conditions, your BitTorrent client maintains a pointer
+(a direct file path) linking the metadata entry in the client to the
+physical location of the payload on your storage device. When this
+pointer breaks, the torrent becomes an "orphan."</p>
+<h3 id="how-torrent-files-lose-connection-to-their-payloads">How
+.torrent Files Lose Connection to Their Payloads</h3>
+<p>A torrent loses connection to its payload whenever the file path
+defined in the client's database no longer matches the actual location,
+structure, or state of the files on the disk. This disconnection
+typically occurs in several ways:</p>
+<h4 id="1-manual-moving-or-renaming-of-files">1. Manual Moving or
+Renaming of Files</h4>
+<p>If you move, rename, or delete the downloaded payload files using
+your operating system's file manager (such as Windows Explorer or macOS
+Finder) while the BitTorrent client is closed or inactive, the client
+will still look for the data in the original directory. Upon startup,
+the client will flag the torrent with an error such as "Error: Files
+Missing" or "Data Not Found."</p>
+<h4 id="2-drive-letter-or-mount-point-changes">2. Drive Letter or Mount
+Point Changes</h4>
+<p>External hard drives and network-attached storage (NAS) devices
+frequently change drive letters (e.g., from <code>D:</code> to
+<code>E:</code>) or mount paths upon rebooting or reconnecting. When
+this happens, the client’s absolute file paths become invalid, rendering
+all associated torrents as orphans until the correct path is
+restored.</p>
+<h4 id="3-client-crashes-and-corrupted-state-files">3. Client Crashes
+and Corrupted State Files</h4>
+<p>BitTorrent clients track active transfers using internal
+configuration files (such as <code>resume.dat</code>). If the client
+crashes, experiences an unexpected power loss, or suffers disk write
+errors while saving its state, the pointers to the payload locations can
+become corrupted or reset to default directories.</p>
+<h4 id="4-loading-metadata-without-pointing-to-existing-data">4. Loading
+Metadata Without Pointing to Existing Data</h4>
+<p>If a user reinstalls their operating system or BitTorrent client and
+re-adds previously downloaded <code>.torrent</code> files, the client
+defaults to downloading the data from scratch into the default download
+directory. Unless the user explicitly directs the client to the existing
+payload location, the <code>.torrent</code> file remains disconnected
+from its existing data.</p>
+<h3 id="how-to-reconnect-an-orphan-torrent">How to Reconnect an Orphan
+Torrent</h3>
+<p>Reconnecting an orphan torrent to its payload is straightforward:</p>
+<ul>
+<li><strong>Relocate/Set Download Location:</strong> Right-click the
+broken torrent within your client, select <strong>Set Download
+Location</strong> (or <strong>Advanced &gt; Set Path</strong>), and
+navigate to the folder containing the existing payload.</li>
+<li><strong>Force Recheck:</strong> Once the path is correctly set,
+right-click the torrent and select <strong>Force Recheck</strong>. The
+client will read the local files, verify their piece hashes against the
+<code>.torrent</code> metadata, and instantly resume seeding once
+validation hits 100%.</li>
+</ul></article>
+        <div id=comments-container></div>
+
+        <script>
+            const utterancesScript = document.createElement('script');
+            
+            utterancesScript.setAttribute('src', 'https://utteranc.es/client.js');
+            utterancesScript.setAttribute('repo', 'salivity/bittorrent'); 
+            utterancesScript.setAttribute('issue-term', 'pathname'); 
+            utterancesScript.setAttribute('theme', localStorage.getItem('theme') === 'dark' ? 'github-dark' : 'github-light'); 
+            utterancesScript.setAttribute('crossorigin', 'anonymous');
+            utterancesScript.async = true;
+
+            document.getElementById('comments-container').appendChild(utterancesScript);
+        </script>
+    
+    </main>
+    <footer>
+        <nav>
+            <ul class="footer-links">
+                <li><a href="/bittorrent/privacy-policy">Privacy Policy</a></li>
+                <li><a href="/bittorrent/terms-and-conditions">Terms and Conditions</a></li>
+            </ul>
+        </nav>
+        <div class="copyright">
+            Copyright &copy; <span id="current-year"></span>
+        </div>
+    </footer>
+</body>
+</html>
